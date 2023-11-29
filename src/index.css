@@ -1,0 +1,5 @@
+@media (prefers-color-scheme: light) {
+  :root {
+    background: linear-gradient(-90deg, #00a2df, #4079f1);
+  }
+}

@@ -1,0 +1,9 @@
+.Credentials-page {
+  background: linear-gradient(-90deg, #0176d3, #4079f1);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.Wrapper {
+  flex-grow: 1;
+}

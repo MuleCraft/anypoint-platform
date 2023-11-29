@@ -1,0 +1,16 @@
+.header-comp {
+  height: 50px;
+  max-width: 200px;
+  width: auto;
+  margin-top: 30px;
+}
+
+.form-input {
+  border: 1px solid black;
+}
+
+.anime-comp {
+  position: absolute;
+  top: 150px;
+  right: 230px;
+}
