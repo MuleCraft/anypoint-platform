@@ -14,3 +14,38 @@
   top: 150px;
   right: 230px;
 }
+
+.for-animation {
+  animation: 0.5s ease-out 0s 1 slideInFromTop;
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-5%);
+  }
+  100% {
+    transform: translateY(0); /* Fix translateY value */
+  }
+}
+
+.animation-comp {
+  animation: 1s ease-out 0s 1 slideInFromLeft; /* Corrected animation name */
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-5%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.checkbox-color {
+  border-radius: 2px;
+}
+.for-form__linkhover:hover .arrow-Icon {
+  transform: translateX(-5px);
+}
+.use-custom__links:hover {
+  text-decoration: none;
+}

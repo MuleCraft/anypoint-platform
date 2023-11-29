@@ -1,10 +1,11 @@
 import {
   Flex,
   Box,
-  Text,
   FormControl,
   FormLabel,
   Input,
+  InputGroup,
+  InputRightElement,
   Stack,
   Button,
   Heading,
@@ -12,13 +13,19 @@ import {
   Link,
 } from "@chakra-ui/react";
 import "../assets/Common.css";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import AnimateCompForms from "./AnimateCompForms";
+
 export default function SimpleCard() {
-  const AnimatedBox = motion(Box);
+  const [show, setShow] = useState(false);
+  const [password, setPassword] = useState("");
+  const handleClick = () => setShow(!show);
+
   return (
     <Box
+      className="for-animation"
       position={{ md: "relative" }}
-      left={{ base: "0", sm: "0", lg: "0", xl: "190px" }}
+      left={{ base: "0", sm: "0", lg: "0", xl: "200px" }}
     >
       <Flex align="center" justify="center">
         <Stack direction="row" align="center">
@@ -65,7 +72,21 @@ export default function SimpleCard() {
                     >
                       Password
                     </FormLabel>
-                    <Input type="password" />
+                    <InputGroup size="md">
+                      {" "}
+                      <Input
+                        type={show ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <InputRightElement width="4.5rem">
+                        {password && (
+                          <Button variant="hideShow" onClick={handleClick}>
+                            {show ? "Hide" : "Show"}
+                          </Button>
+                        )}
+                      </InputRightElement>
+                    </InputGroup>
                   </FormControl>
                   <Stack spacing={5}>
                     <Button variant="formButtons">Sign in</Button>
@@ -95,24 +116,7 @@ export default function SimpleCard() {
             </Stack>
           </Flex>
         </Stack>
-        <AnimatedBox
-          maxW="360px"
-          fontFamily="formCompTexts"
-          color="forWhiteText"
-          ml="5"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1.5 }}
-          display={{ base: "none", xl: "block" }}
-        >
-          <Heading fontSize="xl">
-            Automate everything. Empower everyone. Deliver success now.
-          </Heading>
-          <Text fontSize="lg" maxW="300px">
-            Increase productivity, lower costs, and reduce time to market with
-            MuleSoft.
-          </Text>
-        </AnimatedBox>
+        <AnimateCompForms />
       </Flex>
     </Box>
   );
