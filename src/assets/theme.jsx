@@ -14,6 +14,11 @@ const theme = extendTheme({
         footerLink: {
           textDecoration: "underline",
         },
+        useCustomForgotLink: {
+          _hover: {
+            textDecoration: "none",
+          },
+        },
       },
     },
     Button: {
@@ -25,6 +30,13 @@ const theme = extendTheme({
           fontSize: "14px",
           fontFamily:
             "system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Liberation Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji",
+        },
+        hideShow: {
+          color: "#747474",
+          fontSize: "12px",
+          _hover: {
+            color: "#0176d3",
+          },
         },
         formButtons: {
           bg: "#0176d3 ",
@@ -64,6 +76,7 @@ const theme = extendTheme({
     customHeadingColor: "#5C5C5C",
     formLabelColor: "#747474",
     forWhiteText: "#fff",
+    linkTestUseDomain: "#444444",
   },
   fontSizes: {
     lg: "20px",
@@ -71,6 +84,7 @@ const theme = extendTheme({
     xs: "13px",
     sm: "16px",
     base: "14px",
+    "2xl": "12px",
   },
   fontWeights: {
     normal: 400,
