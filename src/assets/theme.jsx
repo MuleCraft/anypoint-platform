@@ -39,10 +39,18 @@ const theme = extendTheme({
           },
         },
         formButtons: {
-          bg: "#0176d3 ",
+          bg: "#0176d3",
           color: "#fff",
           fontSize: "14px",
           fontWeight: "600",
+          _disabled: {
+            bg: "#0176d3",
+            opacity: "0.4",
+            _hover: {
+              bg: "#0176d3",
+              opacity: "0.4",
+            },
+          },
           _hover: {
             bg: "#014486",
           },
@@ -77,6 +85,9 @@ const theme = extendTheme({
     formLabelColor: "#747474",
     forWhiteText: "#fff",
     linkTestUseDomain: "#444444",
+    hovercolorHome: "#e5e5e5",
+    profileTextIcon: "#06a59a",
+    navText: "#2e2e2e",
   },
   fontSizes: {
     lg: "20px",

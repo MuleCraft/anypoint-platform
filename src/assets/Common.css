@@ -1,5 +1,5 @@
 .header-comp {
-  height: 50px;
+  height: 80px;
   max-width: 200px;
   width: auto;
 }
@@ -47,4 +47,9 @@
 }
 .use-custom__links:hover {
   text-decoration: none;
+}
+.mule-icon {
+  height: 30px;
+  width: auto;
+  max-width: 200px;
 }
