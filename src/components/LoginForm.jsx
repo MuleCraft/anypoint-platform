@@ -101,7 +101,6 @@ export default function SimpleCard() {
                         fontSize="xs"
                         fontFamily="formCompTexts"
                         variant="formlink"
-                        href="login/retrieve-username"
                       >
                         Forgot your credentials?
                       </ChakraLink>

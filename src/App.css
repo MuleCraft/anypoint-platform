@@ -7,11 +7,3 @@
 .Wrapper {
   flex-grow: 1;
 }
-
-.back-to-signin-stack:hover{
-  .back-icon{
-    width: 18px;
-    margin-right: 6px;
-    /* transition: transform .15s cubic-bezier(.65,.05,.36,1),-webkit-transform .15s cubic-bezier(.65,.05,.36,1); */
-  }
-}
