@@ -7,3 +7,9 @@
 .Wrapper {
   flex-grow: 1;
 }
+
+.back-to-signin-stack:hover{
+  .back-icon{
+    margin-right: 5px;
+  }
+}
