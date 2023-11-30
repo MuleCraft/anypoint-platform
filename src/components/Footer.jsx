@@ -10,8 +10,8 @@ export default function Footer() {
         fontWeight="medium"
       >
         &copy;2023 MuleSoft Community, an Open Source platform —{" "}
-        <Link variant="footerLink">Privacy policy </Link>—{" "}
-        <Link variant="footerLink">Cookie preferences</Link>
+        <Link variant="footerLink" href="privacy-policy">Privacy policy </Link>—{" "}
+        <Link variant="footerLink" href="cookie-preferences">Cookie preferences</Link>
       </Text>
     </Flex>
   );
