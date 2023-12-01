@@ -2,7 +2,7 @@
 
 ## Overview
 
-Welcome to the Anypoint Community Edition! This open-source project aims to provide MuleSoft developers with an accessible and feature-rich platform, empowering them with enterprise-grade capabilities.
+Welcome to the Anypoint Platfrom Community Edition! This open-source project aims to provide MuleSoft developers with an accessible and feature-rich platform, empowering them with enterprise-grade capabilities.
 
 ## Key Features
 
