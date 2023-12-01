@@ -1,4 +1,4 @@
-# Anypoint Community Edition
+# Anypoint Platfrom Community Edition
 
 ## Overview
 
