@@ -75,6 +75,7 @@ const Nav = () => {
             <Menu>
               <MenuButton
                 as={Button}
+                display={{ base: "none", md: "block" }}
                 rounded={"full"}
                 variant={"link"}
                 cursor={"pointer"}
@@ -128,6 +129,7 @@ const Nav = () => {
             </Menu>
             <Menu>
               <MenuButton
+                display={{ base: "none", md: "block" }}
                 as={Button}
                 rounded={"full"}
                 variant={"link"}
@@ -253,7 +255,7 @@ const Nav = () => {
                 borderRadius="100px"
                 color="#fff"
                 px="10px"
-                py="1px"
+                py={{ base: "12px" }}
                 bg=" profileTextIcon"
                 _hover={{ textDecoration: "none" }}
                 _active={{ color: "#ff" }}

@@ -53,3 +53,6 @@
   width: auto;
   max-width: 200px;
 }
+.Hero-background {
+  background: linear-gradient(260.4deg, #001639 2.45%, #5867e8 101.28%);
+}
