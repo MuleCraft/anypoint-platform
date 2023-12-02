@@ -5,6 +5,7 @@ import SignUpPage from "./pages/SignUpPage";
 import UseCustomDomainPage from "./pages/useCustomDomainPage";
 import Home from "./pages/Home";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import AccessManagementPage from "./pages/AccessManagementPage";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="login" element={<LoginPage />} />
         <Route path="signup" element={<SignUpPage />} />
         <Route path="use-custom-domain" element={<UseCustomDomainPage />} />
+        <Route path="accounts/users" element={<AccessManagementPage />} />
         <Route path="home/organisation" element={<Home />} />
         <Route
           path="login/retrieve-username"
