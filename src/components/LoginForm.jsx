@@ -10,8 +10,9 @@ import {
   Button,
   Heading,
   useColorModeValue,
-  Link,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
+import { Link as ReactRouterLink } from "react-router-dom";
 import "../assets/Common.css";
 import React, { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
@@ -95,21 +96,24 @@ export default function SimpleCard() {
                       align={"center"}
                       direction={{ base: "column", sm: "row" }}
                     >
-                      <Link
+                      <ChakraLink
+                        as={ReactRouterLink}
                         fontSize="xs"
                         fontFamily="formCompTexts"
                         variant="formlink"
-                        href="login/retrieve-username"
+                        to="/login/retrieve-username"
                       >
                         Forgot your credentials?
-                      </Link>
-                      <Link
+                      </ChakraLink>
+                      <ChakraLink
+                        as={ReactRouterLink}
+                        to="/use-custom-domain"
                         fontSize="xs"
                         fontFamily="formCompTexts"
                         variant="formlink"
                       >
                         Use custom domain
-                      </Link>
+                      </ChakraLink>
                     </Stack>
                   </Stack>
                 </Stack>

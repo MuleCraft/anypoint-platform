@@ -9,10 +9,11 @@ import {
   Heading,
   useColorModeValue,
   Text,
-  Link,
+  Link as ChakraLink,
   HStack,
 } from "@chakra-ui/react";
 import "../assets/Common.css";
+import { Link as ReactRouterLink } from "react-router-dom";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 export default function SimpleCard() {
   return (
@@ -56,7 +57,7 @@ export default function SimpleCard() {
                     >
                       Organization domain
                     </FormLabel>
-                    <Input type="text" />
+                    <Input type="text" isReadOnly />
                   </FormControl>
                   <Text
                     color=" linkTestUseDomain"
@@ -66,9 +67,13 @@ export default function SimpleCard() {
                     {" "}
                     https://anypoint.mulesoft.com/login/domain/
                   </Text>
-                  <Button variant="formButtons">Continue</Button>
+                  <Button variant="formButtons" isDisabled>
+                    Coming Soon
+                  </Button>
                   <HStack justify="center">
-                    <Link
+                    <ChakraLink
+                      as={ReactRouterLink}
+                      to="/login"
                       color=" formLabelColor"
                       fontSize="xs"
                       variant="useCustomForgotLink"
@@ -81,7 +86,7 @@ export default function SimpleCard() {
                         <ArrowBackIcon className="arrow-Icon" />
                         Back to sign in
                       </Flex>
-                    </Link>
+                    </ChakraLink>
                   </HStack>
                 </Stack>
               </Box>
