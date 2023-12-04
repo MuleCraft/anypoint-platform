@@ -56,3 +56,16 @@
 .Hero-background {
   background: linear-gradient(260.4deg, #001639 2.45%, #5867e8 101.28%);
 }
+.home-main__index:hover .arrow-movment {
+  color: #0176d3;
+  transform: translateX(5px);
+}
+.home-main__index:hover .home-main__indexText {
+  text-decoration: none;
+}
+.arrow-slide {
+  opacity: 0;
+}
+.Slide_comp:hover .arrow-slide {
+  opacity: 1;
+}

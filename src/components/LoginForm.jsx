@@ -12,15 +12,28 @@ import {
   useColorModeValue,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { Link as ReactRouterLink } from "react-router-dom";
+import { Link as ReactRouterLink, useNavigate } from "react-router-dom"; // Import useNavigate
 import "../assets/Common.css";
+import { useAuth } from "../Utils/AuthProvider";
 import React, { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
 
 export default function SimpleCard() {
   const [show, setShow] = useState(false);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const handleClick = () => setShow(!show);
+
+  const handleSignIn = () => {
+    if (username === "dummyUser" && password === "dummyPassword") {
+      login("dummyToken"); // Set the user token
+      navigate("/home/organisations"); // Navigate to the protected route
+    } else {
+      console.error("Authentication failed");
+    }
+  };
 
   return (
     <Box
@@ -63,7 +76,11 @@ export default function SimpleCard() {
                     >
                       Username
                     </FormLabel>
-                    <Input type="text" />
+                    <Input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -90,7 +107,9 @@ export default function SimpleCard() {
                     </InputGroup>
                   </FormControl>
                   <Stack spacing={5}>
-                    <Button variant="formButtons">Sign in</Button>
+                    <Button variant="formButtons" onClick={handleSignIn}>
+                      Sign in
+                    </Button>
                     <Stack
                       justify={"space-between"}
                       align={"center"}

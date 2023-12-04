@@ -4,6 +4,12 @@ const theme = extendTheme({
   components: {
     Link: {
       variants: {
+        heroSetupLink: {
+          _hover: {
+            color: "#0176d3",
+            textDecoration: "none",
+          },
+        },
         formlink: {
           color: "#747474",
           textDecoration: "underline",
