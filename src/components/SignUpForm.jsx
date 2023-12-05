@@ -17,14 +17,49 @@ import { CheckIcon } from "@chakra-ui/icons";
 import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { createClient } from '@supabase/supabase-js';
+import config from "../../config";
 
 export default function SimpleCard() {
   const onChange = () => {};
   const [isChecked, setIsChecked] = useState(false);
 
+  // const schemaName = config.db_schema;
+
+  const supabase = createClient(
+    'https://lbtsbocemahbdavnlodi.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM'
+    , { db: { schema: 'mc_dev' } });
+
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
   };
+
+  async function addUser(){
+    const { data, error } = await supabase
+    .schema('mc_dev')
+    .from('capUsers')
+    .insert({
+      userFullname:'Shan',
+      userEmail:'shanmathy@mulecraft.in',
+      userPhone:'9090908899',
+      userCompany:'MuleCraft',
+      userName:'shanRP',
+      userPassword:'shanRP123',
+      acceptedTerms:'true',
+      accountType:'self',
+      identityProvider:'CAP',
+      multiFactorAuth:'false'
+    })
+
+    if(error){
+      console.log(error);
+    }
+    else{
+      console.log('New User added!');
+    }
+  }
 
   return (
     <Box
@@ -157,7 +192,7 @@ export default function SimpleCard() {
                     </Text>
                   </Flex>
 
-                  <Button variant="formButtons">Sign up</Button>
+                  <Button variant="formButtons" onClick={addUser}>Sign up</Button>
                 </Stack>
               </Box>
             </Stack>

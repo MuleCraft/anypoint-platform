@@ -17,8 +17,15 @@ import "../assets/Common.css";
 import { useAuth } from "../Utils/AuthProvider";
 import React, { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
+import { createClient } from "@supabase/supabase-js";
 
 export default function SimpleCard() {
+  const supabase = createClient(
+    "https://lbtsbocemahbdavnlodi.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
+    { db: { schema: "mc_dev" } }
+  );
+
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +41,19 @@ export default function SimpleCard() {
       console.error("Authentication failed");
     }
   };
+  async function verifyUserCredentials() {
+    const { data, error } = await supabase
+      .from("capUsers")
+      .select()
+      .eq("userName", "shanRP")
+      .eq("userPassword", "shanRP123");
+
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("User exists!", data);
+    }
+  }
 
   return (
     <Box
@@ -108,6 +128,12 @@ export default function SimpleCard() {
                   </FormControl>
                   <Stack spacing={5}>
                     <Button variant="formButtons" onClick={handleSignIn}>
+                      Sign in
+                    </Button>
+                    <Button
+                      variant="formButtons"
+                      onClick={verifyUserCredentials}
+                    >
                       Sign in
                     </Button>
                     <Stack
