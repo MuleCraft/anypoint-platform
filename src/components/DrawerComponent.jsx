@@ -13,7 +13,9 @@ import {
   ListItem,
   UnorderedList,
   Text,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
+import { Link as ReactRouterLink } from "react-router-dom";
 import muleicon from "/Images/mulecommunity.svg";
 import accessmanagement from "/Images/access-management-color.svg";
 import apiManager from "/Images/api-manager-color.svg";
@@ -201,13 +203,20 @@ const DrawerComponent = ({ isOpen, onClose }) => {
                     p={1}
                     borderRadius="20px"
                   >
-                    <HStack>
-                      <Image
-                        src={accessmanagement}
-                        alt="access management icon"
-                      ></Image>
-                      <Text>Access Management</Text>
-                    </HStack>
+                    <ChakraLink
+                      as={ReactRouterLink}
+                      to="/accounts/users"
+                      variant="useCustomForgotLink"
+                    >
+                      <HStack>
+                        {" "}
+                        <Image
+                          src={accessmanagement}
+                          alt="access management icon"
+                        />
+                        <Text>Access Management</Text>
+                      </HStack>
+                    </ChakraLink>
                   </ListItem>
                   <ListItem
                     _hover={{ bg: "#e5e5e5" }}

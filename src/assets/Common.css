@@ -53,3 +53,47 @@
   width: auto;
   max-width: 200px;
 }
+.Hero-background {
+  background: linear-gradient(260.4deg, #001639 2.45%, #5867e8 101.28%);
+}
+.home-main__index:hover .arrow-movment {
+  color: #0176d3;
+  transform: translateX(5px);
+}
+.home-main__index:hover .home-main__indexText {
+  text-decoration: none;
+}
+.arrow-slide {
+  opacity: 0;
+}
+.Slide_comp:hover .arrow-slide {
+  opacity: 1;
+}
+.credential-error {
+  background-color: #ba0517;
+  color: #fff;
+  text-align: center;
+  font-size: 14px;
+  padding: 10px 20px;
+  font-weight: 600;
+}
+.field-error {
+  border-left: 2px solid #ba0517;
+  border-right: 2px solid #ba0517;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  color: #ba0517;
+  padding: 8px 20px 8px 10px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+}
+.field-errorpass {
+  border-left: 2px solid #ba0517;
+  border-right: 2px solid #ba0517;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  color: #ba0517;
+  padding: 8px 20px 8px 10px;
+
+  font-size: 14px;
+}

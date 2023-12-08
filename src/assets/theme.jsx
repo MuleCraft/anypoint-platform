@@ -4,6 +4,12 @@ const theme = extendTheme({
   components: {
     Link: {
       variants: {
+        heroSetupLink: {
+          _hover: {
+            color: "#0176d3",
+            textDecoration: "none",
+          },
+        },
         formlink: {
           color: "#747474",
           textDecoration: "underline",
@@ -53,6 +59,16 @@ const theme = extendTheme({
           },
           _hover: {
             bg: "#014486",
+          },
+        },
+        homePageButtons: {
+          border: "1px solid ",
+          borderColor: "#c9c9c9",
+          fontSize: "1rem",
+          color: "#2e2e2e",
+          borderRadius: "4px",
+          _hover: {
+            bg: "#f3f3f3",
           },
         },
       },

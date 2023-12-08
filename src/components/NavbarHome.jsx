@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import muleicon from "/Images/mulecommunity.svg";
 import {
   Box,
@@ -13,27 +13,36 @@ import {
   Text,
   IconButton,
   HStack,
+  Avatar,
   VStack,
+  Spacer,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 import "../assets/Common.css";
-
-import { CiLogout } from "react-icons/ci";
+import { CiLogout, CiMenuBurger } from "react-icons/ci";
 import { CgProfile, CgNotes } from "react-icons/cg";
 import { RxLapTimer } from "react-icons/rx";
 import { LiaUserGraduateSolid } from "react-icons/lia";
-import { FaRegCompass } from "react-icons/fa";
-import { PiNotebook, PiChatsFill } from "react-icons/pi";
+import { PiChatsFill, PiBookOpenText } from "react-icons/pi";
 import { BiSupport } from "react-icons/bi";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { BiMenu } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
 import "../assets/Common.css";
+import { ImCompass2 } from "react-icons/im";
 import { GoQuestion } from "react-icons/go";
 import { HiOutlineBuildingOffice } from "react-icons/hi2";
 import DrawerComponent from "./DrawerComponent";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Utils/AuthProvider";
+import { useUser } from "../Utils/UserContext";
+import { Link as ReactRouterLink } from "react-router-dom";
 const Nav = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const { logout } = useAuth();
+  const { userData } = useUser();
 
+  const navigate = useNavigate();
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
@@ -41,18 +50,49 @@ const Nav = () => {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
   };
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setHasScrolled(true);
+      } else {
+        setHasScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <Box px={4} borderBottom="1px solid #747474">
+    <Box
+      px={4}
+      borderBottom="1px solid #747474"
+      bg="forWhiteText"
+      className={hasScrolled ? "fixed-header" : ""}
+      position={hasScrolled ? "fixed" : "relative"}
+      top={hasScrolled ? 0 : "auto"}
+      width="100%"
+      zIndex={hasScrolled ? "10" : "auto"}
+    >
       <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
-        <Box>
-          <Flex align="center" gap="3">
-            <IconButton
-              bg="none"
-              borderRadius="40px"
-              icon={<BiMenu size="25px" />}
-              _hover={{ bg: "#e5e5e5", borderRadius: "40px" }}
-              onClick={handleDrawerOpen}
-            />
+        <Flex align="center" gap="3">
+          <IconButton
+            bg="none"
+            borderRadius="40px"
+            icon={<CiMenuBurger />}
+            _hover={{ bg: "#e5e5e5", borderRadius: "40px" }}
+            onClick={handleDrawerOpen}
+          />
+          <ChakraLink
+            as={ReactRouterLink}
+            to="/home/organisations"
+            variant="useCustomForgotLink"
+          >
             <Flex
               align="center"
               gap="2"
@@ -68,13 +108,14 @@ const Nav = () => {
                 Community Platform
               </Text>
             </Flex>
-          </Flex>
-        </Box>
+          </ChakraLink>
+        </Flex>
         <Flex alignItems={"center"}>
           <Stack direction={"row"} spacing={7}>
             <Menu>
               <MenuButton
                 as={Button}
+                display={{ base: "none", md: "block" }}
                 rounded={"full"}
                 variant={"link"}
                 cursor={"pointer"}
@@ -128,6 +169,7 @@ const Nav = () => {
             </Menu>
             <Menu>
               <MenuButton
+                display={{ base: "none", md: "block" }}
                 as={Button}
                 rounded={"full"}
                 variant={"link"}
@@ -142,9 +184,9 @@ const Nav = () => {
               >
                 <GoQuestion size="25" />
               </MenuButton>
-              <MenuList alignItems={"center"} minW="320px" p={5} mt="1">
+              <MenuList alignItems={"center"} minW="320px" p={6} mt="1">
                 <Text fontSize="xs" fontWeight="medium" py={1} mb="10px">
-                  ANYPOINT PLATFORM HELP
+                  ACCESS MANAGEMENT HELP
                 </Text>
                 <VStack fontSize="xs" maxW="250px">
                   <MenuItem
@@ -154,7 +196,7 @@ const Nav = () => {
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
-                      <PiNotebook size="18" />
+                      <PiBookOpenText size="25" />
                       <Text>Publishing API Specifications</Text>
                     </HStack>
                   </MenuItem>
@@ -165,7 +207,7 @@ const Nav = () => {
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
-                      <PiNotebook size="22" />
+                      <PiBookOpenText size="33" />
                       <Text>
                         Create an API Specification with the Text Editor
                       </Text>
@@ -179,12 +221,13 @@ const Nav = () => {
                     mb={10}
                   >
                     <HStack>
-                      <PiNotebook size="25" />
+                      <PiBookOpenText size="38" />
                       <Text>
                         API Specification for MuleSoft Connectivity Ecosystem
                       </Text>
                     </HStack>
                   </MenuItem>
+                  <Spacer height={"25px"} />
                   <MenuItem
                     border="1px soild #fff"
                     padding="2px"
@@ -192,7 +235,7 @@ const Nav = () => {
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
-                      <PiNotebook size="17" />
+                      <PiBookOpenText size="25" />
                       <Text>Documentation</Text>
                     </HStack>
                   </MenuItem>
@@ -203,7 +246,7 @@ const Nav = () => {
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
-                      <PiChatsFill size={17} />
+                      <PiChatsFill size={25} />
                       <Text> Forums</Text>
                     </HStack>
                   </MenuItem>
@@ -214,7 +257,7 @@ const Nav = () => {
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
-                      <BiSupport size={17} />
+                      <BiSupport size={25} />
                       <Text> Help Center</Text>
                     </HStack>
                   </MenuItem>
@@ -225,7 +268,7 @@ const Nav = () => {
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
-                      <LiaUserGraduateSolid size={17} />
+                      <LiaUserGraduateSolid size={25} />
                       <Text> Training</Text>
                     </HStack>
                   </MenuItem>
@@ -236,7 +279,7 @@ const Nav = () => {
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
-                      <FaRegCompass size={17} />
+                      <ImCompass2 size={25} />
                       <Text>Tutorials</Text>
                     </HStack>
                   </MenuItem>
@@ -250,15 +293,19 @@ const Nav = () => {
                 variant={"link"}
                 cursor={"pointer"}
                 minW={0}
-                borderRadius="100px"
-                color="#fff"
-                px="10px"
-                py="1px"
-                bg=" profileTextIcon"
-                _hover={{ textDecoration: "none" }}
+                borderRadius="full"
+                px="5px"
+                py="5px"
+                _hover={{ textDecoration: "none", bgColor: "#eaeaea" }}
                 _active={{ color: "#ff" }}
               >
-                KM
+                <Avatar
+                  size={"sm"}
+                  bg="teal.500"
+                  name="Kesavarajan Murugesan"
+                  src=""
+                  color={"white"}
+                />
               </MenuButton>
               <MenuList
                 alignItems={"center"}
@@ -267,12 +314,13 @@ const Nav = () => {
                 pb={2}
                 minW="250px"
                 minH="220px"
+                mt={1}
               >
                 <Text fontSize="sm" fontWeight="medium">
-                  FullName
+                  fullname
                 </Text>
-                <Text fontSize="xs">Username</Text>
-                <VStack>
+                <Text fontSize="xs">username</Text>
+                <VStack spacing={3} pt={2}>
                   <MenuItem
                     fontSize="xs"
                     _hover={{ bg: "#e5e5e5" }}
@@ -310,7 +358,10 @@ const Nav = () => {
                   >
                     <HStack>
                       <CiLogout />
-                      <Text> Sign Out</Text>
+                      <Text onClick={handleLogout} role="button">
+                        {" "}
+                        Sign Out
+                      </Text>
                     </HStack>
                   </MenuItem>
                 </VStack>
