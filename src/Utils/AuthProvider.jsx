@@ -1,21 +1,28 @@
+// AuthProvider.js
 import React, { createContext, useContext, useState } from "react";
+import { UserProvider } from "./UserContext"; // Import UserProvider
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
-  const login = (userToken) => {
+  const [userData, setUserData] = useState(null);
+
+  const login = (userToken, user) => {
     setToken(userToken);
+    setUserData(user);
   };
 
   const logout = () => {
     setToken(null);
+    setUserData(null);
   };
+
   const isAuthenticated = !!token;
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      {children}
+      <UserProvider>{children}</UserProvider>
     </AuthContext.Provider>
   );
 };

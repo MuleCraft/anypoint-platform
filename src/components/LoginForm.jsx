@@ -18,40 +18,76 @@ import { useAuth } from "../Utils/AuthProvider";
 import React, { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
 import { createClient } from "@supabase/supabase-js";
-
 export default function SimpleCard() {
   const supabase = createClient(
     "https://lbtsbocemahbdavnlodi.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
     { db: { schema: "mc_dev" } }
   );
-
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
   const handleClick = () => setShow(!show);
-
-  const handleSignIn = () => {
-    if (username === "dummyUser" && password === "dummyPassword") {
-      login("dummyToken"); // Set the user token
-      navigate("/home/organisations"); // Navigate to the protected route
+  const handleUsernameBlur = () => {
+    if (username.trim() === "") {
+      setUsernameError("Required");
     } else {
-      console.error("Authentication failed");
+      setUsernameError("");
+    }
+  };
+
+  const handlePasswordBlur = () => {
+    if (password.trim() === "") {
+      setPasswordError("Required");
+    } else {
+      setPasswordError("");
     }
   };
   async function verifyUserCredentials() {
-    const { data, error } = await supabase
-      .from("capUsers")
-      .select()
-      .eq("userName", "shanRP")
-      .eq("userPassword", "shanRP123");
-
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("User exists!", data);
+    try {
+      setUsernameError("");
+      setPasswordError("");
+      setError("");
+      if (username.trim() === "" && password.trim() === "") {
+        throw new Error("Username and password are required");
+      }
+      if (username.trim() === "") {
+        throw new Error("Username is required");
+      }
+      if (password.trim() === "") {
+        throw new Error("Password is required");
+      }
+      const { data, error } = await supabase
+        .from("capUsers")
+        .select()
+        .eq("userName", username)
+        .eq("userPassword", password);
+      if (error) {
+        throw new Error("Error connecting to the server");
+      }
+      if (data.length === 0) {
+        throw new Error("Your credentials are not valid.");
+      }
+      login("userAuthenticate");
+      navigate("/home/organisations");
+    } catch (error) {
+      if (error.message === "Username and password are required") {
+        setUsernameError("Required");
+        setPasswordError("Required");
+      } else if (error.message === "Username is required") {
+        setUsernameError("Required");
+      } else if (error.message === "Password is required") {
+        setPasswordError("Required");
+      } else if (error.message === "Error connecting to the server") {
+        setError("Error connecting to the server");
+      } else if (error.message === "Your credentials are not valid.") {
+        setError("Your credentials are not valid.");
+      }
     }
   }
 
@@ -85,9 +121,10 @@ export default function SimpleCard() {
                       size="myHeaderSizeForm"
                       fontWeight="medium"
                     >
-                      Sign in{" "}
+                      Sign in
                     </Heading>
                   </Stack>
+                  {error && <p className="credential-error">{error}</p>}
                   <FormControl>
                     <FormLabel
                       color="formLabelColor"
@@ -100,7 +137,14 @@ export default function SimpleCard() {
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
+                      onBlur={handleUsernameBlur}
+                      style={{
+                        borderColor: usernameError ? "red" : "",
+                      }}
                     />
+                    {usernameError && (
+                      <p className="field-error">{usernameError}</p>
+                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -111,10 +155,13 @@ export default function SimpleCard() {
                       Password
                     </FormLabel>
                     <InputGroup size="md">
-                      {" "}
                       <Input
                         type={show ? "text" : "password"}
                         value={password}
+                        onBlur={handlePasswordBlur}
+                        style={{
+                          borderColor: passwordError ? "red" : "",
+                        }}
                         onChange={(e) => setPassword(e.target.value)}
                       />
                       <InputRightElement width="4.5rem">
@@ -125,11 +172,11 @@ export default function SimpleCard() {
                         )}
                       </InputRightElement>
                     </InputGroup>
+                    {passwordError && (
+                      <p className="field-error">{passwordError}</p>
+                    )}
                   </FormControl>
                   <Stack spacing={5}>
-                    <Button variant="formButtons" onClick={handleSignIn}>
-                      Sign in
-                    </Button>
                     <Button
                       variant="formButtons"
                       onClick={verifyUserCredentials}

@@ -34,11 +34,14 @@ import { HiOutlineBuildingOffice } from "react-icons/hi2";
 import DrawerComponent from "./DrawerComponent";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Utils/AuthProvider";
+import { useUser } from "../Utils/UserContext";
 import { Link as ReactRouterLink } from "react-router-dom";
 const Nav = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const { logout } = useAuth();
+  const { userData } = useUser();
+
   const navigate = useNavigate();
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
@@ -69,7 +72,7 @@ const Nav = () => {
     <Box
       px={4}
       borderBottom="1px solid #747474"
-      bg="    forWhiteText"
+      bg="forWhiteText"
       className={hasScrolled ? "fixed-header" : ""}
       position={hasScrolled ? "fixed" : "relative"}
       top={hasScrolled ? 0 : "auto"}
@@ -314,9 +317,9 @@ const Nav = () => {
                 mt={1}
               >
                 <Text fontSize="sm" fontWeight="medium">
-                  FullName
+                  fullname
                 </Text>
-                <Text fontSize="xs">Username</Text>
+                <Text fontSize="xs">username</Text>
                 <VStack spacing={3} pt={2}>
                   <MenuItem
                     fontSize="xs"

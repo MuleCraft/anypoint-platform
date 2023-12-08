@@ -17,50 +17,231 @@ import { CheckIcon } from "@chakra-ui/icons";
 import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 import config from "../../config";
 
 export default function SimpleCard() {
-  const onChange = () => {};
-  const [isChecked, setIsChecked] = useState(false);
-
-  // const schemaName = config.db_schema;
-
   const supabase = createClient(
-    'https://lbtsbocemahbdavnlodi.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM'
-    , { db: { schema: 'mc_dev' } });
+    "https://lbtsbocemahbdavnlodi.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
+    { db: { schema: "mc_dev" } }
+  );
 
+  const [isChecked, setIsChecked] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [company, setCompany] = useState("");
+  const [username, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [recaptchaChecked, setRecaptchaChecked] = useState(false);
+  const [fullNameError, setFullNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [phoneNumberError, setPhoneNumberError] = useState("");
+  const [companyError, setCompanyError] = useState("");
+  const [userNameError, setUserNameError] = useState("");
+  const [passwordError, setPasswordError] = useState([]);
+  const [recaptchaError, setRecaptchaError] = useState("");
+  const [checkboxError, setCheckboxError] = useState("");
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
+    setCheckboxError(isChecked ? "Required" : "");
+  };
+  const handleRecaptchaChange = (value) => {
+    setRecaptchaChecked(Boolean(value));
+    setRecaptchaError(value ? "" : "Required");
   };
 
-  async function addUser(){
+  const handleFullNameChange = (event) => {
+    const value = event.target.value;
+    setFullName(value);
+
+    if (!value.trim() || value.trim().split(" ").length < 2) {
+      setFullNameError("Enter your first name and last name");
+    } else {
+      setFullNameError("");
+    }
+  };
+  const handleEmailChange = (event) => {
+    const value = event.target.value;
+    setEmail(value);
+
+    if (!value.trim()) {
+      setEmailError("");
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handlePhoneNumberChange = (event) => {
+    const value = event.target.value;
+    setPhoneNumber(value);
+
+    if (!value.trim()) {
+      setPhoneNumberError("");
+    } else if (!/^(\+91[-\s])?[0]?(91)?[6789]\d{9}$/.test(value)) {
+      setPhoneNumberError("Please enter a valid phone number");
+    } else {
+      setPhoneNumberError("");
+    }
+  };
+
+  const handleCompanyChange = (event) => {
+    const value = event.target.value;
+    setCompany(value);
+
+    if (value.trim().length < 2) {
+      setCompanyError("Use at least 2 characters");
+    } else {
+      setCompanyError("");
+    }
+  };
+
+  const handleUserNameChange = (event) => {
+    const value = event.target.value;
+    setUserName(value);
+
+    if (value.trim().length < 2) {
+      setUserNameError("Use at least 3 characters long");
+    } else {
+      setUserNameError("");
+    }
+  };
+
+  const handlePasswordChange = (event) => {
+    const value = event.target.value;
+    setPassword(value);
+
+    let errors = [];
+
+    if (value.length < 8) {
+      errors.push("Use at least 8 characters");
+    }
+
+    if (!/\d/.test(value)) {
+      errors.push("Use at least 1 number");
+    }
+
+    if (!/[a-z]/.test(value)) {
+      errors.push("Use at least 1 lowercase character");
+    }
+
+    if (!/[A-Z]/.test(value)) {
+      errors.push("Use at least 1 uppercase character");
+    }
+
+    setPasswordError([...errors]);
+  };
+
+  const validateForm = () => {
+    let isFormValid = true;
+    if (!fullName.trim() || fullName.trim().split(" ").length < 2) {
+      setFullNameError("Enter your first name and last name");
+      isFormValid = false;
+    } else {
+      setFullNameError("");
+    }
+    if (!email.trim()) {
+      setEmailError("Please enter your email address");
+      isFormValid = false;
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
+      setEmailError("Please enter a valid email address");
+      isFormValid = false;
+    } else {
+      setEmailError("");
+    }
+    if (!phoneNumber.trim()) {
+      setPhoneNumberError("Please enter your phone number");
+      isFormValid = false;
+    } else if (!/^(\+91[-\s])?[0]?(91)?[6789]\d{9}$/.test(phoneNumber)) {
+      setPhoneNumberError("Please enter a valid phone number");
+      isFormValid = false;
+    } else {
+      setPhoneNumberError("");
+    }
+
+    if (company.trim().length < 2) {
+      setCompanyError("Use at least 2 characters");
+      isFormValid = false;
+    } else {
+      setCompanyError("");
+    }
+
+    if (username.trim().length < 3) {
+      setUserNameError("Use at least 3 characters long");
+      isFormValid = false;
+    } else {
+      setUserNameError("");
+    }
+
+    let passwordErrors = [];
+    if (password.length < 8) {
+      passwordErrors.push("Use at least 8 characters");
+    }
+    if (!/\d/.test(password)) {
+      passwordErrors.push("Use at least 1 number");
+    }
+    if (!/[a-z]/.test(password)) {
+      passwordErrors.push("Use at least 1 lowercase character");
+    }
+    if (!/[A-Z]/.test(password)) {
+      passwordErrors.push("Use at least 1 uppercase character");
+    }
+    setPasswordError(passwordErrors);
+    if (!recaptchaChecked) {
+      setRecaptchaError("Required");
+      isFormValid = false;
+    } else {
+      setRecaptchaError("");
+    }
+
+    if (!isChecked) {
+      setCheckboxError("Required");
+      isFormValid = false;
+    } else {
+      setCheckboxError("");
+    }
+
+    return isFormValid;
+  };
+
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      console.log("Form submitted");
+      console.log("Full Name:", fullName);
+      console.log("Email:", email);
+      console.log("Phone Number:", phoneNumber);
+      console.log("Company:", company);
+      console.log("Username:", username);
+      console.log("Password:", password);
+      await addUser();
+    }
+  };
+
+  const addUser = async () => {
     const { data, error } = await supabase
-    .schema('mc_dev')
-    .from('capUsers')
-    .insert({
-      userFullname:'Shan',
-      userEmail:'shanmathy@mulecraft.in',
-      userPhone:'9090908899',
-      userCompany:'MuleCraft',
-      userName:'shanRP',
-      userPassword:'shanRP123',
-      acceptedTerms:'true',
-      accountType:'self',
-      identityProvider:'CAP',
-      multiFactorAuth:'false'
-    })
-
-    if(error){
-      console.log(error);
+      .schema("mc_dev")
+      .from("capUsers")
+      .insert({
+        userFullname: fullName,
+        userEmail: email,
+        userPhone: phoneNumber,
+        userCompany: company,
+        userName: username,
+        userPassword: password,
+        acceptedTerms: "true",
+        accountType: "self",
+        identityProvider: "CAP",
+        multiFactorAuth: "false",
+      });
+    if (error) {
+      console.error("Error adding user:", error);
+    } else {
+      console.log("New User added!");
     }
-    else{
-      console.log('New User added!');
-    }
-  }
-
+  };
   return (
     <Box
       className="for-animation"
@@ -106,7 +287,15 @@ export default function SimpleCard() {
                     >
                       Full name
                     </FormLabel>
-                    <Input type="text" />
+                    <Input
+                      type="text"
+                      value={fullName}
+                      onChange={handleFullNameChange}
+                      isInvalid={fullNameError !== ""}
+                    />
+                    {fullNameError && (
+                      <Text className="field-error">{fullNameError}</Text>
+                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -116,7 +305,15 @@ export default function SimpleCard() {
                     >
                       Email
                     </FormLabel>
-                    <Input type="email" />
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={handleEmailChange}
+                      isInvalid={emailError !== ""}
+                    />
+                    {emailError && (
+                      <Text className="field-error">{emailError}</Text>
+                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -126,7 +323,15 @@ export default function SimpleCard() {
                     >
                       Phone number
                     </FormLabel>
-                    <Input type="text" />
+                    <Input
+                      type="text"
+                      value={phoneNumber}
+                      onChange={handlePhoneNumberChange}
+                      isInvalid={phoneNumberError !== ""}
+                    />
+                    {phoneNumberError && (
+                      <Text className="field-error">{phoneNumberError}</Text>
+                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -136,7 +341,15 @@ export default function SimpleCard() {
                     >
                       Company
                     </FormLabel>
-                    <Input type="text" />
+                    <Input
+                      type="text"
+                      value={company}
+                      onChange={handleCompanyChange}
+                      isInvalid={companyError !== ""}
+                    />
+                    {companyError && (
+                      <Text className="field-error">{companyError}</Text>
+                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -146,7 +359,15 @@ export default function SimpleCard() {
                     >
                       Username
                     </FormLabel>
-                    <Input type="text" />
+                    <Input
+                      type="text"
+                      value={username}
+                      onChange={handleUserNameChange}
+                      isInvalid={userNameError !== ""}
+                    />
+                    {userNameError && (
+                      <Text className="field-error">{userNameError}</Text>
+                    )}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -156,16 +377,29 @@ export default function SimpleCard() {
                     >
                       Password
                     </FormLabel>
-                    <Input type="password" />
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      isInvalid={passwordError.length > 0}
+                    />
+                    {passwordError.map((error, index) => (
+                      <Text key={index} className="field-errorpass">
+                        {error}
+                      </Text>
+                    ))}
                   </FormControl>
                   <Flex justify="center">
                     <Box>
                       <ReCAPTCHA
                         sitekey="6LcibiApAAAAAD8UB2SlA4hmbY7z4zNMaGCYRYEH"
-                        onChange={onChange}
+                        onChange={handleRecaptchaChange}
                       />
                     </Box>
                   </Flex>
+                  {recaptchaError && (
+                    <Text className="field-error">{recaptchaError}</Text>
+                  )}
                   <Flex gap="2" align="center">
                     <Checkbox
                       isChecked={isChecked}
@@ -191,8 +425,12 @@ export default function SimpleCard() {
                       <Link variant="footerLink">privacy policy</Link>.
                     </Text>
                   </Flex>
-
-                  <Button variant="formButtons" onClick={addUser}>Sign up</Button>
+                  {checkboxError && (
+                    <Text className="field-error">{checkboxError}</Text>
+                  )}
+                  <Button variant="formButtons" onClick={handleSubmit}>
+                    Sign up
+                  </Button>
                 </Stack>
               </Box>
             </Stack>
