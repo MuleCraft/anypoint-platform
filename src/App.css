@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
 }
-.sidebar_tab::before {
+/* .sidebar_tab::before {
   background: #0176d3;
   content: "";
   display: block;
@@ -33,4 +33,9 @@
   transition: opacity 0.15s cubic-bezier(0.46, 0.03, 0.52, 0.96),
     transform 0.15s cubic-bezier(0.46, 0.03, 0.52, 0.96);
   width: 3px;
+} */
+.users-table{
+  overflow-x: auto;
+  white-space: nowrap;
 }
+
