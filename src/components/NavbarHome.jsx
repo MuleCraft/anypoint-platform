@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import muleicon from "/Images/mulecommunity.svg";
 import {
   Box,
@@ -34,13 +34,12 @@ import { HiOutlineBuildingOffice } from "react-icons/hi2";
 import DrawerComponent from "./DrawerComponent";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Utils/AuthProvider";
-import { useUser } from "../Utils/UserContext";
+
 import { Link as ReactRouterLink } from "react-router-dom";
 const Nav = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
-  const { logout } = useAuth();
-  const { userData } = useUser();
+  const { logout, userData } = useAuth();
 
   const navigate = useNavigate();
   const handleDrawerOpen = () => {
@@ -67,6 +66,9 @@ const Nav = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  useEffect(() => {
+    console.log("Nav Component - userData:", userData);
+  }, [userData]);
 
   return (
     <Box
@@ -162,7 +164,7 @@ const Nav = () => {
                     color="navText"
                   >
                     <Text>-root-</Text>
-                    <Text>Mulecraft</Text>
+                    <Text>{userData ? userData.company_name : ""}</Text>
                   </VStack>
                 </MenuItem>
               </MenuList>
@@ -302,7 +304,7 @@ const Nav = () => {
                 <Avatar
                   size={"sm"}
                   bg="teal.500"
-                  name="Kesavarajan Murugesan"
+                  name={userData ? userData.full_name : ""}
                   src=""
                   color={"white"}
                 />
@@ -317,9 +319,10 @@ const Nav = () => {
                 mt={1}
               >
                 <Text fontSize="sm" fontWeight="medium">
-                  fullname
+                  {userData ? userData.full_name : ""}
                 </Text>
-                <Text fontSize="xs">username</Text>
+                <Text fontSize="xs">{userData ? userData.username : ""}</Text>
+
                 <VStack spacing={3} pt={2}>
                   <MenuItem
                     fontSize="xs"
