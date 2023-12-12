@@ -15,7 +15,7 @@ import {
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom"; // Import useNavigate
 import "../assets/Common.css";
 import { useAuth } from "../Utils/AuthProvider";
-import React, { useState } from "react";
+import { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
 import { createClient } from "@supabase/supabase-js";
 export default function SimpleCard() {
@@ -73,7 +73,10 @@ export default function SimpleCard() {
       if (data.length === 0) {
         throw new Error("Your credentials are not valid.");
       }
-      login("userAuthenticate");
+      const userToken = {
+        userId: data[0].id,
+      };
+      login(userToken);
       navigate("/home/organisations");
     } catch (error) {
       if (error.message === "Username and password are required") {

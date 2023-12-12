@@ -18,7 +18,7 @@ import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import { createClient } from "@supabase/supabase-js";
-import config from "../../config";
+// import config from "../../config";
 
 export default function SimpleCard() {
   const supabase = createClient(
@@ -91,7 +91,6 @@ export default function SimpleCard() {
   const handleCompanyChange = (event) => {
     const value = event.target.value;
     setCompany(value);
-
     if (value.trim().length < 2) {
       setCompanyError("Use at least 2 characters");
     } else {
@@ -221,21 +220,18 @@ export default function SimpleCard() {
   };
 
   const addUser = async () => {
-    const { data, error } = await supabase
-      .schema("mc_dev")
-      .from("capUsers")
-      .insert({
-        userFullname: fullName,
-        userEmail: email,
-        userPhone: phoneNumber,
-        userCompany: company,
-        userName: username,
-        userPassword: password,
-        acceptedTerms: "true",
-        accountType: "self",
-        identityProvider: "CAP",
-        multiFactorAuth: "false",
-      });
+    const { error } = await supabase.schema("mc_dev").from("capUsers").insert({
+      userFullname: fullName,
+      userEmail: email,
+      userPhone: phoneNumber,
+      userCompany: company,
+      userName: username,
+      userPassword: password,
+      acceptedTerms: "true",
+      accountType: "self",
+      identityProvider: "CAP",
+      multiFactorAuth: "false",
+    });
     if (error) {
       console.error("Error adding user:", error);
     } else {
@@ -292,6 +288,7 @@ export default function SimpleCard() {
                       value={fullName}
                       onChange={handleFullNameChange}
                       isInvalid={fullNameError !== ""}
+                      style={{ borderColor: fullNameError ? "#ba0517" : "" }}
                     />
                     {fullNameError && (
                       <Text className="field-error">{fullNameError}</Text>
@@ -310,6 +307,7 @@ export default function SimpleCard() {
                       value={email}
                       onChange={handleEmailChange}
                       isInvalid={emailError !== ""}
+                      style={{ borderColor: emailError ? "#ba0517" : "" }}
                     />
                     {emailError && (
                       <Text className="field-error">{emailError}</Text>
@@ -328,6 +326,7 @@ export default function SimpleCard() {
                       value={phoneNumber}
                       onChange={handlePhoneNumberChange}
                       isInvalid={phoneNumberError !== ""}
+                      style={{ borderColor: phoneNumberError ? "#ba0517" : "" }}
                     />
                     {phoneNumberError && (
                       <Text className="field-error">{phoneNumberError}</Text>
@@ -346,6 +345,7 @@ export default function SimpleCard() {
                       value={company}
                       onChange={handleCompanyChange}
                       isInvalid={companyError !== ""}
+                      style={{ borderColor: companyError ? "#ba0517" : "" }}
                     />
                     {companyError && (
                       <Text className="field-error">{companyError}</Text>
@@ -364,6 +364,7 @@ export default function SimpleCard() {
                       value={username}
                       onChange={handleUserNameChange}
                       isInvalid={userNameError !== ""}
+                      style={{ borderColor: userNameError ? "#ba0517" : "" }}
                     />
                     {userNameError && (
                       <Text className="field-error">{userNameError}</Text>
@@ -382,6 +383,7 @@ export default function SimpleCard() {
                       value={password}
                       onChange={handlePasswordChange}
                       isInvalid={passwordError.length > 0}
+                      style={{ borderColor: passwordError ? "#ba0517" : "" }}
                     />
                     {passwordError.map((error, index) => (
                       <Text key={index} className="field-errorpass">

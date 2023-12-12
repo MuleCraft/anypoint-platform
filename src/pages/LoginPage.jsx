@@ -4,7 +4,6 @@ import SignUpFeature from "../components/SignUpFeature";
 import "../App.css";
 import Footer from "../components/Footer";
 import { Flex } from "@chakra-ui/react";
-
 export default function LoginPage() {
   return (
     <div className="Credentials-page">
