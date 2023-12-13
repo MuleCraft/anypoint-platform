@@ -11,8 +11,8 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("authToken") || null);
   const [userData, setUserData] = useState(null);
-
-  const login = async (userToken) => {
+  const [loading, setLoading] = useState(true);
+  const login = async (userToken, loggedInUsername) => {
     setToken(userToken);
     localStorage.setItem("authToken", JSON.stringify(userToken));
 
@@ -20,10 +20,11 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase
         .schema("mc_dev")
         .from("capUsers")
-        .select("id, userFullname, userName, userCompany");
-      // .eq("userName", loggedInUsername);
+        .select("id, userFullname, userName, userCompany")
+        .eq("userName", loggedInUsername);
+
       if (data) {
-        setUserData(data);
+        setUserData(data.length === 1 ? data[0] : data);
       } else {
         console.error("Error fetching user data:", error);
       }
@@ -40,13 +41,37 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!token;
   useEffect(() => {
-    if (!token) {
+    const checkAuth = async () => {
+      setLoading(true);
+
       const storedToken = localStorage.getItem("authToken");
       if (storedToken) {
-        login(JSON.parse(storedToken));
+        const parsedToken = JSON.parse(storedToken);
+
+        if (parsedToken && parsedToken.userId) {
+          try {
+            const { data, error } = await supabase
+              .schema("mc_dev")
+              .from("capUsers")
+              .select("id, userFullname, userName, userCompany")
+              .eq("id", parsedToken.userId);
+
+            if (data) {
+              setUserData(data[0]);
+            } else {
+              console.error("Error fetching user data:", error);
+            }
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+          }
+        }
       }
-    }
-  }, [token]);
+
+      setLoading(false);
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout, userData }}>
@@ -56,7 +81,7 @@ export const AuthProvider = ({ children }) => {
 };
 
 AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired, // Ensure that children is a required node
+  children: PropTypes.node.isRequired,
 };
 
 export const useAuth = () => {

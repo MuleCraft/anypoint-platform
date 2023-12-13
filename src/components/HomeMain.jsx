@@ -25,7 +25,6 @@ import runtime from "/Images/runtime-manager-color.svg";
 import monitoring from "/Images/monitoring-color.svg";
 import servicemesh from "/Images/playground-color.svg";
 import apigov from "/Images/edge-security-color.svg";
-import datagraph from "/Images/service-mesh-color.svg";
 import { LiaUserGraduateSolid } from "react-icons/lia";
 import { PiChatsFill, PiBookOpenText } from "react-icons/pi";
 import { BiSupport } from "react-icons/bi";

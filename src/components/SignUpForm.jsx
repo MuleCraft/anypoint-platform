@@ -43,6 +43,8 @@ export default function SimpleCard() {
   const [passwordError, setPasswordError] = useState([]);
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
+  const [userExistsError, setUserExistsError] = useState("");
+
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
     setCheckboxError(isChecked ? "Required" : "");
@@ -224,51 +226,46 @@ export default function SimpleCard() {
       .schema("mc_dev")
       .from("capUsers")
       .select()
-      .eq("userEmail",email);
+      .eq("userEmail", email);
 
-      if(data.length>0){
-        console.log('Email already exists!');
-      }
-      else if(data.length === 0){
+    if (data.length > 0) {
+      console.log("Email already exists!");
+    } else if (data.length === 0) {
+      const { data, error } = await supabase
+        .schema("mc_dev")
+        .from("capUsers")
+        .select()
+        .eq("userName", username);
+      if (data.length > 0) {
+        console.log("User already exists!");
+        setUserExistsError("User already exists!");
+      } else if (error) {
+        console.log("Error confirming user existence.", error);
+      } else {
         const { data, error } = await supabase
           .schema("mc_dev")
           .from("capUsers")
-          .select()
-          .eq("userName",username);
-
-          if(data.length>0){
-            console.log('Username already exists!');
-          }
-          else if(error){
-            console.log('Error confirming user existence.',error);
-          }
-          else{
-            const { data, error } = await supabase
-              .schema("mc_dev")
-              .from("capUsers")
-              .insert({
-                userFullname: fullName,
-                userEmail: email,
-                userPhone: phoneNumber,
-                userCompany: company,
-                userName: username,
-                userPassword: password,
-                acceptedTerms: "true",
-                accountType: "self",
-                identityProvider: "CAP",
-                multiFactorAuth: "false",
-              });
-            if (error) {
-              console.error("Error adding user:", error);
-            } else {
-              console.log("New User added!");
-            }
-          }
+          .insert({
+            userFullname: fullName,
+            userEmail: email,
+            userPhone: phoneNumber,
+            userCompany: company,
+            userName: username,
+            userPassword: password,
+            acceptedTerms: "true",
+            accountType: "self",
+            identityProvider: "CAP",
+            multiFactorAuth: "false",
+          });
+        if (error) {
+          console.error("Error adding user:", error);
+        } else {
+          console.log("New User added!");
+        }
       }
-      else{
-        console.log('Error confirming user existence.',error);
-      }
-      
+    } else {
+      console.log("Error confirming user existence.", error);
+    }
   };
   return (
     <Box
@@ -307,6 +304,9 @@ export default function SimpleCard() {
                       Sign up
                     </Heading>
                   </Stack>
+                  {userExistsError && (
+                    <Text className="credential-error">{userExistsError}</Text>
+                  )}
                   <FormControl>
                     <FormLabel
                       color="formLabelColor"
@@ -415,7 +415,9 @@ export default function SimpleCard() {
                       value={password}
                       onChange={handlePasswordChange}
                       isInvalid={passwordError.length > 0}
-                      style={{ borderColor: passwordError ? "#ba0517" : "" }}
+                      style={{
+                        borderColor: passwordError.length > 0 ? "#ba0517" : "",
+                      }}
                     />
                     {passwordError.map((error, index) => (
                       <Text key={index} className="field-errorpass">
@@ -426,7 +428,7 @@ export default function SimpleCard() {
                   <Flex justify="center">
                     <Box>
                       <ReCAPTCHA
-                        sitekey="6LcibiApAAAAAD8UB2SlA4hmbY7z4zNMaGCYRYEH"
+                        sitekey="6LfKDCwmAAAAAGbIrRaYEdmb1B4wJahLeN5GnCbQ"
                         onChange={handleRecaptchaChange}
                       />
                     </Box>

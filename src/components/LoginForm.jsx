@@ -53,6 +53,7 @@ export default function SimpleCard() {
       setUsernameError("");
       setPasswordError("");
       setError("");
+
       if (username.trim() === "" && password.trim() === "") {
         throw new Error("Username and password are required");
       }
@@ -62,21 +63,26 @@ export default function SimpleCard() {
       if (password.trim() === "") {
         throw new Error("Password is required");
       }
+
       const { data, error } = await supabase
         .from("capUsers")
         .select()
         .eq("userName", username)
         .eq("userPassword", password);
+
       if (error) {
         throw new Error("Error connecting to the server");
       }
+
       if (data.length === 0) {
         throw new Error("Your credentials are not valid.");
       }
       const userToken = {
-        userId: data[0].id,
+        userId: data[0] && data[0].id,
       };
-      login(userToken);
+
+      login(userToken, username);
+
       navigate("/home/organisations");
     } catch (error) {
       if (error.message === "Username and password are required") {
