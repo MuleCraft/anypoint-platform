@@ -77,9 +77,8 @@ export default function SimpleCard() {
       if (data.length === 0) {
         throw new Error("Your credentials are not valid.");
       }
-
       const userToken = {
-        userId: data[0].id,
+        userId: data[0] && data[0].id,
       };
 
       login(userToken, username);

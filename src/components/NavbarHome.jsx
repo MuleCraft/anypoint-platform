@@ -67,7 +67,9 @@ const Nav = () => {
     };
   }, []);
   useEffect(() => {
-    console.log("Nav Component - userData:", userData);
+    if (userData !== null) {
+      console.log("Nav Component - userData:", userData);
+    }
   }, [userData]);
 
   return (
@@ -128,7 +130,7 @@ const Nav = () => {
               >
                 <Flex align="center" gap="1" fontSize="base" color="navText">
                   <HiOutlineBuildingOffice />
-                  <Text>mulecraft</Text>
+                  <Text>{userData?.userCompany}</Text>
                   <IoIosArrowDown />
                 </Flex>
               </MenuButton>
@@ -164,7 +166,7 @@ const Nav = () => {
                     color="navText"
                   >
                     <Text>-root-</Text>
-                    <Text>mulecraft</Text>
+                    <Text>{userData?.userCompany}</Text>
                   </VStack>
                 </MenuItem>
               </MenuList>
@@ -304,7 +306,7 @@ const Nav = () => {
                 <Avatar
                   size={"sm"}
                   bg="teal.500"
-                  name={userData ? userData.full_name : ""}
+                  name={userData?.userFullname}
                   src=""
                   color={"white"}
                 />
@@ -319,10 +321,9 @@ const Nav = () => {
                 mt={1}
               >
                 <Text fontSize="sm" fontWeight="medium">
-                  {userData ? userData.full_name : ""}
+                  {userData?.userFullname}
                 </Text>
-                <Text fontSize="xs">{userData ? userData.username : ""}</Text>
-
+                <Text fontSize="xs">{userData?.userName}</Text>
                 <VStack spacing={3} pt={2}>
                   <MenuItem
                     fontSize="xs"
