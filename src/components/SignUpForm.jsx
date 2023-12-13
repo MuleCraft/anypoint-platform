@@ -383,7 +383,9 @@ export default function SimpleCard() {
                       value={password}
                       onChange={handlePasswordChange}
                       isInvalid={passwordError.length > 0}
-                      style={{ borderColor: passwordError ? "#ba0517" : "" }}
+                      style={{
+                        borderColor: passwordError.length > 0 ? "#ba0517" : "",
+                      }}
                     />
                     {passwordError.map((error, index) => (
                       <Text key={index} className="field-errorpass">

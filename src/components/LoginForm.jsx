@@ -29,6 +29,7 @@ export default function SimpleCard() {
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [loggedInUsername, setLoggedInUsername] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -77,6 +78,7 @@ export default function SimpleCard() {
         userId: data[0].id,
       };
       login(userToken);
+      setLoggedInUsername(username);
       navigate("/home/organisations");
     } catch (error) {
       if (error.message === "Username and password are required") {

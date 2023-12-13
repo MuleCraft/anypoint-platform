@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("authToken") || null);
   const [userData, setUserData] = useState(null);
 
-  const login = async (userToken) => {
+  const login = async (userToken, loggedInUsername) => {
     setToken(userToken);
     localStorage.setItem("authToken", JSON.stringify(userToken));
 
@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }) => {
       const { data, error } = await supabase
         .schema("mc_dev")
         .from("capUsers")
-        .select("id, userFullname, userName, userCompany");
-      // .eq("userName", loggedInUsername);
+        .select("id, userFullname, userName, userCompany")
+        .eq("userName", loggedInUsername);
       if (data) {
         setUserData(data);
       } else {
