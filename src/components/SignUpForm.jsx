@@ -210,12 +210,12 @@ export default function SimpleCard() {
   const handleSubmit = async () => {
     if (validateForm()) {
       console.log("Form submitted");
-      console.log("Full Name:", fullName);
-      console.log("Email:", email);
-      console.log("Phone Number:", phoneNumber);
-      console.log("Company:", company);
-      console.log("Username:", username);
-      console.log("Password:", password);
+      // console.log("Full Name:", fullName);
+      // console.log("Email:", email);
+      // console.log("Phone Number:", phoneNumber);
+      // console.log("Company:", company);
+      // console.log("Username:", username);
+      // console.log("Password:", password);
       await addUser();
     }
   };
@@ -224,23 +224,52 @@ export default function SimpleCard() {
     const { data, error } = await supabase
       .schema("mc_dev")
       .from("capUsers")
-      .insert({
-        userFullname: fullName,
-        userEmail: email,
-        userPhone: phoneNumber,
-        userCompany: company,
-        userName: username,
-        userPassword: password,
-        acceptedTerms: "true",
-        accountType: "self",
-        identityProvider: "CAP",
-        multiFactorAuth: "false",
-      });
-    if (error) {
-      console.error("Error adding user:", error);
-    } else {
-      console.log("New User added!");
-    }
+      .select()
+      .eq("userEmail",email);
+
+      if(data.length>0){
+        console.log('Email already exists!');
+      }
+      else if(data.length === 0){
+        const { data, error } = await supabase
+          .schema("mc_dev")
+          .from("capUsers")
+          .select()
+          .eq("userName",username);
+
+          if(data.length>0){
+            console.log('Username already exists!');
+          }
+          else if(error){
+            console.log('Error confirming user existence.',error);
+          }
+          else{
+            const { data, error } = await supabase
+              .schema("mc_dev")
+              .from("capUsers")
+              .insert({
+                userFullname: fullName,
+                userEmail: email,
+                userPhone: phoneNumber,
+                userCompany: company,
+                userName: username,
+                userPassword: password,
+                acceptedTerms: "true",
+                accountType: "self",
+                identityProvider: "CAP",
+                multiFactorAuth: "false",
+              });
+            if (error) {
+              console.error("Error adding user:", error);
+            } else {
+              console.log("New User added!");
+            }
+          }
+      }
+      else{
+        console.log('Error confirming user existence.',error);
+      }
+      
   };
   return (
     <Box
