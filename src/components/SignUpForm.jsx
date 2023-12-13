@@ -396,7 +396,7 @@ export default function SimpleCard() {
                   <Flex justify="center">
                     <Box>
                       <ReCAPTCHA
-                        sitekey="6LcibiApAAAAAD8UB2SlA4hmbY7z4zNMaGCYRYEH"
+                        sitekey="6LfKDCwmAAAAAGbIrRaYEdmb1B4wJahLeN5GnCbQ"
                         onChange={handleRecaptchaChange}
                       />
                     </Box>

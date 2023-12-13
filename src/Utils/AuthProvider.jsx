@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
         .from("capUsers")
         .select("id, userFullname, userName, userCompany")
         .eq("userName", loggedInUsername);
+
       if (data) {
         setUserData(data);
       } else {
@@ -56,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 };
 
 AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired, // Ensure that children is a required node
+  children: PropTypes.node.isRequired,
 };
 
 export const useAuth = () => {

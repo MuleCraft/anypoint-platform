@@ -164,7 +164,7 @@ const Nav = () => {
                     color="navText"
                   >
                     <Text>-root-</Text>
-                    <Text>{userData ? userData.company_name : ""}</Text>
+                    <Text>mulecraft</Text>
                   </VStack>
                 </MenuItem>
               </MenuList>
