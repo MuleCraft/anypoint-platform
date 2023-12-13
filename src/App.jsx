@@ -1,5 +1,3 @@
-// App.jsx
-import React from "react";
 import LoginPage from "./pages/LoginPage";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import SignUpPage from "./pages/SignUpPage";
