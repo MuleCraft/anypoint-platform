@@ -87,7 +87,7 @@ export default function PageHeader() {
             p={1}
             borderRadius={"25px"}
           >
-            <Image src="/Images/access-management-color.svg" w={"20%"} />
+            <Image src="/Images/access-management-color.svg" />
             <Text
               fontWeight={600}
               fontSize={"16px"}
