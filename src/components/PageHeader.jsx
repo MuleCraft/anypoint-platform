@@ -50,6 +50,7 @@ export default function PageHeader() {
       right={0}
       zIndex={2}
       boxShadow={"rgba(17, 17, 26, 0.3) 0px 1px 0px;"}
+      bgColor={'white'}
     >
       <HStack
         h={"28px"}

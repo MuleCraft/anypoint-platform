@@ -20,8 +20,8 @@ export default function PageSidebar(){
                     <Tab sx={tabStyle} _selected={tabSelectedStyle} 
                         _hover={{borderInlineStart:'3px solid #0077d4'}} className="sidebar_tab">Business Groups</Tab>
                 </TabList>
-                <TabPanels minW={'800px'} maxH={'100vh'} h={'100%'} display={'flex'} justifyContent={'left'} alignItems={'baseline'}> 
-                    <TabPanel p={0}>
+                <TabPanels minW={'1300px'} maxH={'100vh'} h={'100%'} display={'flex'} justifyContent={'left'} alignItems={'baseline'}> 
+                    <TabPanel p={0} w={'-webkit-fill-available'}>
                         <UsersSection/>
                     </TabPanel>
                     <TabPanel>
