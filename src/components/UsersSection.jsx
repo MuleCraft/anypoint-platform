@@ -41,7 +41,6 @@ export default function UsersSection(){
     },[]);
 
     return(
-        // <Container p={0}>
             <Tabs>
             <TabList>
                 <Tab fontSize='14px' fontWeight={500} _selected={tabSelectedStyle}>Users</Tab>
@@ -49,7 +48,7 @@ export default function UsersSection(){
             </TabList>
             <TabPanels>
                 <TabPanel>
-                    <HStack w={'700px'} display={'flex'} justifyContent={'space-between'} mb={'15px'}>
+                    <HStack display={'flex'} justifyContent={'space-between'} mb={'30px'} mt={'10px'}>
                         <Button bgColor={'#0077d4'} color={'white'} fontSize={'14px'} p={'0px 15px'} 
                             w={'109px'} minH={'40px'} _hover={{bgColor:'#0a5dac'}}>
                                 Invite Users</Button>
@@ -183,29 +182,26 @@ export default function UsersSection(){
                         </InputGroup>
                         </HStack>
                     </HStack>
-                    <HStack>
-                    <TableContainer className="users-table">
+                    <HStack className="users-table">
+                    <TableContainer>
                         <Table size='sm'>
                             <Thead>
                             <Tr>
                                 {columnDetails.map((columns)=>(
-                                    <Th>{columns.columnName}</Th>
+                                    <Th color={'#444444'} minW={'100px'}>{columns.columnName}</Th>
                                 ))}
                             </Tr>
                             </Thead>
                             {userData.map((userInfo)=>(
                             <Tbody>
                                 <Tr>
-                                    <Td>{userInfo.userFullname}</Td>
-                                    <Td>{userInfo.userName}</Td>
-                                    <Td>{userInfo.userEmail}</Td>
-                                    <Td>{userInfo.created_at}</Td>
-                                    <Td>{userInfo.identityProvider}</Td>
-                                    <Td>{userInfo.multiFactorAuth}</Td>
+                                    <Td fontSize={'14px'}>{userInfo.userFullname}</Td>
+                                    <Td fontSize={'14px'}>{userInfo.userName}</Td>
+                                    <Td fontSize={'14px'}>{userInfo.userEmail}</Td>
+                                    <Td fontSize={'14px'}>{userInfo.created_at}</Td>
+                                    <Td fontSize={'14px'}>{userInfo.identityProvider}</Td>
+                                    <Td fontSize={'14px'}>{userInfo.multiFactorAuth}</Td>
                                 </Tr>
-                                {/* <Tr>
-                                    <Td>{userInfo.userName}</Td>
-                                </Tr> */}
                             </Tbody>
                             ))}
                         </Table>
@@ -213,10 +209,20 @@ export default function UsersSection(){
                     </HStack>
                 </TabPanel>
                 <TabPanel>
-                <p>two!</p>
+                    <HStack display={'flex'} justifyContent={'space-between'} mb={'15px'}>
+                            <Button bgColor={'#0077d4'} color={'white'} fontSize={'14px'} p={'0px 15px'} 
+                                w={'109px'} minH={'40px'} _hover={{bgColor:'#0a5dac'}}>
+                                    Invite Users</Button>
+                            <InputGroup>
+                                <InputLeftElement pointerEvents='none'>
+                                    <FiSearch color='grey' />
+                                </InputLeftElement>
+                                <Input variant='text' placeholder="Filter users" w={'200px'} fontSize={'14px'} fontWeight={500} >
+                                </Input>
+                            </InputGroup>
+                    </HStack>
                 </TabPanel>
             </TabPanels>
             </Tabs>
-        // </Container>
     )
 }

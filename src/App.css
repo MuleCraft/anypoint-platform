@@ -20,22 +20,8 @@
   display: flex;
   flex-direction: column;
 }
-/* .sidebar_tab::before {
-  background: #0176d3;
-  content: "";
-  display: block;
-  height: 100%;
-  left: 0;
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  transform: translateX(-3px);
-  transition: opacity 0.15s cubic-bezier(0.46, 0.03, 0.52, 0.96),
-    transform 0.15s cubic-bezier(0.46, 0.03, 0.52, 0.96);
-  width: 3px;
-} */
+
 .users-table{
-  overflow-x: auto;
-  white-space: nowrap;
+  overflow-x: scroll;
 }
 
