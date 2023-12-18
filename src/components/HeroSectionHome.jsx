@@ -25,10 +25,16 @@ export default function HeroSectionHome({ greeting }) {
           top={{ md: "0", lg: "50px" }}
           left={{ "2xl": "400px", xl: "320px", lg: "80px" }}
         >
-          <Heading mt={{ base: "5px", lg: "0" }}>
+          <Heading
+            mt={{ base: "5px", lg: "0" }}
+            fontSize={{ base: "24px", sm: "32" }}
+            textTransform=" capitalize"
+          >
             {greeting} {userData?.userName}!
           </Heading>
-          <Text>Welcome to the #1 platform for APIs and integrations</Text>
+          <Text textAlign={"center"}>
+            Welcome to the #1 platform for APIs and integrations
+          </Text>
         </Flex>
         <Image
           src={heroContentbackground}
