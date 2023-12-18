@@ -11,7 +11,8 @@ import {
   Link as ChakraLink,
   HStack,
 } from "@chakra-ui/react";
-
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Link as ReactRouterLink } from "react-router-dom";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
 import accessmanagement from "/Images/access-management-color.svg";
@@ -28,21 +29,35 @@ import apigov from "/Images/edge-security-color.svg";
 import { LiaUserGraduateSolid } from "react-icons/lia";
 import { PiChatsFill, PiBookOpenText } from "react-icons/pi";
 import { BiSupport } from "react-icons/bi";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import "../assets/Common.css";
-import Slider from "react-slick";
+
 export default function HomeMain() {
-  const sliderSettings = {
-    dots: false,
-    infinite: true,
-    arrows: false,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    vertical: true,
-    autoplaySpeed: 2000,
+  const slides = [
+    {
+      title: "Tutorials",
+      description: "Getting started with MuleSoft - Hello Mule",
+      subDescription:
+        "First time using MuleSoft? Build an API in under 10 minutes and deploy it to CloudHub.",
+      href: "https://developer.mulesoft.com/tutorials-and-howtos/getting-started/hello-mule/",
+    },
+    {
+      title: "Tutorials",
+      description: "Learn Dataeweave with Dataweave Playground",
+      subDescription:
+        "The DataWeave playground enables developers to create mock data transformations in their web browser based on an input payload.",
+      href: "https://developer.mulesoft.com/tutorials-and-howtos/dataweave/learn-dataweave-with-the-dataweave-playground-getting-started/",
+    },
+  ];
+  const carouselSettings = {
+    showArrows: false,
+    showStatus: false,
+    showThumbs: false,
+    infiniteLoop: true,
+    showIndicators: false,
+    autoPlay: true,
+    interval: 3000,
+    transitionTime: 500,
+    axis: "vertical",
   };
 
   return (
@@ -53,113 +68,98 @@ export default function HomeMain() {
         alignItems={{ base: "center", lg: "flex-start" }}
         spacing={16}
       >
-        <VStack spacing="10" p={2} mt={5}>
-          <Flex justifyContent="center" alignItems="flex-start" gap="5">
-            <Image src={apiportal} alt="code builder" height="40px" />
-            <Flex direction="column" align="flex-start" gap="2">
-              <Heading fontSize="xl">Anypoint Code Builder</Heading>
-              <Text maxW="350px" minW="280px">
-                Design, develop, and deploy APIs and integrations.
-              </Text>
-              <Button variant="homePageButtons">Coming soon</Button>
+        <Box>
+          <VStack spacing="50px" p={2} mt={5} v>
+            <Flex justifyContent="center" alignItems="flex-start" gap="5">
+              <Image src={apiportal} alt="code builder" height="40px" />
+              <Flex direction="column" align="flex-start" gap="2">
+                <Heading fontSize="xl">Anypoint Code Builder</Heading>
+                <Text maxW="350px" minW="280px">
+                  Design, develop, and deploy APIs and integrations.
+                </Text>
+                <Button variant="homePageButtons">Coming soon</Button>
+              </Flex>
             </Flex>
-          </Flex>
-          <Flex justifyContent="center" alignItems="flex-start" gap="5">
-            <Image src={designCenter} alt="code builder" height="40px" />
-            <Flex direction="column" align="flex-start" gap="2">
-              <Heading fontSize="xl">Design Center</Heading>
-              <Text maxW="350px">
-                Get started creating Mule applications and APIs. Create visual
-                flows, and build, test, and reuse API specifications and
-                fragments.
-              </Text>
-              <Button variant="homePageButtons">Coming soon</Button>
+            <Flex justifyContent="center" alignItems="flex-start" gap="5">
+              <Image src={designCenter} alt="code builder" height="40px" />
+              <Flex direction="column" align="flex-start" gap="2">
+                <Heading fontSize="xl">Design Center</Heading>
+                <Text maxW="350px">
+                  Get started creating Mule applications and APIs. Create visual
+                  flows, and build, test, and reuse API specifications and
+                  fragments.
+                </Text>
+                <Button variant="homePageButtons">Coming soon</Button>
+              </Flex>
             </Flex>
-          </Flex>
-          <Flex justifyContent="center" alignItems="flex-start" gap="5">
-            <Image src={exchange} alt="code builder" height="40px" />
-            <Flex direction="column" align="flex-start" gap="2">
-              <Heading fontSize="xl">Exchange</Heading>
-              <Text maxW="350px">
-                Discover and share reusable APIs, connectors, and templates.
-              </Text>
-              <Button variant="homePageButtons">Coming soon</Button>
+            <Flex justifyContent="center" alignItems="flex-start" gap="5">
+              <Image src={exchange} alt="code builder" height="40px" />
+              <Flex direction="column" align="flex-start" gap="2">
+                <Heading fontSize="xl">Exchange</Heading>
+                <Text maxW="350px">
+                  Discover and share reusable APIs, connectors, and templates.
+                </Text>
+                <Button variant="homePageButtons">Coming soon</Button>
+              </Flex>
             </Flex>
-          </Flex>
-          <Flex justifyContent="center" alignItems="flex-start" gap="5">
-            <Image src={platform} alt="code builder" height="40px" />
-            <Flex direction="column" align="flex-start" gap="2">
-              <Heading fontSize="xl">Anypoint Studio</Heading>
-              <Text maxW="350px">
-                The desktop IDE for building and testing APIs and integrations
-                for Anypoint Platform.
-              </Text>
-              <Button variant="homePageButtons">Coming soon</Button>
+            <Flex justifyContent="center" alignItems="flex-start" gap="5">
+              <Image src={platform} alt="code builder" height="40px" />
+              <Flex direction="column" align="flex-start" gap="2">
+                <Heading fontSize="xl">Anypoint Studio</Heading>
+                <Text maxW="350px">
+                  The desktop IDE for building and testing APIs and integrations
+                  for Anypoint Platform.
+                </Text>
+                <Button variant="homePageButtons">Coming soon</Button>
+              </Flex>
             </Flex>
-          </Flex>
-          <Box
-            maxW="450px"
-            bg="#eef4ff"
-            p={4}
-            border="1px solid #eef4ff"
-            _hover={{ borderColor: "#014486" }}
-            className="Slide_comp"
-          >
-            <Slider {...sliderSettings}>
-              <VStack
-                spacing="60px"
-                align="center"
-                minheight="200px"
-                width="100%"
-              >
-                <HStack>
-                  <PiBookOpenText />
-                  <Heading fontSize="sm">Tutorials</Heading>
-                </HStack>
-                <Box maxh="130">
-                  <Flex gap="2">
-                    <Heading fontSize="sm">
-                      Getting started with MuleSoft - Hello Mule
-                    </Heading>
-                    <ArrowForwardIcon color="#014486" className="arrow-slide" />
-                  </Flex>
-                  <Text fontSize="2xl" maxW="430px">
-                    First time using MuleSoft? Build an API in under 10 minutes
-                    and deploy it to CloudHub.
-                  </Text>
-                </Box>
-              </VStack>
-              <VStack
-                spacing="60px"
-                align="center"
-                minheight="200px"
-                width="100%"
-              >
-                <HStack>
-                  <PiBookOpenText />
-                  <Heading fontSize="sm">Tutorials</Heading>
-                </HStack>
-                <Box maxh="110">
-                  <Flex gap="2">
-                    <Heading fontSize="sm">
-                      Learn DataWeave with the DataWeave Playground.
-                    </Heading>
-                    <ArrowForwardIcon color="#014486" className="arrow-slide" />
-                  </Flex>
-                  <Text fontSize="2xl" maxW="430px">
-                    The DataWeave playground enables developers to create mock
-                    data transformations in their web browser based on an input
-                    payload.
-                  </Text>
-                </Box>
-              </VStack>
-            </Slider>
-          </Box>
-        </VStack>
+            <VStack spacing={{ base: "20px", lg: "50px" }} p={2} mt={5}>
+              <Carousel {...carouselSettings} minH="300px" maxW="500px">
+                {slides.map((slide, index) => (
+                  <Box key={index} mx="auto">
+                    <a href={slide.href} target="_blank" rel="noreferrer">
+                      <Box
+                        className="Slide_comp"
+                        minW={{ base: "300px", lg: "500px" }}
+                        minH="170px"
+                        p="5px"
+                      >
+                        <Box p={{ base: "5px", lg: "20px" }}>
+                          <Flex my="3px" alignItems="center" gap="5px">
+                            <PiBookOpenText size="20" />
+                            <Text fontSize="sm" fontWeight="bold">
+                              {slide.title}
+                            </Text>
+                          </Flex>
+                          <Flex alignItems="center" gap="5px">
+                            <Text
+                              mt="4px"
+                              fontSize="base"
+                              fontWeight="Bold"
+                              my="3px"
+                            >
+                              {slide.description}
+                            </Text>
+                            <ArrowForwardIcon className="arrow-slide" />
+                          </Flex>
+                          <Box>
+                            <Text fontSize="2xl" maxW="450px">
+                              {slide.subDescription}
+                            </Text>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </a>
+                  </Box>
+                ))}
+              </Carousel>
+            </VStack>
+          </VStack>
+        </Box>
         <Box
           p={10}
           bg={"#f3f3f3"}
-          maxH={"1000px"}
+          maxH="1000px"
           minH={"650px"}
           border="1px solid #f3f3f3"
           borderRadius="10px"
@@ -210,22 +210,22 @@ export default function HomeMain() {
               </Box>
               <ArrowForwardIcon />
             </Flex>
-            <ChakraLink
-              as={ReactRouterLink}
-              to="/accounts/users"
-              className="home-main__index"
-            >
-              <Flex alignItems="center" gap={2}>
-                <Image src={accessmanagement} />
-                <Box flex="1">
+            <Flex alignItems="center" gap={2} className="for-hover__effects">
+              <Image src={accessmanagement} />
+              <Box flex="1">
+                <ChakraLink
+                  as={ReactRouterLink}
+                  to="/accounts/users"
+                  className="home-main__index"
+                >
                   <Heading fontSize="sm">Access Management</Heading>
-                  <Text className="home-main__indexText">
-                    Manage users, business groups, and audit logs.
-                  </Text>
-                </Box>
-                <ArrowForwardIcon className="arrow-movment" />
-              </Flex>
-            </ChakraLink>
+                </ChakraLink>
+                <Text className="home-main__indexText">
+                  Manage users, business groups, and audit logs.
+                </Text>
+              </Box>
+              <ArrowForwardIcon className="arrow-movment" />
+            </Flex>
             <Flex alignItems="center" gap={2}>
               <Image src={servicemesh} />
               <Box flex="1">

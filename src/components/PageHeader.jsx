@@ -15,7 +15,7 @@ import { CiMenuBurger } from "react-icons/ci";
 import { RxQuestionMarkCircled } from "react-icons/rx";
 import DrawerComponent from "./DrawerComponent";
 import { useState } from "react";
-
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { CiLogout } from "react-icons/ci";
 import { CgProfile, CgNotes } from "react-icons/cg";
 import { RxLapTimer } from "react-icons/rx";
@@ -25,10 +25,14 @@ import { PiChatsFill } from "react-icons/pi";
 import { BiSupport } from "react-icons/bi";
 import { PiBookOpenText } from "react-icons/pi";
 import "../assets/Common.css";
-
+import { HiOutlineBuildingOffice } from "react-icons/hi2";
+import { IoIosArrowDown } from "react-icons/io";
+import { useAuth } from "../Utils/AuthProvider";
+import { useNavigate } from "react-router-dom";
 export default function PageHeader() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
+  const { logout, userData } = useAuth();
+  const navigate = useNavigate;
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
     console.log("drawer opened!");
@@ -38,7 +42,10 @@ export default function PageHeader() {
     setIsDrawerOpen(false);
     console.log("drawer closed!");
   };
-
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   return (
     <Flex
       as="nav"
@@ -50,7 +57,7 @@ export default function PageHeader() {
       right={0}
       zIndex={2}
       boxShadow={"rgba(17, 17, 26, 0.3) 0px 1px 0px;"}
-      bgColor={'white'}
+      bgColor={"white"}
     >
       <HStack
         h={"28px"}
@@ -100,6 +107,61 @@ export default function PageHeader() {
           </Link>
         </HStack>
         <HStack>
+          <Menu>
+            <MenuButton
+              as={Button}
+              display={{ base: "none", md: "block" }}
+              rounded={"full"}
+              variant={"link"}
+              cursor={"pointer"}
+              minW={0}
+              _hover={{ bg: "#e5e5e5" }}
+              borderRadius="40px"
+              px="2"
+            >
+              <Flex align="center" gap="1" fontSize="base" color="navText">
+                <HiOutlineBuildingOffice />
+                <Text>{userData?.userCompany}</Text>
+                <IoIosArrowDown />
+              </Flex>
+            </MenuButton>
+            <MenuList
+              px="20px"
+              minWidth="280px"
+              minH="100px"
+              py="25px"
+              mt="3px"
+              alignItems={"center"}
+            >
+              <Text
+                fontSize="sm"
+                fontWeight="medium"
+                pl={1}
+                py={1}
+                mb="10px"
+                _hover={{ bg: "#e5e5e5", borderRadius: "10px" }}
+              >
+                Business Groups
+                <ExternalLinkIcon mx="2px" />
+              </Text>
+              <MenuItem
+                p={0}
+                color="navText"
+                _hover={{ bg: "#e5e5e5", borderRadius: "10px" }}
+              >
+                <VStack
+                  spacing={0}
+                  align="flex-start"
+                  pl={1}
+                  fontSize="xs"
+                  color="navText"
+                >
+                  <Text>-root-</Text>
+                  <Text>{userData?.userCompany}</Text>
+                </VStack>
+              </MenuItem>
+            </MenuList>
+          </Menu>
           <Menu>
             <MenuButton
               as={Button}
@@ -232,7 +294,7 @@ export default function PageHeader() {
               <Avatar
                 size={"sm"}
                 bg="teal.500"
-                name="Shanmathy Prabakaran"
+                name={userData?.userFullname}
                 src=""
                 color={"white"}
               />
@@ -246,9 +308,9 @@ export default function PageHeader() {
               minH="220px"
             >
               <Text fontSize="sm" fontWeight="medium">
-                FullName
+                {userData?.userFullname}
               </Text>
-              <Text fontSize="xs">Username</Text>
+              <Text fontSize="xs">{userData?.userName}</Text>
               <VStack>
                 <MenuItem
                   fontSize="xs"
@@ -287,7 +349,9 @@ export default function PageHeader() {
                 >
                   <HStack>
                     <CiLogout />
-                    <Text> Sign Out</Text>
+                    <Text onClick={handleLogout} role="button">
+                      Sign Out
+                    </Text>
                   </HStack>
                 </MenuItem>
               </VStack>

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Drawer,
   DrawerOverlay,
@@ -36,16 +35,23 @@ const DrawerComponent = ({ isOpen, onClose }) => {
           <DrawerContent>
             <DrawerCloseButton mt="7px" borderRadius={"40px"} />
             <DrawerHeader>
-              <HStack>
-                <Image
-                  src={muleicon}
-                  alt="mule icon"
-                  className="mule-icon"
-                ></Image>
-                <Heading fontSize="sm" fontWeight="medium">
-                  Community Platform
-                </Heading>
-              </HStack>
+              <ChakraLink
+                as={ReactRouterLink}
+                to="/home/organisations"
+                variant="useCustomForgotLink"
+              >
+                {" "}
+                <HStack>
+                  <Image
+                    src={muleicon}
+                    alt="mule icon"
+                    className="mule-icon"
+                  ></Image>
+                  <Heading fontSize="sm" fontWeight="medium">
+                    Community Platform
+                  </Heading>
+                </HStack>
+              </ChakraLink>
             </DrawerHeader>
             <DrawerBody>
               <VStack spacing={4} align="start" my={6}>

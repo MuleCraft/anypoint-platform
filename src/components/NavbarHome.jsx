@@ -40,12 +40,10 @@ const Nav = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const { logout, userData } = useAuth();
-
   const navigate = useNavigate();
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
-
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
   };
@@ -71,7 +69,6 @@ const Nav = () => {
       console.log("Nav Component - userData:", userData);
     }
   }, [userData]);
-
   return (
     <Box
       px={4}
@@ -108,7 +105,7 @@ const Nav = () => {
               p={2}
             >
               <Image src={muleicon} alt="mule icon " className="mule-icon" />
-              <Text fontSize="sm" fontWeight="medium">
+              <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="medium">
                 Community Platform
               </Text>
             </Flex>
@@ -188,7 +185,13 @@ const Nav = () => {
               >
                 <GoQuestion size="25" />
               </MenuButton>
-              <MenuList alignItems={"center"} minW="320px" p={6} mt="1">
+              <MenuList
+                alignItems={"center"}
+                minW="320px"
+                p={6}
+                mt="1"
+                sx={{ overflow: "scroll" }}
+              >
                 <Text fontSize="xs" fontWeight="medium" py={1} mb="10px">
                   ACCESS MANAGEMENT HELP
                 </Text>

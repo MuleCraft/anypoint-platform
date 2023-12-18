@@ -56,19 +56,7 @@
 .Hero-background {
   background: linear-gradient(260.4deg, #001639 2.45%, #5867e8 101.28%);
 }
-.home-main__index:hover .arrow-movment {
-  color: #0176d3;
-  transform: translateX(5px);
-}
-.home-main__index:hover .home-main__indexText {
-  text-decoration: none;
-}
-.arrow-slide {
-  opacity: 0;
-}
-.Slide_comp:hover .arrow-slide {
-  opacity: 1;
-}
+
 .credential-error {
   background-color: #ba0517;
   color: #fff;
@@ -96,4 +84,25 @@
   padding: 8px 20px 8px 10px;
 
   font-size: 14px;
+}
+.for-hover__effects:hover .arrow-movment {
+  color: #0176d3;
+  transform: translateX(5px);
+}
+.Slide_comp {
+  text-align: left;
+  border: 1px solid #eef4ff;
+  background: #eef4ff;
+}
+
+.Slide_comp:hover {
+  border-color: #014486;
+}
+.arrow-slide {
+  opacity: 0;
+}
+.Slide_comp:hover .arrow-slide {
+  opacity: 1;
+  color: #0176d3;
+  transform: translateX(5px);
 }
