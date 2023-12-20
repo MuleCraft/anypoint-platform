@@ -4,6 +4,7 @@ import SignUpPage from "./pages/SignUpPage";
 import UseCustomDomainPage from "./pages/UseCustomDomainPage";
 import Home from "./pages/Home";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPassword from "./pages/ResetPasswordPage";
 import AccessManagementPage from "./pages/AccessManagementPage";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import { AuthProvider } from "./Utils/AuthProvider";
@@ -24,6 +25,10 @@ export default function App() {
           <Route
             path="login/retrieve-username"
             element={<ForgotPasswordPage />}
+          />
+          <Route
+            path="login/new-password"
+            element={<ResetPassword />}
           />
         </Routes>
       </AuthProvider>
