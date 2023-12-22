@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const { data, error } = await supabase
-        .schema("mc_dev")
+        .schema("mc_cap_dev")
         .from("capUsers")
         .select("id, userFullname, userName, userCompany")
         .eq("userName", loggedInUsername);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
         if (parsedToken && parsedToken.userId) {
           try {
             const { data, error } = await supabase
-              .schema("mc_dev")
+              .schema("mc_cap_dev")
               .from("capUsers")
               .select("id, userFullname, userName, userCompany")
               .eq("id", parsedToken.userId);

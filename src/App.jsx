@@ -30,6 +30,10 @@ export default function App() {
             path="login/new-password"
             element={<ResetPassword />}
           />
+          <Route
+            path="login/new-password/:code"
+            element={<ResetPassword />}
+          />
         </Routes>
       </AuthProvider>
     </Router>
