@@ -22,7 +22,7 @@ export default function SimpleCard() {
   const supabase = createClient(
     "https://lbtsbocemahbdavnlodi.supabase.co",
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
-    { db: { schema: "mc_dev" } }
+    { db: { schema: "mc_cap_dev" } }
   );
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState("");
