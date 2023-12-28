@@ -64,11 +64,7 @@ const Nav = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  useEffect(() => {
-    if (userData !== null) {
-      console.log("Nav Component - userData:", userData);
-    }
-  }, [userData]);
+
   return (
     <Box
       px={4}

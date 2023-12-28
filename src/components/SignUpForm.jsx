@@ -17,16 +17,10 @@ import { CheckIcon } from "@chakra-ui/icons";
 import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
-import { createClient } from "@supabase/supabase-js";
-// import config from "../../config";
 
+import supabase from "../Utils/supabase";
+import EmailVerificationCard from "./EmailVerificationCard";
 export default function SimpleCard() {
-  const supabase = createClient(
-    "https://lbtsbocemahbdavnlodi.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
-    { db: { schema: "mc_cap_dev" } }
-  );
-
   const [isChecked, setIsChecked] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -44,6 +38,12 @@ export default function SimpleCard() {
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
   const [userExistsError, setUserExistsError] = useState("");
+  const [showEmailVerificationCard, setShowEmailVerificationCard] =
+    useState(false);
+
+  const showEmailVerification = () => {
+    setShowEmailVerificationCard(true);
+  };
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -211,13 +211,8 @@ export default function SimpleCard() {
   const handleSubmit = async () => {
     if (validateForm()) {
       console.log("Form submitted");
-      // console.log("Full Name:", fullName);
-      // console.log("Email:", email);
-      // console.log("Phone Number:", phoneNumber);
-      // console.log("Company:", company);
-      // console.log("Username:", username);
-      // console.log("Password:", password);
       await addUser();
+      showEmailVerification();
     }
   };
 
@@ -242,7 +237,7 @@ export default function SimpleCard() {
       } else if (error) {
         console.log("Error confirming user existence.", error);
       } else {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .schema("mc_cap_dev")
           .from("capUsers")
           .insert({
@@ -304,8 +299,12 @@ export default function SimpleCard() {
                       Sign up
                     </Heading>
                   </Stack>
-                  {userExistsError && (
+                  {userExistsError ? (
                     <Text className="credential-error">{userExistsError}</Text>
+                  ) : (
+                    showEmailVerificationCard && (
+                      <EmailVerificationCard email={email} />
+                    )
                   )}
                   <FormControl>
                     <FormLabel
@@ -455,6 +454,7 @@ export default function SimpleCard() {
                         />
                       }
                     ></Checkbox>
+
                     <Text fontSize="2xl">
                       I agree to MuleSoft’s{" "}
                       <Link variant="footerLink">terms of service</Link> and{" "}
