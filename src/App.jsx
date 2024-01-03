@@ -16,6 +16,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route path="login/:code" element={<LoginPage />} />
           <Route path="signup" element={<SignUpPage />} />
           <Route path="use-custom-domain" element={<UseCustomDomainPage />} />
           <Route element={<PrivateRoutes />}>

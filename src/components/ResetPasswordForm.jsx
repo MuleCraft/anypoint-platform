@@ -6,6 +6,7 @@ import { useState } from "react";
 export default function ResetPasswordForm(){
 
     const [newPassword,setNewPassword] = useState('');
+    const currentURL = document.URL;
 
     const supabase = createClient(
         'https://lbtsbocemahbdavnlodi.supabase.co',
@@ -17,33 +18,41 @@ export default function ResetPasswordForm(){
             console.log(newPassword);
         };
 
-        // async function requestPassword(){
-        //     const { data, error } = await supabase
-        //     .from('capUsers')
-        //     .select('userPassword')
-        //     .eq('userName','shanRP')
-        
-        //     if(error){
-        //       console.log(error);
-        //     }
-        //     else{
-        //       console.log('User exists!',data);
-        //     }
-        //   }
-
           async function updatePassword(){
-            const { data, error } = await supabase
-            .from('capUsers')
-            .update({ userPassword: newPassword })
-            .eq('userName', 'shanRP')
-            .select()
+            // const { data, error } = await supabase
+            // .from('capUsers')
+            // .update({ userPassword: newPassword })
+            // .eq('userName', 'shanRP')
+            // .select()
         
-            if(error){
-              console.log(error);
-            }
-            else{
-              console.log('Password Updated!',data);
-            }
+            // if(error){
+            //   console.log(error);
+            // }
+            // else{
+            //   console.log('Password Updated!',data);
+            // }
+            var myHeaders = new Headers();
+            myHeaders.append("clientId", "mulecraft");
+            myHeaders.append("clientSecret", "mulecraft123");
+            myHeaders.append("Content-Type", "application/json");
+
+            var raw = JSON.stringify({
+              "newPassword": newPassword
+            });
+
+            var requestOptions = {
+              method: 'PUT',
+              headers: myHeaders,
+              body: raw,
+              redirect: 'follow'
+            };
+
+            console.log(currentURL);
+
+            fetch(currentURL, requestOptions)
+              .then(response => response.text())
+              .then(result => console.log(result))
+              .catch(error => console.log('error', error));
           }
 
     return(
