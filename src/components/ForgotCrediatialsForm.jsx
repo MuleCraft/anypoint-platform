@@ -10,7 +10,7 @@ export default function ForgotCredentialsForm(){
 
     const [credential,setCredential] = useState('');
     const { code } = useParams();
-    const generatedCode = code || uuidv4();
+    const resetCode = code || uuidv4();
 
     const supabase = createClient(
         'https://lbtsbocemahbdavnlodi.supabase.co',
@@ -30,7 +30,7 @@ export default function ForgotCredentialsForm(){
 
           var raw = JSON.stringify({
             userCredentials: credential,
-            verificationCode: generatedCode
+            verificationCode: resetCode
           });
 
           var requestOptions = {
@@ -40,7 +40,7 @@ export default function ForgotCredentialsForm(){
             redirect: 'follow'
           };
 
-          fetch("http://localhost:8081/api/resetPassword", requestOptions)
+          fetch("http://localhost:8081/resetPassword", requestOptions)
             .then(response => response.text())
             .then(result => console.log(result))
             .catch(error => console.log('error', error));

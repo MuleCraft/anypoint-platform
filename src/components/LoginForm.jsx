@@ -15,10 +15,22 @@ import {
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom"; // Import useNavigate
 import "../assets/Common.css";
 import { useAuth } from "../Utils/AuthProvider";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AnimateCompForms from "./AnimateCompForms";
+import { createClient } from "@supabase/supabase-js";
 import supabase from "../Utils/supabase";
+
 export default function SimpleCard() {
+  // const supabase = createClient(
+  //   "https://lbtsbocemahbdavnlodi.supabase.co",
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
+  //   { db: { schema: "mc_cap_dev" } }
+  // );
+
+  // useEffect(() => {
+  //   const searchParams = new URLSearchParams(window.location.search);
+  //   const codeParam = searchParams.get('code');
+  // }, []);
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +40,7 @@ export default function SimpleCard() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const handleClick = () => setShow(!show);
+
   const handleUsernameBlur = () => {
     if (username.trim() === "") {
       setUsernameError("Required");
@@ -59,6 +72,9 @@ export default function SimpleCard() {
         throw new Error("Password is required");
       }
 
+      const searchParams = new URLSearchParams(window.location.search);
+      const codeParam = searchParams.get('code');
+
       const { data, error } = await supabase
         .schema("mc_cap_dev")
         .from("capUsers")
@@ -77,9 +93,15 @@ export default function SimpleCard() {
         userId: data[0] && data[0].id,
       };
 
+      const { issue } = await supabase
+      .from('userVerification')
+      .delete()
+      .eq('userCode', codeParam)
+
       login(userToken, username);
 
       navigate("/home/organisations");
+        
     } catch (error) {
       if (error.message === "Username and password are required") {
         setUsernameError("Required");

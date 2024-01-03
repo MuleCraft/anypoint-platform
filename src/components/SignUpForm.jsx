@@ -17,10 +17,22 @@ import { CheckIcon } from "@chakra-ui/icons";
 import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
-
+import { createClient } from "@supabase/supabase-js";
+import { useParams } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import supabase from "../Utils/supabase";
 import EmailVerificationCard from "./EmailVerificationCard";
+
 export default function SimpleCard() {
+  // const supabase = createClient(
+  //   "https://lbtsbocemahbdavnlodi.supabase.co",
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
+  //   { db: { schema: "mc_cap_dev" } }
+  // );
+
+  const { signupCode } = useParams();
+  const loginCode = signupCode || uuidv4();
+
   const [isChecked, setIsChecked] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -237,26 +249,56 @@ export default function SimpleCard() {
       } else if (error) {
         console.log("Error confirming user existence.", error);
       } else {
-        const { error } = await supabase
-          .schema("mc_cap_dev")
-          .from("capUsers")
-          .insert({
-            userFullname: fullName,
-            userEmail: email,
-            userPhone: phoneNumber,
-            userCompany: company,
-            userName: username,
-            userPassword: password,
-            acceptedTerms: "true",
-            accountType: "self",
-            identityProvider: "CAP",
-            multiFactorAuth: "false",
-          });
-        if (error) {
-          console.error("Error adding user:", error);
-        } else {
-          console.log("New User added!");
-        }
+        // const { data, error } = await supabase
+        //   .schema("mc_cap_dev")
+        //   .from("capUsers")
+        //   .insert({
+        //     userFullname: fullName,
+        //     userEmail: email,
+        //     userPhone: phoneNumber,
+        //     userCompany: company,
+        //     userName: username,
+        //     userPassword: password,
+        //     acceptedTerms: "true",
+        //     accountType: "self",
+        //     identityProvider: "CAP",
+        //     multiFactorAuth: "false",
+        //   });
+        // if (error) {
+        //   console.error("Error adding user:", error);
+        // } else {
+        //   console.log("New User added!");
+        // }
+        var myHeaders = new Headers();
+        myHeaders.append("clientId", "mulecraft");
+        myHeaders.append("clientSecret", "mulecraft123");
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify({
+          userFullname: fullName,
+          userEmail: email,
+          userPhone: phoneNumber,
+          userCompany: company,
+          userName: username,
+          userPassword: password,
+          acceptedTerms: "true",
+          accountType: "Self",
+          identityProvider: "CAP",
+          multiFactorAuth: "false",
+          signupVerificationCode: loginCode
+        });
+
+        var requestOptions = {
+          method: 'POST',
+          headers: myHeaders,
+          body: raw,
+          redirect: 'follow'
+        };
+
+        fetch("http://localhost:8081/addUser", requestOptions)
+          .then(response => response.text())
+          .then(result => console.log(result))
+          .catch(error => console.log('error', error));
       }
     } else {
       console.log("Error confirming user existence.", error);
