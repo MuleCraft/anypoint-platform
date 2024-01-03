@@ -27,10 +27,11 @@ export default function HeroSectionHome({ greeting }) {
         >
           <Heading
             mt={{ base: "5px", lg: "0" }}
-            fontSize={{ base: "24px", sm: "32" }}
+            fontSize={{ base: "22px", sm: "32" }}
             textTransform=" capitalize"
+            textAlign="center"
           >
-            {greeting} {userData?.userName}!
+            {greeting}, {userData?.userName} !
           </Heading>
           <Text textAlign={"center"}>
             Welcome to the #1 platform for APIs and integrations

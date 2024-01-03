@@ -20,14 +20,15 @@ import AnimateCompForms from "./AnimateCompForms";
 import { createClient } from "@supabase/supabase-js";
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-// import config from "../../config";
+import supabase from "../Utils/supabase";
+import EmailVerificationCard from "./EmailVerificationCard";
 
 export default function SimpleCard() {
-  const supabase = createClient(
-    "https://lbtsbocemahbdavnlodi.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
-    { db: { schema: "mc_cap_dev" } }
-  );
+  // const supabase = createClient(
+  //   "https://lbtsbocemahbdavnlodi.supabase.co",
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
+  //   { db: { schema: "mc_cap_dev" } }
+  // );
 
   const { signupCode } = useParams();
   const loginCode = signupCode || uuidv4();
@@ -49,6 +50,12 @@ export default function SimpleCard() {
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
   const [userExistsError, setUserExistsError] = useState("");
+  const [showEmailVerificationCard, setShowEmailVerificationCard] =
+    useState(false);
+
+  const showEmailVerification = () => {
+    setShowEmailVerificationCard(true);
+  };
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
@@ -217,6 +224,7 @@ export default function SimpleCard() {
     if (validateForm()) {
       console.log("Form submitted");
       await addUser();
+      showEmailVerification();
     }
   };
 
@@ -333,8 +341,12 @@ export default function SimpleCard() {
                       Sign up
                     </Heading>
                   </Stack>
-                  {userExistsError && (
+                  {userExistsError ? (
                     <Text className="credential-error">{userExistsError}</Text>
+                  ) : (
+                    showEmailVerificationCard && (
+                      <EmailVerificationCard email={email} />
+                    )
                   )}
                   <FormControl>
                     <FormLabel
@@ -484,6 +496,7 @@ export default function SimpleCard() {
                         />
                       }
                     ></Checkbox>
+
                     <Text fontSize="2xl">
                       I agree to MuleSoft’s{" "}
                       <Link variant="footerLink">terms of service</Link> and{" "}
