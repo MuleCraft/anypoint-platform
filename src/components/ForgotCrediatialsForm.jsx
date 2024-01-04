@@ -40,7 +40,7 @@ export default function ForgotCredentialsForm(){
             redirect: 'follow'
           };
 
-          fetch("http://localhost:8081/resetPassword", requestOptions)
+          fetch("http://mc-cap-email-system-api.us-e2.cloudhub.io/resetPassword", requestOptions)
             .then(response => response.text())
             .then(result => console.log(result))
             .catch(error => console.log('error', error));

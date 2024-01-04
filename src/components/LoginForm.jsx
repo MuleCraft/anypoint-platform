@@ -98,6 +98,20 @@ export default function SimpleCard() {
       .delete()
       .eq('userCode', codeParam)
 
+      const { dataValue, errorValue } = await supabase
+      .schema("mc_cap_dev")
+      .from('capUsers')
+      .update({ isVerified: 'TRUE' })
+      .eq('userName', username)
+      .select()
+
+      if(dataValue){
+        console.log("Login process ended!");
+      }
+      if(dataValue){
+        console.log("Login process ended!");
+      }
+
       login(userToken, username);
 
       navigate("/home/organisations");
