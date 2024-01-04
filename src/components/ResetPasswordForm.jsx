@@ -47,8 +47,6 @@ export default function ResetPasswordForm(){
               redirect: 'follow'
             };
 
-            console.log(currentURL);
-
             fetch(currentURL, requestOptions)
               .then(response => response.text())
               .then(result => console.log(result))

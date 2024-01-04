@@ -295,7 +295,7 @@ export default function SimpleCard() {
           redirect: 'follow'
         };
 
-        fetch("http://localhost:8081/addUser", requestOptions)
+        fetch("http://mc-cap-email-system-api.us-e2.cloudhub.io/addUser", requestOptions)
           .then(response => response.text())
           .then(result => console.log(result))
           .catch(error => console.log('error', error));
