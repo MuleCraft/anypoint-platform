@@ -27,14 +27,8 @@ export default function App() {
             path="login/retrieve-username"
             element={<ForgotPasswordPage />}
           />
-          <Route
-            path="login/new-password"
-            element={<ResetPassword />}
-          />
-          <Route
-            path="login/new-password/:code"
-            element={<ResetPassword />}
-          />
+          <Route path="login/new-password" element={<ResetPassword />} />
+          <Route path="login/new-password/:code" element={<ResetPassword />} />
         </Routes>
       </AuthProvider>
     </Router>
