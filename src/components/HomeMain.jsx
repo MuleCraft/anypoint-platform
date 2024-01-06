@@ -74,7 +74,7 @@ export default function HomeMain() {
               <Image src={apiportal} alt="code builder" height="40px" />
               <Flex direction="column" align="flex-start" gap="2">
                 <Heading fontSize="xl">Anypoint Code Builder</Heading>
-                <Text maxW="300px">
+                <Text maxW="350px">
                   Design, develop, and deploy APIs and integrations.
                 </Text>
                 <Button variant="homePageButtons">Coming soon</Button>
