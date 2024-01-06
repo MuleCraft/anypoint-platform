@@ -2,11 +2,15 @@ import { Input,VStack,FormLabel,FormControl, Text, Button, FormHelperText } from
 import "../App.css";
 import { createClient } from '@supabase/supabase-js';
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function ResetPasswordForm(){
 
     const [newPassword,setNewPassword] = useState('');
-    const currentURL = document.URL;
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const codeParam = queryParams.get('code');
+    const resetUrl = "http://mc-cap-email-system-api.us-e2.cloudhub.io/login/new-password?code=" + codeParam;
 
     const supabase = createClient(
         'https://lbtsbocemahbdavnlodi.supabase.co',
@@ -46,8 +50,7 @@ export default function ResetPasswordForm(){
               body: raw,
               redirect: 'follow'
             };
-
-            fetch(currentURL, requestOptions)
+            fetch(resetUrl, requestOptions)
               .then(response => response.text())
               .then(result => console.log(result))
               .catch(error => console.log('error', error));
