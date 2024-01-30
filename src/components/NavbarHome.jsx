@@ -362,7 +362,7 @@ const Nav = () => {
                     <HStack>
                       <CiLogout />
                       <Text onClick={handleLogout} role="button">
-                        {" "}
+                        {""}
                         Sign Out
                       </Text>
                     </HStack>

@@ -17,18 +17,13 @@ import { CheckIcon } from "@chakra-ui/icons";
 import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
-import { createClient } from "@supabase/supabase-js";
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import supabase from "../Utils/supabase";
 import EmailVerificationCard from "./EmailVerificationCard";
+import { signupFlow } from "../Utils/SignUp";
 
 export default function SimpleCard() {
-  // const supabase = createClient(
-  //   "https://lbtsbocemahbdavnlodi.supabase.co",
-  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
-  //   { db: { schema: "mc_cap_dev" } }
-  // );
 
   const { signupCode } = useParams();
   const loginCode = signupCode || uuidv4();
@@ -249,56 +244,9 @@ export default function SimpleCard() {
       } else if (error) {
         console.log("Error confirming user existence.", error);
       } else {
-        // const { data, error } = await supabase
-        //   .schema("mc_cap_dev")
-        //   .from("capUsers")
-        //   .insert({
-        //     userFullname: fullName,
-        //     userEmail: email,
-        //     userPhone: phoneNumber,
-        //     userCompany: company,
-        //     userName: username,
-        //     userPassword: password,
-        //     acceptedTerms: "true",
-        //     accountType: "self",
-        //     identityProvider: "CAP",
-        //     multiFactorAuth: "false",
-        //   });
-        // if (error) {
-        //   console.error("Error adding user:", error);
-        // } else {
-        //   console.log("New User added!");
-        // }
-        var myHeaders = new Headers();
-        myHeaders.append("clientId", "mulecraft");
-        myHeaders.append("clientSecret", "mulecraft123");
-        myHeaders.append("Content-Type", "application/json");
-
-        var raw = JSON.stringify({
-          userFullname: fullName,
-          userEmail: email,
-          userPhone: phoneNumber,
-          userCompany: company,
-          userName: username,
-          userPassword: password,
-          acceptedTerms: "true",
-          accountType: "Self",
-          identityProvider: "CAP",
-          multiFactorAuth: "false",
-          signupVerificationCode: loginCode
-        });
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'
-        };
-
-        fetch("http://mc-cap-email-system-api.us-e2.cloudhub.io/addUser", requestOptions)
-          .then(response => response.text())
-          .then(result => console.log(result))
-          .catch(error => console.log('error', error));
+        const signupResponse = signupFlow(fullName,email,phoneNumber,company,username,password,loginCode);
+        
+        console.log(signupResponse);
       }
     } else {
       console.log("Error confirming user existence.", error);
@@ -345,7 +293,8 @@ export default function SimpleCard() {
                     <Text className="credential-error">{userExistsError}</Text>
                   ) : (
                     showEmailVerificationCard && (
-                      <EmailVerificationCard email={email} />
+                      <EmailVerificationCard email={email} 
+                       message={"Please check your email to complete the registration process."}/>
                     )
                   )}
                   <FormControl>

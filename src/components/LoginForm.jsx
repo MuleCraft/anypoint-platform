@@ -1,26 +1,15 @@
 import {
-  Flex,
-  Box,
-  FormControl,
-  FormLabel,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Stack,
-  Button,
-  Heading,
-  useColorModeValue,
-  Link as ChakraLink,
+  Flex,Box,FormControl,FormLabel,Input,InputGroup,InputRightElement,Stack,Button,Heading,useColorModeValue,Link as ChakraLink,
 } from "@chakra-ui/react";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom"; // Import useNavigate
 import "../assets/Common.css";
 import { useAuth } from "../Utils/AuthProvider";
 import { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
-
-import supabase from "../Utils/supabase";
+import { loginFlow } from "../Utils/Login";
 
 export default function SimpleCard() {
+  
   const [show, setShow] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +18,7 @@ export default function SimpleCard() {
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+
   const handleClick = () => setShow(!show);
 
   const handleUsernameBlur = () => {
@@ -46,6 +36,7 @@ export default function SimpleCard() {
       setPasswordError("");
     }
   };
+  
   async function verifyUserCredentials() {
     try {
       setUsernameError("");
@@ -62,48 +53,14 @@ export default function SimpleCard() {
         throw new Error("Password is required");
       }
 
-      const searchParams = new URLSearchParams(window.location.search);
-      const codeParam = searchParams.get("code");
+      const loginResponse = loginFlow(username, password);
+      //console.log("Login Response: ",loginResponse);
 
-      const { data, error } = await supabase
-        .schema("mc_cap_dev")
-        .from("capUsers")
-        .select()
-        .eq("userName", username)
-        .eq("userPassword", password);
-
-      if (error) {
-        throw new Error("Error connecting to the server");
-      }
-
-      if (data.length === 0) {
-        throw new Error("Your credentials are not valid.");
-      }
       const userToken = {
-        userId: data[0] && data[0].id,
+        userId: loginResponse[0] && loginResponse[0].id,
       };
-
-      const { issue } = await supabase
-        .from("userVerification")
-        .delete()
-        .eq("userCode", codeParam);
-
-      const { dataValue, errorValue } = await supabase
-        .schema("mc_cap_dev")
-        .from("capUsers")
-        .update({ isVerified: "TRUE" })
-        .eq("userName", username)
-        .select();
-
-      if (dataValue) {
-        console.log("Login process ended!");
-      }
-      if (dataValue) {
-        console.log("Login process ended!");
-      }
-
+      //console.log("usertoken: ",userToken);
       login(userToken, username);
-
       navigate("/home/organisations");
     } catch (error) {
       if (error.message === "Username and password are required") {
@@ -113,10 +70,12 @@ export default function SimpleCard() {
         setUsernameError("Required");
       } else if (error.message === "Password is required") {
         setPasswordError("Required");
-      } else if (error.message === "Error connecting to the server") {
-        setError("Error connecting to the server");
+      } else if (error.message === "Error connecting to the server.") {
+        setError("Error connecting to the server.");
       } else if (error.message === "Your credentials are not valid.") {
         setError("Your credentials are not valid.");
+      } else{
+        console.log(error);
       }
     }
   }

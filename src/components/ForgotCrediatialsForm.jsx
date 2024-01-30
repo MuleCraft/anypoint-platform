@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import { useState } from "react";
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { sendResetLink } from "../Utils/SendResetLink";
 
 export default function ForgotCredentialsForm(){
 
@@ -23,27 +24,9 @@ export default function ForgotCredentialsForm(){
         };
 
         const sendVerificationMail = () =>{
-          var myHeaders = new Headers();
-          myHeaders.append("clientId", "mulecraft");
-          myHeaders.append("clientSecret", "mulecraft123");
-          myHeaders.append("Content-Type", "application/json");
-
-          var raw = JSON.stringify({
-            userCredentials: credential,
-            verificationCode: resetCode
-          });
-
-          var requestOptions = {
-            method: 'PUT',
-            headers: myHeaders,
-            body: raw,
-            redirect: 'follow'
-          };
-
-          fetch("http://mc-cap-email-system-api.us-e2.cloudhub.io/resetPassword", requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
+            const resetMailResponse = sendResetLink(credential,resetCode);
+            console.log(resetMailResponse);
+        
         }
 
         // async function requestPassword(){
