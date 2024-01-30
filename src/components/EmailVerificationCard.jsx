@@ -1,6 +1,6 @@
 import { Box, Text } from "@chakra-ui/react";
 
-const EmailVerificationCard = ({ email }) => {
+const EmailVerificationCard = ({ email,message }) => {
   return (
     <Box
       bg="green.100"
@@ -11,8 +11,7 @@ const EmailVerificationCard = ({ email }) => {
       borderColor="green.300"
     >
       <Text>
-        Email verification has been sent to {email}. Please check your email to
-        complete the registration process.
+        Verification email has been sent to {email}. {message}
       </Text>
     </Box>
   );
