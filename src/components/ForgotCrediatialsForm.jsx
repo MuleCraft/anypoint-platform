@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { sendResetLink } from "../Utils/SendResetLink";
+import supabase,{supabaseUrl} from "../Utils/supabase";
 
 export default function ForgotCredentialsForm(){
 
@@ -13,14 +14,14 @@ export default function ForgotCredentialsForm(){
     const { code } = useParams();
     const resetCode = code || uuidv4();
 
-    const supabase = createClient(
-        'https://lbtsbocemahbdavnlodi.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM'
-        , { db: { schema: 'mc_cap_dev' } });
+    // const supabase = createClient(
+    //     'https://lbtsbocemahbdavnlodi.supabase.co',
+    //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM'
+    //     , { db: { schema: 'mc_cap_dev' } });
 
         const updateCredential = (e) => {
             setCredential(e.target.value);
-            console.log(credential);
+            //console.log(credential);
         };
 
         const sendVerificationMail = () =>{
