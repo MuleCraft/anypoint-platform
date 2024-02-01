@@ -8,6 +8,7 @@ import { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
 import { loginFlow } from "../Utils/Login";
 
+
 export default function SimpleCard() {
   
   const [show, setShow] = useState(false);
@@ -15,9 +16,14 @@ export default function SimpleCard() {
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [error, setError] = useState("");
+  const [loginError, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  let loginFlowMessage;
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const codeParam = searchParams.get('code');
 
   const handleClick = () => setShow(!show);
 
@@ -44,24 +50,45 @@ export default function SimpleCard() {
       setError("");
 
       if (username.trim() === "" && password.trim() === "") {
+        loginFlowMessage = "Username and password are required";
         throw new Error("Username and password are required");
       }
       if (username.trim() === "") {
+        loginFlowMessage = "Username is required";
         throw new Error("Username is required");
       }
       if (password.trim() === "") {
+        loginFlowMessage = "Password is required";
         throw new Error("Password is required");
       }
 
-      const loginResponse = loginFlow(username, password);
+      const loginResponse = loginFlow(username, password,codeParam);
       //console.log("Login Response: ",loginResponse);
-
-      const userToken = {
-        userId: loginResponse[0] && loginResponse[0].id,
-      };
-      //console.log("usertoken: ",userToken);
-      login(userToken, username);
-      navigate("/home/organisations");
+      if (Array.isArray(loginResponse)) {
+        const userToken = {
+          userId: loginResponse[0] && loginResponse[0].id,
+        };
+        login(userToken, username);
+        navigate("/home/organisations");
+      } else {
+          loginResponse
+          .then((response) => {
+            loginFlowMessage = response;
+            console.log(loginFlowMessage, "login response message");
+            throw new Error(loginFlowMessage);
+          })
+          .catch((error) => {
+            if (error.message === "Code not found.") {
+              setError("Code Expired. SignUp & verify.");
+            } else if(error.message === "User not found."){
+              setError("Your credentials are not valid.");
+            } else if (error.message === "Email not verified.") {
+              setError("Kindly verify your email to login.");
+            } else {
+              console.log(error.message);
+            }
+          });
+      }
     } catch (error) {
       if (error.message === "Username and password are required") {
         setUsernameError("Required");
@@ -70,12 +97,14 @@ export default function SimpleCard() {
         setUsernameError("Required");
       } else if (error.message === "Password is required") {
         setPasswordError("Required");
-      } else if (error.message === "Error connecting to the server.") {
-        setError("Error connecting to the server.");
-      } else if (error.message === "Your credentials are not valid.") {
+      } else if (error.message === "Code not found.") {
+        setError("Code Expired. SignUp & verify.");
+      } else if (error.message === "User not found.") {
         setError("Your credentials are not valid.");
+      } else if (error.message === "Email not verified.") {
+        setError("Kindly verify your email to login.");
       } else{
-        console.log(error);
+        console.log(loginFlowMessage);
       }
     }
   }
@@ -113,7 +142,7 @@ export default function SimpleCard() {
                       Sign in
                     </Heading>
                   </Stack>
-                  {error && <p className="credential-error">{error}</p>}
+                  {loginError && <p className="credential-error">{loginError}</p>}
                   <FormControl>
                     <FormLabel
                       color="formLabelColor"

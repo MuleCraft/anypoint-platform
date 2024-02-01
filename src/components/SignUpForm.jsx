@@ -47,8 +47,10 @@ export default function SimpleCard() {
   const [userExistsError, setUserExistsError] = useState("");
   const [showEmailVerificationCard, setShowEmailVerificationCard] =
     useState(false);
+  const [showSignUpForm, setShowSignUpForm] = useState(true);
 
   const showEmailVerification = () => {
+    setShowSignUpForm(false);
     setShowEmailVerificationCard(true);
   };
 
@@ -277,6 +279,11 @@ export default function SimpleCard() {
                 boxShadow={"lg"}
                 p={8}
               >
+                {showEmailVerificationCard && (
+                      <EmailVerificationCard email={email} 
+                       message={"Please check your email to complete the registration process."}/>
+                    )}
+                {showSignUpForm && (
                 <Stack spacing={4}>
                   <Stack align={"center"}>
                     <Heading
@@ -297,6 +304,7 @@ export default function SimpleCard() {
                        message={"Please check your email to complete the registration process."}/>
                     )
                   )}
+                  
                   <FormControl>
                     <FormLabel
                       color="formLabelColor"
@@ -459,6 +467,7 @@ export default function SimpleCard() {
                     Sign up
                   </Button>
                 </Stack>
+                )}
               </Box>
             </Stack>
           </Flex>

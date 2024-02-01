@@ -69,7 +69,7 @@ export async function sendResetLink(credential,resetCode){
                         .catch(error => console.log('error', error));
                   }
 
-        return data;
+        return userData[0].userEmail;
     }
     catch(error){
         return error;
