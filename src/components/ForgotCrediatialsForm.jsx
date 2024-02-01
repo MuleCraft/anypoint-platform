@@ -1,65 +1,56 @@
-import { Input,VStack,FormLabel,FormControl, Text, Button, HStack, Icon, Link } from "@chakra-ui/react";
+import { Input,VStack,FormLabel,FormControl, Text, Button, HStack, Icon, Link, Box } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import "../App.css";
-import { createClient } from '@supabase/supabase-js';
 import { useState } from "react";
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { sendResetLink } from "../Utils/SendResetLink";
-import supabase,{supabaseUrl} from "../Utils/supabase";
+import EmailVerificationCard from "./EmailVerificationCard";
 
 export default function ForgotCredentialsForm(){
 
     const [credential,setCredential] = useState('');
+    const [showForgotCredentialsForm, setShowForgotCredentialsForm] = useState(true);
+    const [showEmailVerificationCard, setShowEmailVerificationCard] = useState(false);
+    const [showLoadingCard, setShowLoadingCard] = useState(false);
     const { code } = useParams();
     const resetCode = code || uuidv4();
+    let emailData;
 
-    // const supabase = createClient(
-    //     'https://lbtsbocemahbdavnlodi.supabase.co',
-    //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM'
-    //     , { db: { schema: 'mc_cap_dev' } });
+    const updateCredential = (e) => {
+        setCredential(e.target.value);
+    };
 
-        const updateCredential = (e) => {
-            setCredential(e.target.value);
-            //console.log(credential);
-        };
-
-        const sendVerificationMail = () =>{
-            const resetMailResponse = sendResetLink(credential,resetCode);
-            console.log(resetMailResponse);
-        
+    const sendVerificationMail = () =>{
+        const resetMailResponse = sendResetLink(credential,resetCode);
+        resetMailResponse.then((email) => {
+            emailData = email;
+            const emailContainer = document.getElementById("responseContainer");
+            emailContainer.innerHTML = `Verification email has been sent to <span style="font-weight: bold; font-style: italic;">${emailData}</span>. Please check your email to reset your password.`;
+        });
+        if(emailData){
+            setShowForgotCredentialsForm(false);
+            setShowEmailVerificationCard(true);
         }
-
-        // async function requestPassword(){
-        //     const { data, error } = await supabase
-        //     .from('capUsers')
-        //     .select('userPassword')
-        //     .eq('userName','shanRP')
-        
-        //     if(error){
-        //       console.log(error);
-        //     }
-        //     else{
-        //       console.log('User exists!',data);
-        //     }
-        //   }
-
-        //   async function updatePassword(){
-        //     const { data, error } = await supabase
-        //     .from('capUsers')
-        //     .update({ userPassword: 'shanNewPwd' })
-        //     .eq('userName', 'shanRP')
-        //     .select()
-        
-        //     if(error){
-        //       console.log(error);
-        //     }
-        //     else{
-        //       console.log('Password Updated!',data);
-        //     }
-        //   }
+        else if(emailData === undefined){
+            setShowForgotCredentialsForm(false);
+            setShowLoadingCard(true);
+        }
+    }
 
     return(
+        <>
+        {showLoadingCard && (
+            <Box id="responseContainer" bgColor={'white'} width={['100%','450px']} padding={['40px 20px','40px']} spacing={3} maxW={'950px'} 
+            borderRadius={'2px'} boxShadow={'0 5px 30px 0 rgba(0,0,0,.15)'}>
+                <Text>Sending your verification email...</Text>
+            </Box>
+        )}
+        {showEmailVerificationCard &&(
+            <EmailVerificationCard email={emailData} 
+            message={"Please check your email to reset your password."}/>
+        )}
+        {showForgotCredentialsForm && (
             <VStack bgColor={'white'} width={['100%','450px']} padding={['40px 20px','40px']} spacing={3} maxW={'950px'} 
                     borderRadius={'2px'} boxShadow={'0 5px 30px 0 rgba(0,0,0,.15)'}>
                 <Text fontSize={'20px'} fontWeight={700} color={'#5c5c5c'} align={'center'}>Forgot your credentials?</Text>
@@ -77,5 +68,6 @@ export default function ForgotCredentialsForm(){
                     </Button>
                 </Link>
             </VStack>
-    )
+            )}
+    </>)
 }

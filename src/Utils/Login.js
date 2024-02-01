@@ -1,13 +1,11 @@
 import supabase from "../Utils/supabase";
 import CryptoJS from 'crypto-js';
 
-export async function loginFlow(validUsername,validPassword) {
+export async function loginFlow(validUsername,validPassword,codeParam) {
+    
+    let loginError="";
 
     try {
-
-        console.log("loginflow fn invoked!",validUsername,validPassword);
-        const searchParams = new URLSearchParams(window.location.search);
-        const codeParam = searchParams.get('code');
 
         // const {secretKey,decryptError} = await supabase
         // .schema("vault")
@@ -22,89 +20,105 @@ export async function loginFlow(validUsername,validPassword) {
         const fixedIV = CryptoJS.enc.Hex.parse('00000000000000000000000000000000');
 
         const encryptedText = CryptoJS.AES.encrypt(validPassword, CryptoJS.enc.Utf8.parse('1234567890123456'),
-        {
-            iv: fixedIV,
-        }).toString();
+        { iv: fixedIV, }).toString();
 
-        //console.log(encryptedText);
-
-        const { data, fetchError } = await supabase
-            .schema("mc_cap_dev")
-            .from("capUsers")
-            .select()
-            .eq("userName", validUsername)
-            .eq("userPassword", encryptedText);
-
-        //setUserData(data);
-
-        console.log("Data: ",data);
-        console.log("fetchError: ",fetchError);
-
-        if (fetchError) {
-            throw new Error("Error connecting to the server.");  
-        }
-
-        if (data.length === 0) {
-            throw new Error("Your credentials are not valid.");
-        }
-
-        if (data.length > 0) {
-            const { userStatus } = await supabase
+        if(codeParam){
+            const { data: codeCheck, error: codeCheckError } = await supabase
                 .schema("mc_cap_dev")
                 .from("userVerification")
                 .select()
                 .eq("userCode", codeParam);
-
-            if(userStatus.length > 0){
-                const { deleteError } = await supabase
-                .schema("mc_cap_dev")
-                .from('userVerification')
-                .delete()
-                .eq('userCode', codeParam);
             
-                if(deleteError){
-                    throw new Error("Error disabling the verification code.");
-                } else {
-                    console.log("Verification code deleted.");
+                if(codeCheck.length === 0){
+                    loginError = "Code not found.";
+                    return loginError;
                 }
-
-                const { updateError } = await supabase
-                    .schema("mc_cap_dev")
-                    .from('capUsers')
-                    .update({ isVerified: 'TRUE' })
-                    .eq('userName', validUsername)
-                    .select()
-
-                if (updateError) {
-                    throw new Error("Error occurred during the Login process.");
-                } else {
-                    console.log("isVerified value updated.");
+                else if(codeCheckError){
+                    console.log(codeCheckError);
+                    loginError = "Code check error.";
+                    return loginError;
                 }
-            } else if (userStatus.length === 0){
-                const { data, fetchError } = await supabase
-                    .schema("mc_cap_dev")
-                    .from("capUsers")
-                    .select("isVerified")
-                    .eq("userName", validUsername);
+                else{
+                    const { data, fetchError } = await supabase
+                        .schema("mc_cap_dev")
+                        .from("capUsers")
+                        .select()
+                        .eq("userName", validUsername)
+                        .eq("userPassword", encryptedText);
 
-                console.log("isVerified value: ",data);
+                    // console.log("Data: ",data);
+                    // console.log("fetchError: ",fetchError);
 
-                // if(data){
+                    if (fetchError || data === undefined) {
+                        console.log(fetchError);
+                        loginError = "User fetch error.";
+                        return loginError;
+                        //throw new Error("Error connecting to the server.");  
+                    }
+                    else if (data.length === 0) {
+                        loginError = "User not found.";
+                        return loginError;
+                        //throw new Error("Your credentials are not valid.");
+                    }
+                    else{
+                            const { deleteError } = await supabase
+                            .schema("mc_cap_dev")
+                            .from('userVerification')
+                            .delete()
+                            .eq('userCode', codeParam);
+                        
+                            if(deleteError){
+                                console.log(deleteError);
+                                loginError = "Code delete error.";
+                                return loginError;
+                                //throw new Error("Error disabling the verification code.");
+                            } else {
+                                console.log("Verification code deleted.");
+                                const { updateError } = await supabase
+                                    .schema("mc_cap_dev")
+                                    .from('capUsers')
+                                    .update({ isVerified: 'TRUE' })
+                                    .eq('userName', validUsername)
+                                    .select()
 
-                // }
-            } else {
-                console.log("userStatus: ",userStatus);
-            }
-
-            
-            console.log("loginFlow fn ended!");
+                                if (updateError) {
+                                    console.log(updateError);
+                                    loginError = "isVerified update error.";
+                                    return loginError;
+                                    //throw new Error("Error occurred during the Login process.");
+                                } else {
+                                    console.log("User Verified.");
+                                    console.log("loginFlow fn ended!");
+                                    return data;
+                                }
+                            }
+                    }
+                }
         }
-        //console.log("return data: ",data);
-        return data;
+        else{
+            const { data: userData, error: userDataError } = await supabase
+                .schema("mc_cap_dev")
+                .from("capUsers")
+                .select()
+                .eq("userName", validUsername)
+                .eq("userPassword", encryptedText)
+                .eq("isVerified",true);
+            
+            if(userData.length > 0){
+                return userData;
+            }
+            else if(userDataError){
+                loginError = "User fetch error.";
+                return loginError;
+            }
+            else{
+                loginError = "Email not verified.";
+                return loginError;
+            }
+        }
     }
-    catch(error) {
-        //console.log("return error: ",error);
-        return error;
+    catch(loginError) {
+        return loginError;
     }
     
 }
