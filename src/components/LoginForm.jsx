@@ -1,113 +1,64 @@
+import React from "react";
 import {
-  Flex,Box,FormControl,FormLabel,Input,InputGroup,InputRightElement,Stack,Button,Heading,useColorModeValue,Link as ChakraLink,
+  Flex,
+  Box,
+  FormControl,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Stack,
+  Button,
+  Heading,
+  useColorModeValue,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
-import { Link as ReactRouterLink, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link as ReactRouterLink } from "react-router-dom";
 import "../assets/Common.css";
-import { useAuth } from "../Utils/AuthProvider";
-import { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
-import { loginFlow } from "../Utils/Login";
 
+const checkCredentials = async (enteredUsername, enteredPassword) => {
+  const validUsername = "demo";
+  const validPassword = "password";
+
+  return enteredUsername === validUsername && enteredPassword === validPassword;
+};
 
 export default function SimpleCard() {
-  
-  const [show, setShow] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [loginError, setError] = useState("");
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
-  let loginFlowMessage;
-
-  const searchParams = new URLSearchParams(window.location.search);
-  const codeParam = searchParams.get('code');
+  const [show, setShow] = React.useState(false);
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [usernameError, setUsernameError] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
+  const [loginError, setError] = React.useState("");
 
   const handleClick = () => setShow(!show);
-
   const handleUsernameBlur = () => {
-    if (username.trim() === "") {
-      setUsernameError("Required");
-    } else {
-      setUsernameError("");
-    }
+    setUsernameError(username.trim() === "" ? "Required" : "");
   };
-
   const handlePasswordBlur = () => {
-    if (password.trim() === "") {
-      setPasswordError("Required");
-    } else {
-      setPasswordError("");
-    }
+    setPasswordError(password.trim() === "" ? "Required" : "");
   };
-  
-  async function verifyUserCredentials() {
+  const verifyUserCredentials = async () => {
     try {
-      setUsernameError("");
-      setPasswordError("");
+      setUsernameError(username.trim() === "" ? "Required" : "");
+      setPasswordError(password.trim() === "" ? "Required" : "");
+
+      if (username.trim() === "" || password.trim() === "") {
+        return;
+      }
+
       setError("");
 
-      if (username.trim() === "" && password.trim() === "") {
-        loginFlowMessage = "Username and password are required";
-        throw new Error("Username and password are required");
-      }
-      if (username.trim() === "") {
-        loginFlowMessage = "Username is required";
-        throw new Error("Username is required");
-      }
-      if (password.trim() === "") {
-        loginFlowMessage = "Password is required";
-        throw new Error("Password is required");
-      }
+      const isValidCredentials = await checkCredentials(username, password);
 
-      const loginResponse = loginFlow(username, password,codeParam);
-      //console.log("Login Response: ",loginResponse);
-      if (Array.isArray(loginResponse)) {
-        const userToken = {
-          userId: loginResponse[0] && loginResponse[0].id,
-        };
-        login(userToken, username);
-        navigate("/home/organisations");
-      } else {
-          loginResponse
-          .then((response) => {
-            loginFlowMessage = response;
-            console.log(loginFlowMessage, "login response message");
-            throw new Error(loginFlowMessage);
-          })
-          .catch((error) => {
-            if (error.message === "Code not found.") {
-              setError("Code Expired. SignUp & verify.");
-            } else if(error.message === "User not found."){
-              setError("Your credentials are not valid.");
-            } else if (error.message === "Email not verified.") {
-              setError("Kindly verify your email to login.");
-            } else {
-              console.log(error.message);
-            }
-          });
+      if (!isValidCredentials) {
+        throw new Error("Your credentials are not valid.");
       }
     } catch (error) {
-      if (error.message === "Username and password are required") {
-        setUsernameError("Required");
-        setPasswordError("Required");
-      } else if (error.message === "Username is required") {
-        setUsernameError("Required");
-      } else if (error.message === "Password is required") {
-        setPasswordError("Required");
-      } else if (error.message === "Code not found.") {
-        setError("Code Expired. SignUp & verify.");
-      } else if (error.message === "User not found.") {
-        setError("Your credentials are not valid.");
-      } else if (error.message === "Email not verified.") {
-        setError("Kindly verify your email to login.");
-      } else{
-        console.log(loginFlowMessage);
-      }
+      setError(error.message);
     }
-  }
+  };
 
   return (
     <Box
@@ -142,7 +93,9 @@ export default function SimpleCard() {
                       Sign in
                     </Heading>
                   </Stack>
-                  {loginError && <p className="credential-error">{loginError}</p>}
+                  {loginError && (
+                    <p className="credential-error">{loginError}</p>
+                  )}
                   <FormControl>
                     <FormLabel
                       color="formLabelColor"

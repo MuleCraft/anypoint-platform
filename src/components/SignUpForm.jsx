@@ -17,17 +17,8 @@ import { CheckIcon } from "@chakra-ui/icons";
 import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
-import { useParams } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import supabase from "../Utils/supabase";
-import EmailVerificationCard from "./EmailVerificationCard";
-import { signupFlow } from "../Utils/SignUp";
-
 export default function SimpleCard() {
-
-  const { signupCode } = useParams();
-  const loginCode = signupCode || uuidv4();
-
   const [isChecked, setIsChecked] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -44,22 +35,16 @@ export default function SimpleCard() {
   const [passwordError, setPasswordError] = useState([]);
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
-  const [userExistsError, setUserExistsError] = useState("");
-  const [showEmailVerificationCard, setShowEmailVerificationCard] =
-    useState(false);
-  const [showSignUpForm, setShowSignUpForm] = useState(true);
-
-  const showEmailVerification = () => {
-    setShowSignUpForm(false);
-    setShowEmailVerificationCard(true);
-  };
-
-  const handleCheckboxChange = () => {
+  const [recaptchaCheck, setRecaptchaCheck] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const handleCheckboxChange = (value) => {
     setIsChecked(!isChecked);
+    setAcceptedTerms(Boolean(value));
     setCheckboxError(isChecked ? "Required" : "");
   };
   const handleRecaptchaChange = (value) => {
     setRecaptchaChecked(Boolean(value));
+    setRecaptchaCheck(Boolean(value));
     setRecaptchaError(value ? "" : "Required");
   };
 
@@ -171,21 +156,18 @@ export default function SimpleCard() {
     } else {
       setPhoneNumberError("");
     }
-
     if (company.trim().length < 2) {
       setCompanyError("Use at least 2 characters");
       isFormValid = false;
     } else {
       setCompanyError("");
     }
-
     if (username.trim().length < 3) {
       setUserNameError("Use at least 3 characters long");
       isFormValid = false;
     } else {
       setUserNameError("");
     }
-
     let passwordErrors = [];
     if (password.length < 8) {
       passwordErrors.push("Use at least 8 characters");
@@ -206,54 +188,52 @@ export default function SimpleCard() {
     } else {
       setRecaptchaError("");
     }
-
     if (!isChecked) {
       setCheckboxError("Required");
       isFormValid = false;
     } else {
       setCheckboxError("");
     }
-
     return isFormValid;
   };
-
   const handleSubmit = async () => {
     if (validateForm()) {
-      console.log("Form submitted");
-      await addUser();
-      showEmailVerification();
-    }
-  };
-
-  const addUser = async () => {
-    const { data, error } = await supabase
-      .schema("mc_cap_dev")
-      .from("capUsers")
-      .select()
-      .eq("userEmail", email);
-
-    if (data.length > 0) {
-      console.log("Email already exists!");
-    } else if (data.length === 0) {
-      const { data, error } = await supabase
-        .schema("mc_cap_dev")
-        .from("capUsers")
-        .select()
-        .eq("userName", username);
-      if (data.length > 0) {
-        console.log("User already exists!");
-        setUserExistsError("User already exists!");
-      } else if (error) {
-        console.log("Error confirming user existence.", error);
+      const { user, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      });
+      if (error) {
+        console.error("Error creating user:", error.message);
       } else {
-        const signupResponse = signupFlow(fullName,email,phoneNumber,company,username,password,loginCode);
-        
-        console.log(signupResponse);
+        console.log("User created:", user);
+        await insertAdditionalDetails(user.id);
+        console.log("Signup successful!");
       }
-    } else {
-      console.log("Error confirming user existence.", error);
     }
   };
+  const insertAdditionalDetails = async (userId) => {
+    const { data, error } = await supabase
+      .schema("mc_cap_dev_1")
+      .from("users")
+      .upsert([
+        {
+          id: userId,
+          full_name: fullName,
+          phone_number: phoneNumber,
+          username: username,
+          recaptcha_verification: recaptchaCheck,
+          acceptedterms_verification: acceptedTerms,
+          company: company,
+        },
+      ]);
+
+    if (error) {
+      console.error("Error inserting additional details:", error.message);
+    } else {
+      console.log("Additional details inserted:", data);
+    }
+  };
+
   return (
     <Box
       className="for-animation"
@@ -279,11 +259,6 @@ export default function SimpleCard() {
                 boxShadow={"lg"}
                 p={8}
               >
-                {showEmailVerificationCard && (
-                      <EmailVerificationCard email={email} 
-                       message={"Please check your email to complete the registration process."}/>
-                    )}
-                {showSignUpForm && (
                 <Stack spacing={4}>
                   <Stack align={"center"}>
                     <Heading
@@ -296,15 +271,6 @@ export default function SimpleCard() {
                       Sign up
                     </Heading>
                   </Stack>
-                  {userExistsError ? (
-                    <Text className="credential-error">{userExistsError}</Text>
-                  ) : (
-                    showEmailVerificationCard && (
-                      <EmailVerificationCard email={email} 
-                       message={"Please check your email to complete the registration process."}/>
-                    )
-                  )}
-                  
                   <FormControl>
                     <FormLabel
                       color="formLabelColor"
@@ -356,7 +322,9 @@ export default function SimpleCard() {
                       value={phoneNumber}
                       onChange={handlePhoneNumberChange}
                       isInvalid={phoneNumberError !== ""}
-                      style={{ borderColor: phoneNumberError ? "#ba0517" : "" }}
+                      style={{
+                        borderColor: phoneNumberError ? "#ba0517" : "",
+                      }}
                     />
                     {phoneNumberError && (
                       <Text className="field-error">{phoneNumberError}</Text>
@@ -453,7 +421,6 @@ export default function SimpleCard() {
                         />
                       }
                     ></Checkbox>
-
                     <Text fontSize="2xl">
                       I agree to MuleSoft’s{" "}
                       <Link variant="footerLink">terms of service</Link> and{" "}
@@ -467,7 +434,6 @@ export default function SimpleCard() {
                     Sign up
                   </Button>
                 </Stack>
-                )}
               </Box>
             </Stack>
           </Flex>
