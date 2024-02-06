@@ -19,7 +19,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
 export default function SimpleCard() {
-  const [isChecked, setIsChecked] = useState(false);
+  const [isCheckedBox, setIsCheckedBox] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -35,16 +35,15 @@ export default function SimpleCard() {
   const [passwordError, setPasswordError] = useState([]);
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
-  const [recaptchaCheck, setRecaptchaCheck] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const handleCheckboxChange = (value) => {
-    setIsChecked(!isChecked);
-    setAcceptedTerms(Boolean(value));
-    setCheckboxError(isChecked ? "Required" : "");
+
+  const handleCheckboxChange = () => {
+    setIsCheckedBox(!isCheckedBox);
+
+    setCheckboxError(isCheckedBox ? "Required" : "");
   };
   const handleRecaptchaChange = (value) => {
-    setRecaptchaChecked(Boolean(value));
-    setRecaptchaCheck(Boolean(value));
+    setRecaptchaChecked(value);
+
     setRecaptchaError(value ? "" : "Required");
   };
 
@@ -188,7 +187,7 @@ export default function SimpleCard() {
     } else {
       setRecaptchaError("");
     }
-    if (!isChecked) {
+    if (!isCheckedBox) {
       setCheckboxError("Required");
       isFormValid = false;
     } else {
@@ -198,42 +197,47 @@ export default function SimpleCard() {
   };
   const handleSubmit = async () => {
     if (validateForm()) {
-      const { user, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-      });
-      if (error) {
-        console.error("Error creating user:", error.message);
-      } else {
-        console.log("User created:", user);
-        await insertAdditionalDetails(user.id);
-        console.log("Signup successful!");
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+        });
+        if (error) {
+          console.error("Error creating user:", error.message);
+        } else if (data && data.user && data.user.id) {
+          console.log("User created:", data.user);
+          await insertAdditionalDetails(data.user.id);
+          console.log("Signup successful!");
+        } else {
+          console.error("User object is missing 'id'.");
+        }
+      } catch (error) {
+        console.error("Error:", error.message);
       }
     }
   };
-  const insertAdditionalDetails = async (userId) => {
+
+  const insertAdditionalDetails = async (id) => {
     const { data, error } = await supabase
-      .schema("mc_cap_dev_1")
+      .schema("mc_cap_develop")
       .from("users")
       .upsert([
         {
-          id: userId,
+          id: id,
           full_name: fullName,
           phone_number: phoneNumber,
-          username: username,
-          recaptcha_verification: recaptchaCheck,
-          acceptedterms_verification: acceptedTerms,
+          display_name: username,
+          recaptcha_verification: "true",
+          acceptedterms_verification: "true",
           company: company,
         },
       ]);
-
     if (error) {
       console.error("Error inserting additional details:", error.message);
     } else {
       console.log("Additional details inserted:", data);
     }
   };
-
   return (
     <Box
       className="for-animation"
@@ -404,18 +408,18 @@ export default function SimpleCard() {
                   )}
                   <Flex gap="2" align="center">
                     <Checkbox
-                      isChecked={isChecked}
+                      isCheckedBox={isCheckedBox}
                       size="lg"
                       className="checkbox-color"
-                      border={isChecked ? "none" : "1px"}
+                      border={isCheckedBox ? "none" : "1px"}
                       onChange={handleCheckboxChange}
                       _hover={{ boxShadow: "0 0 0 0.25em rgba(0,0,0,.12)" }}
                       icon={
                         <CheckIcon
                           sx={{
                             _hover: {
-                              color: isChecked ? "inherit" : "#747474",
-                              cursor: isChecked ? "inherit" : "pointer",
+                              color: isCheckedBox ? "inherit" : "#747474",
+                              cursor: isCheckedBox ? "inherit" : "pointer",
                             },
                           }}
                         />

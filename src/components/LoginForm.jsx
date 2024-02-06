@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
   Flex,
   Box,
@@ -16,44 +16,50 @@ import {
 import { Link as ReactRouterLink } from "react-router-dom";
 import "../assets/Common.css";
 import AnimateCompForms from "./AnimateCompForms";
-
-const checkCredentials = async (enteredUsername, enteredPassword) => {
-  const validUsername = "demo";
-  const validPassword = "password";
-
-  return enteredUsername === validUsername && enteredPassword === validPassword;
-};
-
+import supabase from "../Utils/supabase";
+import { useAuth } from "../Utils/AuthProvider";
+import { useNavigate } from "react-router-dom";
 export default function SimpleCard() {
-  const [show, setShow] = React.useState(false);
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [usernameError, setUsernameError] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState("");
-  const [loginError, setError] = React.useState("");
-
+  const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [loginError, setError] = useState("");
   const handleClick = () => setShow(!show);
-  const handleUsernameBlur = () => {
-    setUsernameError(username.trim() === "" ? "Required" : "");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const handleEmailBlur = () => {
+    setEmailError(email.trim() === "" ? "Required" : "");
   };
+
   const handlePasswordBlur = () => {
     setPasswordError(password.trim() === "" ? "Required" : "");
   };
-  const verifyUserCredentials = async () => {
-    try {
-      setUsernameError(username.trim() === "" ? "Required" : "");
-      setPasswordError(password.trim() === "" ? "Required" : "");
 
-      if (username.trim() === "" || password.trim() === "") {
-        return;
+  const signInWithEmail = async () => {
+    setEmailError(email.trim() === "" ? "Required" : "");
+    setPasswordError(password.trim() === "" ? "Required" : "");
+
+    if (email.trim() === "" || password.trim() === "") {
+      return;
+    }
+
+    setError("");
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        throw new Error(error.message);
       }
 
-      setError("");
-
-      const isValidCredentials = await checkCredentials(username, password);
-
-      if (!isValidCredentials) {
-        throw new Error("Your credentials are not valid.");
+      if (data) {
+        login(data.access_token, email);
+        navigate("/home/organisations");
       }
     } catch (error) {
       setError(error.message);
@@ -102,20 +108,18 @@ export default function SimpleCard() {
                       fontSize="xs"
                       fontFamily="formCompTexts"
                     >
-                      Username
+                      Email
                     </FormLabel>
                     <Input
                       type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      onBlur={handleUsernameBlur}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={handleEmailBlur}
                       style={{
-                        borderColor: usernameError ? "red" : "",
+                        borderColor: emailError ? "red" : "",
                       }}
                     />
-                    {usernameError && (
-                      <p className="field-error">{usernameError}</p>
-                    )}
+                    {emailError && <p className="field-error">{emailError}</p>}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -150,7 +154,8 @@ export default function SimpleCard() {
                   <Stack spacing={5}>
                     <Button
                       variant="formButtons"
-                      onClick={verifyUserCredentials}
+                      onClick={signInWithEmail}
+                      isLoading={false}
                     >
                       Sign in
                     </Button>

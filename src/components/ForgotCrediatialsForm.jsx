@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Input,
   VStack,
@@ -6,12 +7,45 @@ import {
   Text,
   Button,
   Link,
-  Box,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
+import supabase from "../Utils/supabase"; // Import your Supabase client instance
 import "../App.css";
 
 export default function ForgotCredentialsForm() {
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [requestSuccess, setRequestSuccess] = useState(false);
+  const [requestError, setRequestError] = useState("");
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    setEmailError("");
+  };
+
+  const handleRequestCredentials = async () => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    } else if (!emailPattern.test(email)) {
+      setEmailError("Invalid email format");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setRequestSuccess(true);
+    } catch (error) {
+      setRequestError(error.message);
+    }
+  };
+
   return (
     <>
       <VStack
@@ -51,13 +85,33 @@ export default function ForgotCredentialsForm() {
         </Text>
         <FormControl>
           <FormLabel fontSize={"14px"} fontWeight={400} color={"#5c5c5c"}>
-            Email address or username
+            Email
           </FormLabel>
-          <Input type="text" />
+          <Input
+            type="text"
+            onChange={handleEmailChange}
+            value={email}
+            borderColor={emailError ? "red" : ""}
+          />
+          {emailError && <Text className="field-error">{emailError}</Text>}
         </FormControl>
-        <Button variant="formButtons" width={"100%"}>
+        <Button
+          variant="formButtons"
+          width={"100%"}
+          onClick={handleRequestCredentials}
+        >
           Request Credentials
         </Button>
+        {requestSuccess && (
+          <Text fontSize={"14px"} color={"green"}>
+            Password reset email sent successfully!
+          </Text>
+        )}
+        {requestError && (
+          <Text fontSize={"14px"} color={"red"}>
+            {requestError}
+          </Text>
+        )}
         <Link className="back-to-signin-stack" width={"100%"} href="/">
           <Button
             fontSize={"14px"}
