@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   Flex,
   Box,
@@ -17,7 +17,7 @@ import { Link as ReactRouterLink } from "react-router-dom";
 import "../assets/Common.css";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
-import { useAuth } from "../Utils/AuthProvider";
+import { AuthContext } from "../Utils/AuthProvider";
 import { useNavigate } from "react-router-dom";
 export default function SimpleCard() {
   const [show, setShow] = useState(false);
@@ -27,7 +27,7 @@ export default function SimpleCard() {
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setError] = useState("");
   const handleClick = () => setShow(!show);
-  const { login } = useAuth();
+  const { setSession } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleEmailBlur = () => {
     setEmailError(email.trim() === "" ? "Required" : "");
@@ -58,7 +58,7 @@ export default function SimpleCard() {
       }
 
       if (data) {
-        login(data.access_token, email);
+        setSession(data.session);
         navigate("/home/organisations");
       }
     } catch (error) {

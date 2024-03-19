@@ -8,7 +8,8 @@ import {
   Button,
   FormHelperText,
 } from "@chakra-ui/react";
-import supabase from "../Utils/supabase"; // Import your Supabase client instance
+import supabase from "../Utils/supabase";
+import { useNavigate } from "react-router-dom";
 import "../App.css";
 import "../assets/Common.css";
 
@@ -16,27 +17,38 @@ export default function ResetPasswordForm() {
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
   const [requestError, setRequestError] = useState("");
+  const navigate = useNavigate();
 
   const handleNewPasswordChange = (e) => {
-    setNewPassword(e.target.value);
+    const newPasswordValue = e.target.value;
+    setNewPassword(newPasswordValue);
     setNewPasswordError("");
+    setRequestError("");
+    validatePassword(newPasswordValue);
   };
 
-  const validatePassword = () => {
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
-    if (!passwordRegex.test(newPassword)) {
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      console.log("Password validation failed");
       setNewPasswordError(
         "Password must contain at least 8 characters including one number, one uppercase, and one lowercase letter."
       );
       return false;
+    } else {
+      console.log("Password validation successful");
+      setNewPasswordError("");
+      return true;
     }
-    return true;
   };
+
   const handleResetPassword = async () => {
-    if (!validatePassword()) {
+    if (!validatePassword(newPassword)) {
       return;
     }
     try {
+      console.log("Attempting to reset password...");
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -44,6 +56,7 @@ export default function ResetPasswordForm() {
         throw new Error(error.message);
       }
       console.log("Password reset successful!");
+      navigate("/login");
     } catch (error) {
       setRequestError(error.message);
     }
@@ -79,17 +92,18 @@ export default function ResetPasswordForm() {
         {newPasswordError && (
           <Text className="field-error">{newPasswordError}</Text>
         )}
+        {requestError && (
+          <Text fontSize={"14px"} color={"red"} mt={1}>
+            {requestError}
+          </Text>
+        )}
         <FormHelperText fontSize={"12px"} mb={"20px"} color={"#747474"}>
           Use at least 8 characters, including a number, an uppercase character,
           and a lowercase character. You cannot reuse any of your previous three
           passwords.
         </FormHelperText>
       </FormControl>
-      {requestError && (
-        <Text fontSize={"14px"} color={"red"}>
-          {requestError}
-        </Text>
-      )}
+
       <Button
         variant="formButtons"
         width={"100%"}

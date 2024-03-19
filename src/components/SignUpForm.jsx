@@ -35,7 +35,7 @@ export default function SimpleCard() {
   const [passwordError, setPasswordError] = useState([]);
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
-
+  const [submissionStatus, setSubmissionStatus] = useState(null);
   const handleCheckboxChange = () => {
     setIsCheckedBox(!isCheckedBox);
 
@@ -198,10 +198,34 @@ export default function SimpleCard() {
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
+        const { data: existingUsers, error: userError } = await supabase
+          .schema("mc_cap_develop")
+          .from("users")
+          .select("*")
+          .eq("email", email)
+          .or(`display_name.eq.${username}`);
+
+        if (userError) {
+          console.error("Error checking existing users:", userError.message);
+          return;
+        }
+
+        if (existingUsers && existingUsers.length > 0) {
+          const existingUser = existingUsers[0];
+          if (existingUser.email === email) {
+            setEmailError("Email already exists");
+          }
+          if (existingUser.display_name === username) {
+            setUserNameError("Username already exists");
+          }
+          return;
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email: email,
           password: password,
         });
+
         if (error) {
           console.error("Error creating user:", error.message);
         } else if (data && data.user && data.user.id) {
@@ -211,6 +235,7 @@ export default function SimpleCard() {
         } else {
           console.error("User object is missing 'id'.");
         }
+        setSubmissionStatus("success");
       } catch (error) {
         console.error("Error:", error.message);
       }
@@ -258,187 +283,205 @@ export default function SimpleCard() {
               py={12}
               px={{ base: "0", sm: "6" }}
             >
-              <Box
-                bg={useColorModeValue("white", "gray.700")}
-                boxShadow={"lg"}
-                p={8}
-              >
-                <Stack spacing={4}>
-                  <Stack align={"center"}>
-                    <Heading
-                      fontSize="lg"
-                      fontFamily="formCompTexts"
-                      color="customHeadingColor"
-                      size="myHeaderSizeForm"
-                      fontWeight="medium"
-                    >
-                      Sign up
-                    </Heading>
-                  </Stack>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Full name
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={fullName}
-                      onChange={handleFullNameChange}
-                      isInvalid={fullNameError !== ""}
-                      style={{ borderColor: fullNameError ? "#ba0517" : "" }}
-                    />
-                    {fullNameError && (
-                      <Text className="field-error">{fullNameError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Email
-                    </FormLabel>
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={handleEmailChange}
-                      isInvalid={emailError !== ""}
-                      style={{ borderColor: emailError ? "#ba0517" : "" }}
-                    />
-                    {emailError && (
-                      <Text className="field-error">{emailError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Phone number
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={phoneNumber}
-                      onChange={handlePhoneNumberChange}
-                      isInvalid={phoneNumberError !== ""}
-                      style={{
-                        borderColor: phoneNumberError ? "#ba0517" : "",
-                      }}
-                    />
-                    {phoneNumberError && (
-                      <Text className="field-error">{phoneNumberError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Company
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={company}
-                      onChange={handleCompanyChange}
-                      isInvalid={companyError !== ""}
-                      style={{ borderColor: companyError ? "#ba0517" : "" }}
-                    />
-                    {companyError && (
-                      <Text className="field-error">{companyError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Username
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={username}
-                      onChange={handleUserNameChange}
-                      isInvalid={userNameError !== ""}
-                      style={{ borderColor: userNameError ? "#ba0517" : "" }}
-                    />
-                    {userNameError && (
-                      <Text className="field-error">{userNameError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Password
-                    </FormLabel>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                      isInvalid={passwordError.length > 0}
-                      style={{
-                        borderColor: passwordError.length > 0 ? "#ba0517" : "",
-                      }}
-                    />
-                    {passwordError.map((error, index) => (
-                      <Text key={index} className="field-errorpass">
-                        {error}
-                      </Text>
-                    ))}
-                  </FormControl>
-                  <Flex justify="center">
-                    <Box>
-                      <ReCAPTCHA
-                        sitekey="6LfKDCwmAAAAAGbIrRaYEdmb1B4wJahLeN5GnCbQ"
-                        onChange={handleRecaptchaChange}
+              {submissionStatus === "success" ? (
+                <Box
+                  bg={useColorModeValue("white", "gray.700")}
+                  boxShadow={"lg"}
+                  p={8}
+                >
+                  <Text fontSize="lg" color="green.500" mb={4}>
+                    Mail Sent Successfully!
+                  </Text>
+                  <Text>
+                    Thank you for signing up! We have sent a verification email
+                    to {email}. Please check your inbox and follow the
+                    instructions to complete the registration process.
+                  </Text>
+                </Box>
+              ) : (
+                <Box
+                  bg={useColorModeValue("white", "gray.700")}
+                  boxShadow={"lg"}
+                  p={8}
+                >
+                  <Stack spacing={4}>
+                    <Stack align={"center"}>
+                      <Heading
+                        fontSize="lg"
+                        fontFamily="formCompTexts"
+                        color="customHeadingColor"
+                        size="myHeaderSizeForm"
+                        fontWeight="medium"
+                      >
+                        Sign up
+                      </Heading>
+                    </Stack>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Full name
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={fullName}
+                        onChange={handleFullNameChange}
+                        isInvalid={fullNameError !== ""}
+                        style={{ borderColor: fullNameError ? "#ba0517" : "" }}
                       />
-                    </Box>
-                  </Flex>
-                  {recaptchaError && (
-                    <Text className="field-error">{recaptchaError}</Text>
-                  )}
-                  <Flex gap="2" align="center">
-                    <Checkbox
-                      isCheckedBox={isCheckedBox}
-                      size="lg"
-                      className="checkbox-color"
-                      border={isCheckedBox ? "none" : "1px"}
-                      onChange={handleCheckboxChange}
-                      _hover={{ boxShadow: "0 0 0 0.25em rgba(0,0,0,.12)" }}
-                      icon={
-                        <CheckIcon
-                          sx={{
-                            _hover: {
-                              color: isCheckedBox ? "inherit" : "#747474",
-                              cursor: isCheckedBox ? "inherit" : "pointer",
-                            },
-                          }}
+                      {fullNameError && (
+                        <Text className="field-error">{fullNameError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Email
+                      </FormLabel>
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        isInvalid={emailError !== ""}
+                        style={{ borderColor: emailError ? "#ba0517" : "" }}
+                      />
+                      {emailError && (
+                        <Text className="field-error">{emailError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Phone number
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={phoneNumber}
+                        onChange={handlePhoneNumberChange}
+                        isInvalid={phoneNumberError !== ""}
+                        style={{
+                          borderColor: phoneNumberError ? "#ba0517" : "",
+                        }}
+                      />
+                      {phoneNumberError && (
+                        <Text className="field-error">{phoneNumberError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Company
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={company}
+                        onChange={handleCompanyChange}
+                        isInvalid={companyError !== ""}
+                        style={{ borderColor: companyError ? "#ba0517" : "" }}
+                      />
+                      {companyError && (
+                        <Text className="field-error">{companyError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Username
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={username}
+                        onChange={handleUserNameChange}
+                        isInvalid={userNameError !== ""}
+                        style={{ borderColor: userNameError ? "#ba0517" : "" }}
+                      />
+                      {userNameError && (
+                        <Text className="field-error">{userNameError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Password
+                      </FormLabel>
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        isInvalid={passwordError.length > 0}
+                        style={{
+                          borderColor:
+                            passwordError.length > 0 ? "#ba0517" : "",
+                        }}
+                      />
+                      {passwordError.map((error, index) => (
+                        <Text key={index} className="field-errorpass">
+                          {error}
+                        </Text>
+                      ))}
+                    </FormControl>
+                    <Flex justify="center">
+                      <Box>
+                        <ReCAPTCHA
+                          sitekey="6LfKDCwmAAAAAGbIrRaYEdmb1B4wJahLeN5GnCbQ"
+                          onChange={handleRecaptchaChange}
                         />
-                      }
-                    ></Checkbox>
-                    <Text fontSize="2xl">
-                      I agree to MuleSoft’s{" "}
-                      <Link variant="footerLink">terms of service</Link> and{" "}
-                      <Link variant="footerLink">privacy policy</Link>.
-                    </Text>
-                  </Flex>
-                  {checkboxError && (
-                    <Text className="field-error">{checkboxError}</Text>
-                  )}
-                  <Button variant="formButtons" onClick={handleSubmit}>
-                    Sign up
-                  </Button>
-                </Stack>
-              </Box>
+                      </Box>
+                    </Flex>
+                    {recaptchaError && (
+                      <Text className="field-error">{recaptchaError}</Text>
+                    )}
+                    <Flex gap="2" align="center">
+                      <Checkbox
+                        isCheckedBox={isCheckedBox}
+                        size="lg"
+                        className="checkbox-color"
+                        border={isCheckedBox ? "none" : "1px"}
+                        onChange={handleCheckboxChange}
+                        _hover={{ boxShadow: "0 0 0 0.25em rgba(0,0,0,.12)" }}
+                        icon={
+                          <CheckIcon
+                            sx={{
+                              _hover: {
+                                color: isCheckedBox ? "inherit" : "#747474",
+                                cursor: isCheckedBox ? "inherit" : "pointer",
+                              },
+                            }}
+                          />
+                        }
+                      ></Checkbox>
+                      <Text fontSize="2xl">
+                        I agree to MuleSoft’s{" "}
+                        <Link variant="footerLink">terms of service</Link> and{" "}
+                        <Link variant="footerLink">privacy policy</Link>.
+                      </Text>
+                    </Flex>
+                    {checkboxError && (
+                      <Text className="field-error">{checkboxError}</Text>
+                    )}
+                    <Button variant="formButtons" onClick={handleSubmit}>
+                      Sign up
+                    </Button>
+                  </Stack>
+                </Box>
+              )}{" "}
             </Stack>
           </Flex>
         </Stack>

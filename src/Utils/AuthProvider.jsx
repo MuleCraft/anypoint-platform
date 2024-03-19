@@ -1,75 +1,39 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import PropTypes from "prop-types";
+import { createContext, useState, useEffect } from "react";
 import supabase from "./supabase";
+
 const AuthContext = createContext();
-export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("authToken") || null);
-  const [userData, setUserData] = useState(null);
-  const login = async (userToken, loggedInEmail) => {
-    setToken(userToken);
-    localStorage.setItem("authToken", JSON.stringify(userToken));
-    try {
-      const { data, error } = await supabase
-        .schema("mc_cap_develop")
-        .from("users")
-        .select("id, full_name, display_name, company")
-        .eq("email", loggedInEmail);
-      if (data) {
-        setUserData(data.length === 1 ? data[0] : data);
-      } else {
-        console.error("Error fetching user data:", error);
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-  const logout = () => {
-    setToken(null);
-    setUserData(null);
-    localStorage.removeItem("authToken");
-  };
-  const isAuthenticated = !!token;
+
+const AuthProvider = ({ children }) => {
+  const [session, setSession] = useState(null);
+  const [subscription, setSubscription] = useState(null);
+
   useEffect(() => {
-    const checkAuth = async () => {
-      const storedToken = localStorage.getItem("authToken");
-      if (storedToken) {
-        const parsedToken = JSON.parse(storedToken);
-        if (parsedToken && parsedToken.userId) {
-          try {
-            const { data, error } = await supabase
-              .schema("mc_cap_develop")
-              .from("users")
-              .select("id, full_name, display_name, company")
-              .eq("id", parsedToken.userId);
-            if (data) {
-              setUserData(data[0]);
-            } else {
-              console.error("Error fetching user data:", error);
-            }
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-          }
-        }
+    const handleAuthStateChange = (_event, session) => {
+      setSession(session);
+    };
+
+    const authSubscription = supabase.auth.onAuthStateChange(
+      handleAuthStateChange
+    );
+
+    const initialSession = supabase.auth.getSession();
+    if (initialSession) {
+      setSession(initialSession);
+    }
+
+    setSubscription(authSubscription);
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
       }
     };
-    checkAuth();
   }, []);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, userData }}>
+    <AuthContext.Provider value={{ session, setSession }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return context;
-};
+export { AuthProvider, AuthContext };

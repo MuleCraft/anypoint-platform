@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import muleicon from "/Images/mulecommunity.svg";
 import {
   Box,
@@ -10,54 +10,81 @@ import {
   MenuItem,
   Stack,
   Image,
+  HStack,
   Text,
   IconButton,
-  HStack,
-  Avatar,
   VStack,
   Spacer,
-  Link as ChakraLink,
+  Avatar,
 } from "@chakra-ui/react";
-import "../assets/Common.css";
 import { CiLogout, CiMenuBurger } from "react-icons/ci";
-import { CgProfile, CgNotes } from "react-icons/cg";
-import { RxLapTimer } from "react-icons/rx";
-import { LiaUserGraduateSolid } from "react-icons/lia";
+import { HiOutlineBuildingOffice } from "react-icons/hi2";
+import { IoIosArrowDown } from "react-icons/io";
+import { GoQuestion } from "react-icons/go";
 import { PiChatsFill, PiBookOpenText } from "react-icons/pi";
 import { BiSupport } from "react-icons/bi";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
-import { IoIosArrowDown } from "react-icons/io";
-import "../assets/Common.css";
+import { LiaUserGraduateSolid } from "react-icons/lia";
+import { RxLapTimer } from "react-icons/rx";
+import { CgNotes, CgProfile } from "react-icons/cg";
 import { ImCompass2 } from "react-icons/im";
-import { GoQuestion } from "react-icons/go";
-import { HiOutlineBuildingOffice } from "react-icons/hi2";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import DrawerComponent from "./DrawerComponent";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../Utils/AuthProvider";
-
+import { AuthContext } from "../Utils/AuthProvider";
 import { Link as ReactRouterLink } from "react-router-dom";
+import supabase from "../Utils/supabase";
+
 const Nav = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
-  const { logout, userData } = useAuth();
+  const { session } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
+
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
   };
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing out:", error.message);
+    }
   };
+
+  useEffect(() => {
+    if (session) {
+      fetchUserData();
+    }
+  }, [session]);
+
+  const fetchUserData = async () => {
+    try {
+      const { data, error } = await supabase
+        .schema("mc_cap_develop")
+        .from("users")
+        .select("full_name, display_name, company")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching user data:", error.message);
+    }
+  };
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setHasScrolled(true);
-      } else {
-        setHasScrolled(false);
-      }
+      setHasScrolled(window.scrollY > 0);
     };
     window.addEventListener("scroll", handleScroll);
     return () => {
@@ -76,7 +103,7 @@ const Nav = () => {
       width="100%"
       zIndex={hasScrolled ? "10" : "auto"}
     >
-      <Flex h={16} alignItems={"center"} justifyContent={"space-between"}>
+      <Flex h={16} alignItems="center" justifyContent="space-between">
         <Flex align="center" gap="3">
           <IconButton
             bg="none"
@@ -85,11 +112,7 @@ const Nav = () => {
             _hover={{ bg: "#e5e5e5", borderRadius: "40px" }}
             onClick={handleDrawerOpen}
           />
-          <ChakraLink
-            as={ReactRouterLink}
-            to="/home/organisations"
-            variant="useCustomForgotLink"
-          >
+          <ReactRouterLink to="/home/organisations">
             <Flex
               align="center"
               gap="2"
@@ -100,22 +123,22 @@ const Nav = () => {
               borderRadius="40px"
               p={2}
             >
-              <Image src={muleicon} alt="mule icon " className="mule-icon" />
+              <Image src={muleicon} alt="mule icon" className="mule-icon" />
               <Text fontSize={{ base: "xs", sm: "sm" }} fontWeight="medium">
                 Community Platform
               </Text>
             </Flex>
-          </ChakraLink>
+          </ReactRouterLink>
         </Flex>
-        <Flex alignItems={"center"}>
-          <Stack direction={"row"} spacing={7}>
+        <Flex alignItems="center">
+          <Stack direction="row" spacing={7}>
             <Menu>
               <MenuButton
                 as={Button}
                 display={{ base: "none", md: "block" }}
-                rounded={"full"}
-                variant={"link"}
-                cursor={"pointer"}
+                rounded="full"
+                variant="link"
+                cursor="pointer"
                 minW={0}
                 _hover={{ bg: "#e5e5e5" }}
                 borderRadius="40px"
@@ -133,7 +156,7 @@ const Nav = () => {
                 minH="100px"
                 py="25px"
                 mt="3px"
-                alignItems={"center"}
+                alignItems="center"
               >
                 <Text
                   fontSize="sm"
@@ -168,9 +191,9 @@ const Nav = () => {
               <MenuButton
                 display={{ base: "none", md: "block" }}
                 as={Button}
-                rounded={"full"}
-                variant={"link"}
-                cursor={"pointer"}
+                rounded="full"
+                variant="link"
+                cursor="pointer"
                 minW={0}
                 _hover={{ bg: "#e5e5e5" }}
                 borderRadius="40px"
@@ -182,7 +205,7 @@ const Nav = () => {
                 <GoQuestion size="25" />
               </MenuButton>
               <MenuList
-                alignItems={"center"}
+                alignItems="center"
                 minW="320px"
                 p={6}
                 mt="1"
@@ -193,7 +216,7 @@ const Nav = () => {
                 </Text>
                 <VStack fontSize="xs" maxW="250px">
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
@@ -204,7 +227,7 @@ const Nav = () => {
                     </HStack>
                   </MenuItem>
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
@@ -217,7 +240,7 @@ const Nav = () => {
                     </HStack>
                   </MenuItem>
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
@@ -230,9 +253,9 @@ const Nav = () => {
                       </Text>
                     </HStack>
                   </MenuItem>
-                  <Spacer height={"25px"} />
+                  <Spacer height="25px" />
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
@@ -243,40 +266,40 @@ const Nav = () => {
                     </HStack>
                   </MenuItem>
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
                       <PiChatsFill size={25} />
-                      <Text> Forums</Text>
+                      <Text>Forums</Text>
                     </HStack>
                   </MenuItem>
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
                       <BiSupport size={25} />
-                      <Text> Help Center</Text>
+                      <Text>Help Center</Text>
                     </HStack>
                   </MenuItem>
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
                   >
                     <HStack>
                       <LiaUserGraduateSolid size={25} />
-                      <Text> Training</Text>
+                      <Text>Training</Text>
                     </HStack>
                   </MenuItem>
                   <MenuItem
-                    border="1px soild #fff"
+                    border="1px solid #fff"
                     padding="2px"
                     borderRadius="4px"
                     _hover={{ bg: "#e5e5e5" }}
@@ -292,9 +315,9 @@ const Nav = () => {
             <Menu>
               <MenuButton
                 as={Button}
-                rounded={"full"}
-                variant={"link"}
-                cursor={"pointer"}
+                rounded="full"
+                variant="link"
+                cursor="pointer"
                 minW={0}
                 borderRadius="full"
                 px="5px"
@@ -303,15 +326,15 @@ const Nav = () => {
                 _active={{ color: "#ff" }}
               >
                 <Avatar
-                  size={"sm"}
+                  size="sm"
                   bg="teal.500"
                   name={userData?.full_name}
                   src=""
-                  color={"white"}
+                  color="white"
                 />
               </MenuButton>
               <MenuList
-                alignItems={"center"}
+                alignItems="center"
                 px={5}
                 pt={3}
                 pb={2}
@@ -320,51 +343,51 @@ const Nav = () => {
                 mt={1}
               >
                 <Text fontSize="sm" fontWeight="medium">
-                  {userData?.full_name}
+                  {userData ? userData.full_name : "Loading..."}
                 </Text>
-                <Text fontSize="xs">{userData?.display_name}</Text>
+                <Text fontSize="xs">
+                  {userData ? userData.display_name : "Loading..."}
+                </Text>
                 <VStack spacing={3} pt={2}>
                   <MenuItem
                     fontSize="xs"
                     _hover={{ bg: "#e5e5e5" }}
-                    borderRadius={"4px"}
+                    borderRadius="4px"
                   >
                     <HStack>
                       <RxLapTimer />
-                      <Text> Usage</Text>
+                      <Text>Usage</Text>
                     </HStack>
                   </MenuItem>
                   <MenuItem
                     fontSize="xs"
                     _hover={{ bg: "#e5e5e5" }}
-                    borderRadius={"4px"}
+                    borderRadius="4px"
                   >
                     <HStack>
                       <CgProfile />
-                      <Text> Profile</Text>
+                      <Text>Profile</Text>
                     </HStack>
                   </MenuItem>
                   <MenuItem
                     fontSize="xs"
                     _hover={{ bg: "#e5e5e5" }}
-                    borderRadius={"4px"}
+                    borderRadius="4px"
                   >
                     <HStack>
                       <CgNotes />
-                      <Text> Privacy Policy</Text>
+                      <Text>Privacy Policy</Text>
                     </HStack>
                   </MenuItem>
                   <MenuItem
                     fontSize="xs"
                     _hover={{ bg: "#e5e5e5" }}
-                    borderRadius={"4px"}
+                    borderRadius="4px"
+                    onClick={handleLogout}
                   >
                     <HStack>
                       <CiLogout />
-                      <Text onClick={handleLogout} role="button">
-                        {""}
-                        Sign Out
-                      </Text>
+                      <Text>Sign Out</Text>
                     </HStack>
                   </MenuItem>
                 </VStack>

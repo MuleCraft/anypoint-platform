@@ -19,6 +19,7 @@ export default function App() {
           <Route element={<PrivateRoutes />}>
             <Route path="/home/organisations" element={<Home />} />
           </Route>
+          <Route path="login/new-password" element={<ResetPassword />} />
           <Route
             path="login/retrieve-username"
             element={<ForgotPasswordPage />}

@@ -7,6 +7,7 @@ import {
   Text,
   Button,
   Link,
+  Box,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import supabase from "../Utils/supabase"; // Import your Supabase client instance
@@ -15,7 +16,7 @@ import "../App.css";
 export default function ForgotCredentialsForm() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [requestSuccess, setRequestSuccess] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState("");
   const [requestError, setRequestError] = useState("");
 
   const handleEmailChange = (e) => {
@@ -32,15 +33,12 @@ export default function ForgotCredentialsForm() {
       setEmailError("Invalid email format");
       return;
     }
-
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email);
-
       if (error) {
         throw new Error(error.message);
       }
-
-      setRequestSuccess(true);
+      setSubmissionStatus("success");
     } catch (error) {
       setRequestError(error.message);
     }
@@ -71,24 +69,15 @@ export default function ForgotCredentialsForm() {
           lineHeight={1.5}
           color={"#5c5c5c"}
         >
-          If you forgot your username, enter your email address to receive a
-          list of your usernames.
-        </Text>
-        <Text
-          fontSize={"14px"}
-          fontWeight={500}
-          lineHeight={1.5}
-          color={"#5c5c5c"}
-        >
-          If you forgot your password, enter your username to reset your
-          password and create a new one.
+          If you forgot your password, enter your email to reset your password
+          and create a new one.
         </Text>
         <FormControl>
           <FormLabel fontSize={"14px"} fontWeight={400} color={"#5c5c5c"}>
             Email
           </FormLabel>
           <Input
-            type="text"
+            type="email"
             onChange={handleEmailChange}
             value={email}
             borderColor={emailError ? "red" : ""}
@@ -102,15 +91,19 @@ export default function ForgotCredentialsForm() {
         >
           Request Credentials
         </Button>
-        {requestSuccess && (
-          <Text fontSize={"14px"} color={"green"}>
-            Password reset email sent successfully!
-          </Text>
+        {submissionStatus === "success" && (
+          <Box bgColor="green.50" p={3} borderRadius={4} boxShadow="md">
+            <Text fontSize={"14px"} color={"green.500"}>
+              Password reset email sent successfully!
+            </Text>
+          </Box>
         )}
         {requestError && (
-          <Text fontSize={"14px"} color={"red"}>
-            {requestError}
-          </Text>
+          <Box bgColor="red.50" p={3} borderRadius={4} boxShadow="md">
+            <Text fontSize={"14px"} color={"red"}>
+              {requestError}
+            </Text>
+          </Box>
         )}
         <Link className="back-to-signin-stack" width={"100%"} href="/">
           <Button
