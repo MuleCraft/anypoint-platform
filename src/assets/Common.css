@@ -106,3 +106,6 @@
   color: #0176d3;
   transform: translateX(5px);
 }
+.access-management__sidecomp:hover .access_box{
+background-color: #0376d3;
+}

@@ -104,6 +104,7 @@ const theme = extendTheme({
     hovercolorHome: "#e5e5e5",
     profileTextIcon: "#06a59a",
     navText: "#2e2e2e",
+    boxColor: "#0376d3"
   },
   fontSizes: {
     lg: "20px",

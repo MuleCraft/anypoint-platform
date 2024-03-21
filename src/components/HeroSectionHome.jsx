@@ -43,6 +43,7 @@ export default function HeroSectionHome({ greeting }) {
         className="Hero-background"
         position="relative"
         height={{ base: "90px", lg: "170px" }}
+        mt="65px"
       >
         <Flex
           color="forWhiteText"
