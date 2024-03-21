@@ -22,7 +22,7 @@ export default function HeroSectionHome({ greeting }) {
   const fetchUserData = async () => {
     try {
       const { data, error } = await supabase
-        .schema("mc_cap_develop")
+        .schema("mc_cap_qa")
         .from("users")
         .select("full_name, display_name")
         .eq("id", session.user.id)

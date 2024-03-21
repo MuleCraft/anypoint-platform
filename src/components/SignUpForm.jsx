@@ -199,7 +199,7 @@ export default function SimpleCard() {
     if (validateForm()) {
       try {
         const { data: existingUsers, error: userError } = await supabase
-          .schema("mc_cap_develop")
+          .schema("mc_cap_qa")
           .from("users")
           .select("*")
           .eq("email", email)
@@ -244,7 +244,7 @@ export default function SimpleCard() {
 
   const insertAdditionalDetails = async (id) => {
     const { data, error } = await supabase
-      .schema("mc_cap_develop")
+      .schema("mc_cap_qa")
       .from("users")
       .upsert([
         {
