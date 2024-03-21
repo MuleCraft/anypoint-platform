@@ -81,31 +81,6 @@ const Nav = ({ name, pathValue }) => {
       console.error("Error fetching user data:", error.message);
     }
   };
-
-  useEffect(() => {
-    if (session) {
-      fetchUserData();
-    }
-  }, [session]);
-
-  const fetchUserData = async () => {
-    try {
-      const { data, error } = await supabase
-        .schema("mc_cap_develop")
-        .from("users")
-        .select("full_name, display_name, company")
-        .eq("id", session.user.id)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-      setUserData(data);
-    } catch (error) {
-      console.error("Error fetching user data:", error.message);
-    }
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       setHasScrolled(window.scrollY > 0);
