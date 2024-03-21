@@ -5,6 +5,7 @@ import sections from "../utils/AM-sidebar";
 import { Box, Flex } from "@chakra-ui/react";
 import HorizontalSidebar from "../../components/HorizontalSidebar";
 import userTab from "../utils/AM-userTab";
+import UserInvite from "../../components/AM-Component/userInvite";
 
 
 export default function AMUserList({ name }) {
@@ -27,18 +28,15 @@ export default function AMUserList({ name }) {
                                 onItemSelect={handleItemSelect}
                             />
                         </Box>
-                        <Flex direction="column" w="full" m="200">
+                        <Flex direction="column" ml="200" mt="200" zIndex="-0">
                             <HorizontalSidebar
                                 sections={userTab}
                                 activeItem={activeItem}
                                 onItemSelect={handleItemSelect}
                             />
 
-                            <Box p="4" flex="1">
-
-                                <h1>Hello, World!</h1>
-                                <p>This is the main content area below the horizontal sidebar.</p>
-
+                            <Box p="4" mt={"-60px"}>
+                                <UserInvite />
                             </Box>
                         </Flex>
                     </Flex>

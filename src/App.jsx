@@ -8,7 +8,6 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPassword from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import { AuthProvider } from "./Utils/AuthProvider";
-import AMMaim from "./pages/Access-Management/AM-main";
 import AMTeams from "./pages/Access-Management/AM-teams";
 import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
 import AMUserList from "./pages/Access-Management/AM-userList";
@@ -26,15 +25,13 @@ export default function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignUpPage />} />
           <Route path="use-custom-domain" element={<UseCustomDomainPage />} />
-
-
           <Route
             element={<PrivateRoutes />}
           >
 
           </Route>
           <Route path="/home/organisations" element={<Home name={AnypointPlatform} />} />
-          <Route path="/accounts/users" element={<AMMaim name={AccessManagement} />} />
+          <Route path="/accounts/users" element={<AMUserList name={AccessManagement} />} />
           <Route path="/accounts/teams" element={<AMTeams name={AccessManagement} />} />
           <Route path="accounts/businessGroups" element={<AMBusinessGroup name={AccessManagement} />} />
           <Route path="/accounts/users/list" element={<AMUserList name={AccessManagement} />} />
