@@ -4,7 +4,7 @@ import Sidebar from "../../components/sidebar";
 import sections from "../utils/AM-sidebar";
 
 
-export default function AMBusinessGroup({ name }) {
+export default function AMBusinessGroup({ name, pathValue }) {
     const [activeItem, setActiveItem] = useState('BusinessGroups');
 
 
@@ -15,12 +15,12 @@ export default function AMBusinessGroup({ name }) {
         <>
             <div className="home">
 
-                <Nav name={name} />
+                <Nav name={name} pathValue={pathValue} />
                 <div className="Wrapper">
                     <Sidebar
                         sections={sections}
-                        activeItem={activeItem} // The name of the currently active item
-                        onItemSelect={handleItemSelect} // Function to handle item selection
+                        activeItem={activeItem}
+                        onItemSelect={handleItemSelect}
                     />
                 </div>
             </div>

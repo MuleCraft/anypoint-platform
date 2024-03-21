@@ -13,8 +13,6 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
             h="auto"
             position="fixed"
             top="20"
-            zIndex="sticky"
-            overflowX="auto"
         >
             {sections.map((section, sectionIndex) => (
                 <Box key={sectionIndex} mr={1}>
