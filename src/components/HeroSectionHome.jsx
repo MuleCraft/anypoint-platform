@@ -1,14 +1,42 @@
+import { useContext, useEffect, useState } from "react";
 import { Box, Heading, Text, Flex, Image } from "@chakra-ui/react";
 import heroContentbackground from "/Images/herobannerbackground.svg";
 import "../assets/Common.css";
 import PropTypes from "prop-types";
-import { useAuth } from "../Utils/AuthProvider";
+import { AuthContext } from "../Utils/AuthProvider"; // Import AuthContext
+import supabase from "../Utils/supabase";
 HeroSectionHome.propTypes = {
   greeting: PropTypes.string.isRequired,
 };
 
 export default function HeroSectionHome({ greeting }) {
-  const { userData } = useAuth();
+  const { session } = useContext(AuthContext);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    if (session) {
+      fetchUserData();
+    }
+  }, [session]);
+
+  const fetchUserData = async () => {
+    try {
+      const { data, error } = await supabase
+        .schema("mc_cap_develop")
+        .from("users")
+        .select("full_name, display_name")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching user data:", error.message);
+    }
+  };
+
   return (
     <>
       <Box
@@ -28,10 +56,10 @@ export default function HeroSectionHome({ greeting }) {
           <Heading
             mt={{ base: "5px", lg: "0" }}
             fontSize={{ base: "22px", sm: "32" }}
-            textTransform=" capitalize"
+            textTransform="capitalize"
             textAlign="center"
           >
-            {greeting}, {userData?.userName} !
+            {userData ? `${greeting}, ${userData.display_name}!` : greeting}
           </Heading>
           <Text textAlign={"center"}>
             Welcome to the #1 platform for APIs and integrations

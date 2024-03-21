@@ -1,73 +1,129 @@
-import { Input,VStack,FormLabel,FormControl, Text, Button, HStack, Icon, Link, Box } from "@chakra-ui/react";
-import { ArrowBackIcon } from "@chakra-ui/icons";
-import "../App.css";
 import { useState } from "react";
-import { useParams } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
-import { sendResetLink } from "../Utils/SendResetLink";
-import EmailVerificationCard from "./EmailVerificationCard";
+import {
+  Input,
+  VStack,
+  FormLabel,
+  FormControl,
+  Text,
+  Button,
+  Link,
+  Box,
+} from "@chakra-ui/react";
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import supabase from "../Utils/supabase"; // Import your Supabase client instance
+import "../App.css";
 
-export default function ForgotCredentialsForm(){
+export default function ForgotCredentialsForm() {
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [submissionStatus, setSubmissionStatus] = useState("");
+  const [requestError, setRequestError] = useState("");
 
-    const [credential,setCredential] = useState('');
-    const [showForgotCredentialsForm, setShowForgotCredentialsForm] = useState(true);
-    const [showEmailVerificationCard, setShowEmailVerificationCard] = useState(false);
-    const [showLoadingCard, setShowLoadingCard] = useState(false);
-    const { code } = useParams();
-    const resetCode = code || uuidv4();
-    let emailData;
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    setEmailError("");
+  };
 
-    const updateCredential = (e) => {
-        setCredential(e.target.value);
-    };
-
-    const sendVerificationMail = () =>{
-        const resetMailResponse = sendResetLink(credential,resetCode);
-        resetMailResponse.then((email) => {
-            emailData = email;
-            const emailContainer = document.getElementById("responseContainer");
-            emailContainer.innerHTML = `Verification email has been sent to <span style="font-weight: bold; font-style: italic;">${emailData}</span>. Please check your email to reset your password.`;
-        });
-        if(emailData){
-            setShowForgotCredentialsForm(false);
-            setShowEmailVerificationCard(true);
-        }
-        else if(emailData === undefined){
-            setShowForgotCredentialsForm(false);
-            setShowLoadingCard(true);
-        }
+  const handleRequestCredentials = async () => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError("Email is required");
+      return;
+    } else if (!emailPattern.test(email)) {
+      setEmailError("Invalid email format");
+      return;
     }
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) {
+        throw new Error(error.message);
+      }
+      setSubmissionStatus("success");
+    } catch (error) {
+      setRequestError(error.message);
+    }
+  };
 
-    return(
-        <>
-        {showLoadingCard && (
-            <Box id="responseContainer" bgColor={'white'} width={['100%','450px']} padding={['40px 20px','40px']} spacing={3} maxW={'950px'} 
-            borderRadius={'2px'} boxShadow={'0 5px 30px 0 rgba(0,0,0,.15)'}>
-                <Text>Sending your verification email...</Text>
-            </Box>
+  return (
+    <>
+      <VStack
+        bgColor={"white"}
+        width={["100%", "450px"]}
+        padding={["40px 20px", "40px"]}
+        spacing={3}
+        maxW={"950px"}
+        borderRadius={"2px"}
+        boxShadow={"0 5px 30px 0 rgba(0,0,0,.15)"}
+      >
+        <Text
+          fontSize={"20px"}
+          fontWeight={700}
+          color={"#5c5c5c"}
+          align={"center"}
+        >
+          Forgot your credentials?
+        </Text>
+        <Text
+          fontSize={"14px"}
+          fontWeight={500}
+          lineHeight={1.5}
+          color={"#5c5c5c"}
+        >
+          If you forgot your password, enter your email to reset your password
+          and create a new one.
+        </Text>
+        <FormControl>
+          <FormLabel fontSize={"14px"} fontWeight={400} color={"#5c5c5c"}>
+            Email
+          </FormLabel>
+          <Input
+            type="email"
+            onChange={handleEmailChange}
+            value={email}
+            borderColor={emailError ? "red" : ""}
+          />
+          {emailError && <Text className="field-error">{emailError}</Text>}
+        </FormControl>
+        <Button
+          variant="formButtons"
+          width={"100%"}
+          onClick={handleRequestCredentials}
+        >
+          Request Credentials
+        </Button>
+        {submissionStatus === "success" && (
+          <Box bgColor="green.50" p={3} borderRadius={4} boxShadow="md">
+            <Text fontSize={"14px"} color={"green.500"}>
+              Password reset email sent successfully!
+            </Text>
+          </Box>
         )}
-        {showEmailVerificationCard &&(
-            <EmailVerificationCard email={emailData} 
-            message={"Please check your email to reset your password."}/>
+        {requestError && (
+          <Box bgColor="red.50" p={3} borderRadius={4} boxShadow="md">
+            <Text fontSize={"14px"} color={"red"}>
+              {requestError}
+            </Text>
+          </Box>
         )}
-        {showForgotCredentialsForm && (
-            <VStack bgColor={'white'} width={['100%','450px']} padding={['40px 20px','40px']} spacing={3} maxW={'950px'} 
-                    borderRadius={'2px'} boxShadow={'0 5px 30px 0 rgba(0,0,0,.15)'}>
-                <Text fontSize={'20px'} fontWeight={700} color={'#5c5c5c'} align={'center'}>Forgot your credentials?</Text>
-                <Text fontSize={'14px'} fontWeight={500} lineHeight={1.5} color={'#5c5c5c'}>If you forgot your username, enter your email address to receive a list of your usernames.</Text>
-                <Text fontSize={'14px'} fontWeight={500} lineHeight={1.5} color={'#5c5c5c'}>If you forgot your password, enter your username to reset your password and create a new one.</Text>
-                <FormControl>
-                    <FormLabel fontSize={'14px'} fontWeight={400} color={'#5c5c5c'}>Email address or username</FormLabel>
-                    <Input type='text' value={credential} onChange={updateCredential}/>
-                </FormControl>
-                <Button variant='formButtons' width={'100%'} onClick={sendVerificationMail}>Request Credentials</Button>
-                <Link className="back-to-signin-stack" width={'100%'} href="/">
-                    <Button fontSize={'14px'} fontWeight={500} variant={'text'} width={'100%'} color={'#5c5c5c'}>
-                        <ArrowBackIcon className="back-icon" width={'15px'} h={'15px'} display={'inline-flex'} mr={'3px'}/>
-                        Back to sign in
-                    </Button>
-                </Link>
-            </VStack>
-            )}
-    </>)
+        <Link className="back-to-signin-stack" width={"100%"} href="/">
+          <Button
+            fontSize={"14px"}
+            fontWeight={500}
+            variant={"text"}
+            width={"100%"}
+            color={"#5c5c5c"}
+          >
+            <ArrowBackIcon
+              className="back-icon"
+              width={"15px"}
+              h={"15px"}
+              display={"inline-flex"}
+              mr={"3px"}
+            />
+            Back to sign in
+          </Button>
+        </Link>
+      </VStack>
+    </>
+  );
 }

@@ -1,74 +1,116 @@
-import { Input,VStack,FormLabel,FormControl, Text, Button, FormHelperText } from "@chakra-ui/react";
+import { useState } from "react";
+import {
+  Input,
+  VStack,
+  FormLabel,
+  FormControl,
+  Text,
+  Button,
+  FormHelperText,
+} from "@chakra-ui/react";
+import supabase from "../Utils/supabase";
+import { useNavigate } from "react-router-dom";
 import "../App.css";
 import "../assets/Common.css";
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
-import { resetFlow } from "../Utils/ResetPassword";
 
-export default function ResetPasswordForm(){
+export default function ResetPasswordForm() {
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [requestError, setRequestError] = useState("");
+  const navigate = useNavigate();
 
-    const [newPassword,setNewPassword] = useState('');
-    const [resetError, setError] = useState("");
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const codeParam = queryParams.get('code');
+  const handleNewPasswordChange = (e) => {
+    const newPasswordValue = e.target.value;
+    setNewPassword(newPasswordValue);
+    setNewPasswordError("");
+    setRequestError("");
+    validatePassword(newPasswordValue);
+  };
 
-    let resetFlowMessage;
-    
-    const updateCredential = (e) => {
-            setNewPassword(e.target.value);
-            //console.log(newPassword);
-        };
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
 
-          async function updatePassword(){
-            const resetResponse = resetFlow(newPassword,codeParam);
-            //console.log(resetResponse);
-            
-            resetResponse
-            .then((response) => {
-              resetFlowMessage = response;
-              //console.log(resetFlowMessage, "reset response message");
-              throw new Error(resetFlowMessage);
-            })
-            .catch((error) => {
-              if (error.message === "Code not found.") {
-                setError("Code Expired. Re-request for credentials.");
-              } else {
-                console.log(error.message);
-              }
-            });
-            // var myHeaders = new Headers();
-            // myHeaders.append("clientId", "mulecraft");
-            // myHeaders.append("clientSecret", "mulecraft123");
-            // myHeaders.append("Content-Type", "application/json");
+    if (!passwordRegex.test(password)) {
+      console.log("Password validation failed");
+      setNewPasswordError(
+        "Password must contain at least 8 characters including one number, one uppercase, and one lowercase letter."
+      );
+      return false;
+    } else {
+      console.log("Password validation successful");
+      setNewPasswordError("");
+      return true;
+    }
+  };
 
-            // var raw = JSON.stringify({
-            //   "newPassword": newPassword
-            // });
+  const handleResetPassword = async () => {
+    if (!validatePassword(newPassword)) {
+      return;
+    }
+    try {
+      console.log("Attempting to reset password...");
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (error) {
+        throw new Error(error.message);
+      }
+      console.log("Password reset successful!");
+      navigate("/login");
+    } catch (error) {
+      setRequestError(error.message);
+    }
+  };
 
-            // var requestOptions = {
-            //   method: 'PUT',
-            //   headers: myHeaders,
-            //   body: raw,
-            //   redirect: 'follow'
-            // };
-            // fetch(resetUrl, requestOptions)
-            //   .then(response => response.text())
-            //   .then(result => console.log(result))
-            //   .catch(error => console.log('error', error));
-          }
+  return (
+    <VStack
+      bgColor={"white"}
+      width={["100%", "450px"]}
+      padding={["40px 20px", "40px"]}
+      spacing={3}
+      maxW={"950px"}
+      borderRadius={"2px"}
+      boxShadow={"0 5px 30px 0 rgba(0,0,0,.15)"}
+    >
+      <Text
+        fontSize={"20px"}
+        fontWeight={700}
+        color={"#5c5c5c"}
+        align={"center"}
+      >
+        Reset your password
+      </Text>
+      <FormControl p={"10px 0px"}>
+        <FormLabel fontSize={"14px"} fontWeight={400} color={"#5c5c5c"}>
+          New Password
+        </FormLabel>
+        <Input
+          type="password"
+          value={newPassword}
+          onChange={handleNewPasswordChange}
+        />
+        {newPasswordError && (
+          <Text className="field-error">{newPasswordError}</Text>
+        )}
+        {requestError && (
+          <Text fontSize={"14px"} color={"red"} mt={1}>
+            {requestError}
+          </Text>
+        )}
+        <FormHelperText fontSize={"12px"} mb={"20px"} color={"#747474"}>
+          Use at least 8 characters, including a number, an uppercase character,
+          and a lowercase character. You cannot reuse any of your previous three
+          passwords.
+        </FormHelperText>
+      </FormControl>
 
-    return(
-            <VStack bgColor={'white'} width={['100%','450px']} padding={['40px 20px','40px']} spacing={3} maxW={'950px'} 
-                    borderRadius={'2px'} boxShadow={'0 5px 30px 0 rgba(0,0,0,.15)'}>
-                <Text fontSize={'20px'} fontWeight={700} color={'#5c5c5c'} align={'center'}>Reset your password</Text>
-                {resetError && <p className="credential-error">{resetError}</p>}
-                <FormControl p={'10px 0px'}>
-                    <FormLabel fontSize={'14px'} fontWeight={400} color={'#5c5c5c'}>New Password</FormLabel>
-                    <Input type='text' value={newPassword} onChange={updateCredential}/>
-                    <FormHelperText fontSize={'12px'} mb={'20px'} color={'#747474'}>Use at least 8 characters, including a number, an uppercase character, and a lowercase character. You cannot reuse any of your previous three passwords.</FormHelperText>
-                </FormControl>
-                <Button variant='formButtons' width={'100%'} onClick={updatePassword} disabled={resetError}>Reset Password</Button>
-            </VStack>
-    )
+      <Button
+        variant="formButtons"
+        width={"100%"}
+        onClick={handleResetPassword}
+      >
+        Reset Password
+      </Button>
+    </VStack>
+  );
 }
