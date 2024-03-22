@@ -3,7 +3,7 @@ import Nav from "../components/NavbarHome";
 import HomeMain from "../components/HomeMain";
 import HomeFooter from "../components/HomeFooter";
 
-export default function Home({ name }) {
+export default function Home({ name, pathValue }) {
   const getGreeting = () => {
     const currentHour = new Date().getHours();
     return currentHour >= 5 && currentHour < 2
@@ -16,7 +16,7 @@ export default function Home({ name }) {
   return (
     <>
       <div className="home">
-        <Nav name={name} />
+        <Nav name={name} pathValue={pathValue} />
         <div className="Wrapper">
           <HeroSectionHome greeting={greeting} />
           <HomeMain />

@@ -8,7 +8,7 @@ import userTab from "../utils/AM-userTab";
 import UserInvite from "../../components/AM-Component/userInvite";
 
 
-export default function AMUserList({ name }) {
+export default function AMUserList({ name, pathValue }) {
     const [activeItem, setActiveItem] = useState('users');
 
 
@@ -18,7 +18,7 @@ export default function AMUserList({ name }) {
     return (
         <>
             <div className="home">
-                <Nav name={name} />
+                <Nav name={name} pathValue={pathValue} />
                 <div className="Wrapper">
                     <Flex>
                         <Box>
@@ -28,7 +28,7 @@ export default function AMUserList({ name }) {
                                 onItemSelect={handleItemSelect}
                             />
                         </Box>
-                        <Flex direction="column" ml="200" mt="200" zIndex="-0">
+                        <Flex direction="column" ml="200" mt="200">
                             <HorizontalSidebar
                                 sections={userTab}
                                 activeItem={activeItem}

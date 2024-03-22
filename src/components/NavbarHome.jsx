@@ -31,7 +31,7 @@ import Images from "./Images";
 import DynamicContent from "./AccessManagemntHelpCard";
 
 
-const Nav = ({ name }) => {
+const Nav = ({ name, pathValue }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const { session } = useContext(AuthContext);
@@ -74,12 +74,13 @@ const Nav = ({ name }) => {
       if (error) {
         throw error;
       }
+
+
       setUserData(data);
     } catch (error) {
       console.error("Error fetching user data:", error.message);
     }
   };
-
   useEffect(() => {
     const handleScroll = () => {
       setHasScrolled(window.scrollY > 0);
@@ -97,10 +98,9 @@ const Nav = ({ name }) => {
       bg="forWhiteText"
       className={hasScrolled ? "fixed-header" : ""}
       position={"fixed"}
-
       top={hasScrolled ? 0 : "auto"}
       width="100%"
-      zIndex={hasScrolled ? "10" : "auto"}
+      zIndex={"1"}
     >
       <Flex h={16} alignItems="center" justifyContent="space-between">
         <Flex align="center" gap="3">
@@ -111,7 +111,7 @@ const Nav = ({ name }) => {
             _hover={{ bg: "#e5e5e5", borderRadius: "40px" }}
             onClick={handleDrawerOpen}
           />
-          <ReactRouterLink to="/home/organisations">
+          <ReactRouterLink to={pathValue}>
             <Flex
               align="center"
               gap="2"
