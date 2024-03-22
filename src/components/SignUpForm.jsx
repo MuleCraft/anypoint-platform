@@ -17,23 +17,9 @@ import { CheckIcon } from "@chakra-ui/icons";
 import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
-import { createClient } from "@supabase/supabase-js";
-import { useParams } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import supabase from "../Utils/supabase";
-import EmailVerificationCard from "./EmailVerificationCard";
-
 export default function SimpleCard() {
-  // const supabase = createClient(
-  //   "https://lbtsbocemahbdavnlodi.supabase.co",
-  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxidHNib2NlbWFoYmRhdm5sb2RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MzM3NzYsImV4cCI6MjAxMjQwOTc3Nn0.E6DkrTeqEvJdZf-LJN9OzuQ2RfEiPGvU-73BydwQZJM",
-  //   { db: { schema: "mc_cap_dev" } }
-  // );
-
-  const { signupCode } = useParams();
-  const loginCode = signupCode || uuidv4();
-
-  const [isChecked, setIsChecked] = useState(false);
+  const [isCheckedBox, setIsCheckedBox] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -49,20 +35,15 @@ export default function SimpleCard() {
   const [passwordError, setPasswordError] = useState([]);
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
-  const [userExistsError, setUserExistsError] = useState("");
-  const [showEmailVerificationCard, setShowEmailVerificationCard] =
-    useState(false);
-
-  const showEmailVerification = () => {
-    setShowEmailVerificationCard(true);
-  };
-
+  const [submissionStatus, setSubmissionStatus] = useState(null);
   const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
-    setCheckboxError(isChecked ? "Required" : "");
+    setIsCheckedBox(!isCheckedBox);
+
+    setCheckboxError(isCheckedBox ? "Required" : "");
   };
   const handleRecaptchaChange = (value) => {
-    setRecaptchaChecked(Boolean(value));
+    setRecaptchaChecked(value);
+
     setRecaptchaError(value ? "" : "Required");
   };
 
@@ -174,21 +155,18 @@ export default function SimpleCard() {
     } else {
       setPhoneNumberError("");
     }
-
     if (company.trim().length < 2) {
       setCompanyError("Use at least 2 characters");
       isFormValid = false;
     } else {
       setCompanyError("");
     }
-
     if (username.trim().length < 3) {
       setUserNameError("Use at least 3 characters long");
       isFormValid = false;
     } else {
       setUserNameError("");
     }
-
     let passwordErrors = [];
     if (password.length < 8) {
       passwordErrors.push("Use at least 8 characters");
@@ -209,99 +187,80 @@ export default function SimpleCard() {
     } else {
       setRecaptchaError("");
     }
-
-    if (!isChecked) {
+    if (!isCheckedBox) {
       setCheckboxError("Required");
       isFormValid = false;
     } else {
       setCheckboxError("");
     }
-
     return isFormValid;
   };
-
   const handleSubmit = async () => {
     if (validateForm()) {
-      console.log("Form submitted");
-      await addUser();
-      showEmailVerification();
+      try {
+        const { data: existingUsers, error: userError } = await supabase
+          .schema("mc_cap_develop")
+          .from("users")
+          .select("*")
+          .eq("email", email)
+          .or(`display_name.eq.${username}`);
+
+        if (userError) {
+          console.error("Error checking existing users:", userError.message);
+          return;
+        }
+
+        if (existingUsers && existingUsers.length > 0) {
+          const existingUser = existingUsers[0];
+          if (existingUser.email === email) {
+            setEmailError("Email already exists");
+          }
+          if (existingUser.display_name === username) {
+            setUserNameError("Username already exists");
+          }
+          return;
+        }
+
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+        });
+
+        if (error) {
+          console.error("Error creating user:", error.message);
+        } else if (data && data.user && data.user.id) {
+          console.log("User created:", data.user);
+          await insertAdditionalDetails(data.user.id);
+          console.log("Signup successful!");
+        } else {
+          console.error("User object is missing 'id'.");
+        }
+        setSubmissionStatus("success");
+      } catch (error) {
+        console.error("Error:", error.message);
+      }
     }
   };
 
-  const addUser = async () => {
+  const insertAdditionalDetails = async (id) => {
     const { data, error } = await supabase
-      .schema("mc_cap_dev")
-      .from("capUsers")
-      .select()
-      .eq("userEmail", email);
-
-    if (data.length > 0) {
-      console.log("Email already exists!");
-    } else if (data.length === 0) {
-      const { data, error } = await supabase
-        .schema("mc_cap_dev")
-        .from("capUsers")
-        .select()
-        .eq("userName", username);
-      if (data.length > 0) {
-        console.log("User already exists!");
-        setUserExistsError("User already exists!");
-      } else if (error) {
-        console.log("Error confirming user existence.", error);
-      } else {
-        // const { data, error } = await supabase
-        //   .schema("mc_cap_dev")
-        //   .from("capUsers")
-        //   .insert({
-        //     userFullname: fullName,
-        //     userEmail: email,
-        //     userPhone: phoneNumber,
-        //     userCompany: company,
-        //     userName: username,
-        //     userPassword: password,
-        //     acceptedTerms: "true",
-        //     accountType: "self",
-        //     identityProvider: "CAP",
-        //     multiFactorAuth: "false",
-        //   });
-        // if (error) {
-        //   console.error("Error adding user:", error);
-        // } else {
-        //   console.log("New User added!");
-        // }
-        var myHeaders = new Headers();
-        myHeaders.append("clientId", "mulecraft");
-        myHeaders.append("clientSecret", "mulecraft123");
-        myHeaders.append("Content-Type", "application/json");
-
-        var raw = JSON.stringify({
-          userFullname: fullName,
-          userEmail: email,
-          userPhone: phoneNumber,
-          userCompany: company,
-          userName: username,
-          userPassword: password,
-          acceptedTerms: "true",
-          accountType: "Self",
-          identityProvider: "CAP",
-          multiFactorAuth: "false",
-          signupVerificationCode: loginCode
-        });
-
-        var requestOptions = {
-          method: 'POST',
-          headers: myHeaders,
-          body: raw,
-          redirect: 'follow'
-        };
-
-        fetch("http://mc-cap-email-system-api.us-e2.cloudhub.io/addUser", requestOptions)
-          .then(response => response.text())
-          .then(result => console.log(result))
-          .catch(error => console.log('error', error));
-      }
+      .schema("mc_cap_develop")
+      .from("users")
+      .upsert([
+        {
+          id: id,
+          full_name: fullName,
+          phone_number: phoneNumber,
+          display_name: username,
+          recaptcha_verification: "true",
+          acceptedterms_verification: "true",
+          company: company,
+        },
+      ]);
+    if (error) {
+      console.error("Error inserting additional details:", error.message);
     } else {
-      console.log("Error confirming user existence.", error);
+      console.log("Additional details inserted:", data);
     }
   };
   return (
@@ -324,193 +283,205 @@ export default function SimpleCard() {
               py={12}
               px={{ base: "0", sm: "6" }}
             >
-              <Box
-                bg={useColorModeValue("white", "gray.700")}
-                boxShadow={"lg"}
-                p={8}
-              >
-                <Stack spacing={4}>
-                  <Stack align={"center"}>
-                    <Heading
-                      fontSize="lg"
-                      fontFamily="formCompTexts"
-                      color="customHeadingColor"
-                      size="myHeaderSizeForm"
-                      fontWeight="medium"
-                    >
-                      Sign up
-                    </Heading>
-                  </Stack>
-                  {userExistsError ? (
-                    <Text className="credential-error">{userExistsError}</Text>
-                  ) : (
-                    showEmailVerificationCard && (
-                      <EmailVerificationCard email={email} />
-                    )
-                  )}
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Full name
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={fullName}
-                      onChange={handleFullNameChange}
-                      isInvalid={fullNameError !== ""}
-                      style={{ borderColor: fullNameError ? "#ba0517" : "" }}
-                    />
-                    {fullNameError && (
-                      <Text className="field-error">{fullNameError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Email
-                    </FormLabel>
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={handleEmailChange}
-                      isInvalid={emailError !== ""}
-                      style={{ borderColor: emailError ? "#ba0517" : "" }}
-                    />
-                    {emailError && (
-                      <Text className="field-error">{emailError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Phone number
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={phoneNumber}
-                      onChange={handlePhoneNumberChange}
-                      isInvalid={phoneNumberError !== ""}
-                      style={{ borderColor: phoneNumberError ? "#ba0517" : "" }}
-                    />
-                    {phoneNumberError && (
-                      <Text className="field-error">{phoneNumberError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Company
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={company}
-                      onChange={handleCompanyChange}
-                      isInvalid={companyError !== ""}
-                      style={{ borderColor: companyError ? "#ba0517" : "" }}
-                    />
-                    {companyError && (
-                      <Text className="field-error">{companyError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Username
-                    </FormLabel>
-                    <Input
-                      type="text"
-                      value={username}
-                      onChange={handleUserNameChange}
-                      isInvalid={userNameError !== ""}
-                      style={{ borderColor: userNameError ? "#ba0517" : "" }}
-                    />
-                    {userNameError && (
-                      <Text className="field-error">{userNameError}</Text>
-                    )}
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel
-                      color="formLabelColor"
-                      fontSize="xs"
-                      fontFamily="formCompTexts"
-                    >
-                      Password
-                    </FormLabel>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                      isInvalid={passwordError.length > 0}
-                      style={{
-                        borderColor: passwordError.length > 0 ? "#ba0517" : "",
-                      }}
-                    />
-                    {passwordError.map((error, index) => (
-                      <Text key={index} className="field-errorpass">
-                        {error}
-                      </Text>
-                    ))}
-                  </FormControl>
-                  <Flex justify="center">
-                    <Box>
-                      <ReCAPTCHA
-                        sitekey="6LfKDCwmAAAAAGbIrRaYEdmb1B4wJahLeN5GnCbQ"
-                        onChange={handleRecaptchaChange}
+              {submissionStatus === "success" ? (
+                <Box
+                  bg={useColorModeValue("white", "gray.700")}
+                  boxShadow={"lg"}
+                  p={8}
+                >
+                  <Text fontSize="lg" color="green.500" mb={4}>
+                    Mail Sent Successfully!
+                  </Text>
+                  <Text>
+                    Thank you for signing up! We have sent a verification email
+                    to {email}. Please check your inbox and follow the
+                    instructions to complete the registration process.
+                  </Text>
+                </Box>
+              ) : (
+                <Box
+                  bg={useColorModeValue("white", "gray.700")}
+                  boxShadow={"lg"}
+                  p={8}
+                >
+                  <Stack spacing={4}>
+                    <Stack align={"center"}>
+                      <Heading
+                        fontSize="lg"
+                        fontFamily="formCompTexts"
+                        color="customHeadingColor"
+                        size="myHeaderSizeForm"
+                        fontWeight="medium"
+                      >
+                        Sign up
+                      </Heading>
+                    </Stack>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Full name
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={fullName}
+                        onChange={handleFullNameChange}
+                        isInvalid={fullNameError !== ""}
+                        style={{ borderColor: fullNameError ? "#ba0517" : "" }}
                       />
-                    </Box>
-                  </Flex>
-                  {recaptchaError && (
-                    <Text className="field-error">{recaptchaError}</Text>
-                  )}
-                  <Flex gap="2" align="center">
-                    <Checkbox
-                      isChecked={isChecked}
-                      size="lg"
-                      className="checkbox-color"
-                      border={isChecked ? "none" : "1px"}
-                      onChange={handleCheckboxChange}
-                      _hover={{ boxShadow: "0 0 0 0.25em rgba(0,0,0,.12)" }}
-                      icon={
-                        <CheckIcon
-                          sx={{
-                            _hover: {
-                              color: isChecked ? "inherit" : "#747474",
-                              cursor: isChecked ? "inherit" : "pointer",
-                            },
-                          }}
+                      {fullNameError && (
+                        <Text className="field-error">{fullNameError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Email
+                      </FormLabel>
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={handleEmailChange}
+                        isInvalid={emailError !== ""}
+                        style={{ borderColor: emailError ? "#ba0517" : "" }}
+                      />
+                      {emailError && (
+                        <Text className="field-error">{emailError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Phone number
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={phoneNumber}
+                        onChange={handlePhoneNumberChange}
+                        isInvalid={phoneNumberError !== ""}
+                        style={{
+                          borderColor: phoneNumberError ? "#ba0517" : "",
+                        }}
+                      />
+                      {phoneNumberError && (
+                        <Text className="field-error">{phoneNumberError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Company
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={company}
+                        onChange={handleCompanyChange}
+                        isInvalid={companyError !== ""}
+                        style={{ borderColor: companyError ? "#ba0517" : "" }}
+                      />
+                      {companyError && (
+                        <Text className="field-error">{companyError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Username
+                      </FormLabel>
+                      <Input
+                        type="text"
+                        value={username}
+                        onChange={handleUserNameChange}
+                        isInvalid={userNameError !== ""}
+                        style={{ borderColor: userNameError ? "#ba0517" : "" }}
+                      />
+                      {userNameError && (
+                        <Text className="field-error">{userNameError}</Text>
+                      )}
+                    </FormControl>
+                    <FormControl>
+                      <FormLabel
+                        color="formLabelColor"
+                        fontSize="xs"
+                        fontFamily="formCompTexts"
+                      >
+                        Password
+                      </FormLabel>
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        isInvalid={passwordError.length > 0}
+                        style={{
+                          borderColor:
+                            passwordError.length > 0 ? "#ba0517" : "",
+                        }}
+                      />
+                      {passwordError.map((error, index) => (
+                        <Text key={index} className="field-errorpass">
+                          {error}
+                        </Text>
+                      ))}
+                    </FormControl>
+                    <Flex justify="center">
+                      <Box>
+                        <ReCAPTCHA
+                          sitekey="6LfKDCwmAAAAAGbIrRaYEdmb1B4wJahLeN5GnCbQ"
+                          onChange={handleRecaptchaChange}
                         />
-                      }
-                    ></Checkbox>
-
-                    <Text fontSize="2xl">
-                      I agree to MuleSoft’s{" "}
-                      <Link variant="footerLink">terms of service</Link> and{" "}
-                      <Link variant="footerLink">privacy policy</Link>.
-                    </Text>
-                  </Flex>
-                  {checkboxError && (
-                    <Text className="field-error">{checkboxError}</Text>
-                  )}
-                  <Button variant="formButtons" onClick={handleSubmit}>
-                    Sign up
-                  </Button>
-                </Stack>
-              </Box>
+                      </Box>
+                    </Flex>
+                    {recaptchaError && (
+                      <Text className="field-error">{recaptchaError}</Text>
+                    )}
+                    <Flex gap="2" align="center">
+                      <Checkbox
+                        isCheckedBox={isCheckedBox}
+                        size="lg"
+                        className="checkbox-color"
+                        border={isCheckedBox ? "none" : "1px"}
+                        onChange={handleCheckboxChange}
+                        _hover={{ boxShadow: "0 0 0 0.25em rgba(0,0,0,.12)" }}
+                        icon={
+                          <CheckIcon
+                            sx={{
+                              _hover: {
+                                color: isCheckedBox ? "inherit" : "#747474",
+                                cursor: isCheckedBox ? "inherit" : "pointer",
+                              },
+                            }}
+                          />
+                        }
+                      ></Checkbox>
+                      <Text fontSize="2xl">
+                        I agree to MuleSoft’s{" "}
+                        <Link variant="footerLink">terms of service</Link> and{" "}
+                        <Link variant="footerLink">privacy policy</Link>.
+                      </Text>
+                    </Flex>
+                    {checkboxError && (
+                      <Text className="field-error">{checkboxError}</Text>
+                    )}
+                    <Button variant="formButtons" onClick={handleSubmit}>
+                      Sign up
+                    </Button>
+                  </Stack>
+                </Box>
+              )}{" "}
             </Stack>
           </Flex>
         </Stack>

@@ -1,3 +1,4 @@
+import { useState, useContext } from "react";
 import {
   Flex,
   Box,
@@ -12,114 +13,58 @@ import {
   useColorModeValue,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { Link as ReactRouterLink, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link as ReactRouterLink } from "react-router-dom";
 import "../assets/Common.css";
-import { useAuth } from "../Utils/AuthProvider";
-import { useState } from "react";
 import AnimateCompForms from "./AnimateCompForms";
-
 import supabase from "../Utils/supabase";
-
+import { AuthContext } from "../Utils/AuthProvider";
+import { useNavigate } from "react-router-dom";
 export default function SimpleCard() {
   const [show, setShow] = useState(false);
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [error, setError] = useState("");
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [loginError, setError] = useState("");
   const handleClick = () => setShow(!show);
-
-  const handleUsernameBlur = () => {
-    if (username.trim() === "") {
-      setUsernameError("Required");
-    } else {
-      setUsernameError("");
-    }
+  const { setSession } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const handleEmailBlur = () => {
+    setEmailError(email.trim() === "" ? "Required" : "");
   };
 
   const handlePasswordBlur = () => {
-    if (password.trim() === "") {
-      setPasswordError("Required");
-    } else {
-      setPasswordError("");
-    }
+    setPasswordError(password.trim() === "" ? "Required" : "");
   };
-  async function verifyUserCredentials() {
+
+  const signInWithEmail = async () => {
+    setEmailError(email.trim() === "" ? "Required" : "");
+    setPasswordError(password.trim() === "" ? "Required" : "");
+
+    if (email.trim() === "" || password.trim() === "") {
+      return;
+    }
+
+    setError("");
+
     try {
-      setUsernameError("");
-      setPasswordError("");
-      setError("");
-
-      if (username.trim() === "" && password.trim() === "") {
-        throw new Error("Username and password are required");
-      }
-      if (username.trim() === "") {
-        throw new Error("Username is required");
-      }
-      if (password.trim() === "") {
-        throw new Error("Password is required");
-      }
-
-      const searchParams = new URLSearchParams(window.location.search);
-      const codeParam = searchParams.get("code");
-
-      const { data, error } = await supabase
-        .schema("mc_cap_dev")
-        .from("capUsers")
-        .select()
-        .eq("userName", username)
-        .eq("userPassword", password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
 
       if (error) {
-        throw new Error("Error connecting to the server");
+        throw new Error(error.message);
       }
 
-      if (data.length === 0) {
-        throw new Error("Your credentials are not valid.");
+      if (data) {
+        setSession(data.session);
+        navigate("/home/organisations");
       }
-      const userToken = {
-        userId: data[0] && data[0].id,
-      };
-
-      const { issue } = await supabase
-        .from("userVerification")
-        .delete()
-        .eq("userCode", codeParam);
-
-      const { dataValue, errorValue } = await supabase
-        .schema("mc_cap_dev")
-        .from("capUsers")
-        .update({ isVerified: "TRUE" })
-        .eq("userName", username)
-        .select();
-
-      if (dataValue) {
-        console.log("Login process ended!");
-      }
-      if (dataValue) {
-        console.log("Login process ended!");
-      }
-
-      login(userToken, username);
-
-      navigate("/home/organisations");
     } catch (error) {
-      if (error.message === "Username and password are required") {
-        setUsernameError("Required");
-        setPasswordError("Required");
-      } else if (error.message === "Username is required") {
-        setUsernameError("Required");
-      } else if (error.message === "Password is required") {
-        setPasswordError("Required");
-      } else if (error.message === "Error connecting to the server") {
-        setError("Error connecting to the server");
-      } else if (error.message === "Your credentials are not valid.") {
-        setError("Your credentials are not valid.");
-      }
+      setError(error.message);
     }
-  }
+  };
 
   return (
     <Box
@@ -154,27 +99,27 @@ export default function SimpleCard() {
                       Sign in
                     </Heading>
                   </Stack>
-                  {error && <p className="credential-error">{error}</p>}
+                  {loginError && (
+                    <p className="credential-error">{loginError}</p>
+                  )}
                   <FormControl>
                     <FormLabel
                       color="formLabelColor"
                       fontSize="xs"
                       fontFamily="formCompTexts"
                     >
-                      Username
+                      Email
                     </FormLabel>
                     <Input
                       type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      onBlur={handleUsernameBlur}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={handleEmailBlur}
                       style={{
-                        borderColor: usernameError ? "red" : "",
+                        borderColor: emailError ? "red" : "",
                       }}
                     />
-                    {usernameError && (
-                      <p className="field-error">{usernameError}</p>
-                    )}
+                    {emailError && <p className="field-error">{emailError}</p>}
                   </FormControl>
                   <FormControl>
                     <FormLabel
@@ -209,7 +154,8 @@ export default function SimpleCard() {
                   <Stack spacing={5}>
                     <Button
                       variant="formButtons"
-                      onClick={verifyUserCredentials}
+                      onClick={signInWithEmail}
+                      isLoading={false}
                     >
                       Sign in
                     </Button>
