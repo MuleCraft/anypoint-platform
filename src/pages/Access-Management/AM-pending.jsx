@@ -1,10 +1,11 @@
 import { useState } from "react";
 import Nav from "../../components/NavbarHome";
 import Sidebar from "../../components/sidebar";
-import sections from "../utils/AM-sidebar";
+import sections from "./utils/AM-sidebar";
 import { Box, Flex } from "@chakra-ui/react";
 import HorizontalSidebar from "../../components/HorizontalSidebar";
-import userTab from "../utils/AM-userTab";
+import userTab from "./utils/AM-userTab";
+import PendingInvitation from "../../components/AM-Component/pendingInvitation";
 
 
 export default function AMPending({ name }) {
@@ -27,23 +28,19 @@ export default function AMPending({ name }) {
                                 onItemSelect={handleItemSelect}
                             />
                         </Box>
-                        <Flex direction="column" w="full" m="200">
+                        <Flex direction="column" w="full" ml="200" mt="200">
                             <HorizontalSidebar
                                 sections={userTab}
                                 activeItem={activeItem}
                                 onItemSelect={handleItemSelect}
                             />
-
-                            <Box p="4" flex="1">
-
-                                <h1>Hello, World!</h1>
-                                <p>This is the main content area below the horizontal sidebar.</p>
-
+                            <Box p="4" w="100%" alignItems="center" justifyContent="center" >
+                                <PendingInvitation />
                             </Box>
                         </Flex>
                     </Flex>
                 </div>
-            </div>
+            </div >
         </>
     );
 }

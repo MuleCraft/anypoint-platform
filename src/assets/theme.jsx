@@ -105,7 +105,8 @@ const theme = extendTheme({
     profileTextIcon: "#06a59a",
     navText: "#2e2e2e",
     boxColor: "#0376d3",
-    modelColer: "#f3f3f3"
+    modelColor: "#f3f3f3",
+    textColor: "#9e9e9e"
   },
   fontSizes: {
     lg: "20px",

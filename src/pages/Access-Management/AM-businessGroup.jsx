@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Nav from "../../components/NavbarHome";
 import Sidebar from "../../components/sidebar";
-import sections from "../utils/AM-sidebar";
+import sections from "./utils/AM-sidebar";
 
 
 export default function AMBusinessGroup({ name, pathValue }) {
