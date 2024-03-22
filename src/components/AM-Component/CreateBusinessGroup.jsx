@@ -1,12 +1,12 @@
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, useDisclosure, Box } from "@chakra-ui/react";
 
 
-function VerticallyCenter() {
+function CreateBusinessGroup() {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     return (
         <>
-            <Button variant="formButtons" onClick={onOpen}>Invite users</Button>
+            <Button variant="formButtons" onClick={onOpen} minW={'fit-content'}>Create Bussiness Group</Button>
             <Modal onClose={onClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />
                 <ModalContent>
@@ -26,4 +26,4 @@ function VerticallyCenter() {
     );
 }
 
-export default VerticallyCenter;
+export default CreateBusinessGroup;
