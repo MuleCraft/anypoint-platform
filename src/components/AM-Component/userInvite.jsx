@@ -13,6 +13,7 @@ function VerticallyCenter() {
                     <Box bg="modelColor">
                         <ModalHeader>Modal Title</ModalHeader>
                     </Box>
+
                     <ModalCloseButton />
                     <ModalBody>
                         Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quam, alias.

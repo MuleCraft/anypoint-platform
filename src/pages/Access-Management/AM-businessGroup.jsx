@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button, Stack, Flex, Box, Text, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
+import { Stack, Flex, Box, Text, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
 import Nav from "../../components/NavbarHome";
 import Sidebar from "../../components/sidebar";
-import sections from "../utils/AM-sidebar";
+import sections from "./utils/AM-sidebar";
 import CreateBusinessGroup from "../../components/AM-Component/CreateBusinessGroup";
 import { FiSearch } from "react-icons/fi";
 
