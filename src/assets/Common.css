@@ -124,3 +124,12 @@ background-color: #0376d3;
   margin-right:0;
 }
 
+.chakra-checkbox__control {
+  border: 1px solid #747474 !important;
+}
+
+.chakra-checkbox__label {
+  font-size: 14px !important;
+  font-weight: 500;
+  color: #444444;
+}
