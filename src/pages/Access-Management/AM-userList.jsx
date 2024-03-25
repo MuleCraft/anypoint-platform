@@ -35,7 +35,7 @@ export default function AMUserList({ name, pathValue }) {
                                 onItemSelect={handleItemSelect}
                             />
 
-                            <Box p="4" mt={"-60px"}>
+                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px">
                                 <UserInvite />
                             </Box>
                         </Flex>

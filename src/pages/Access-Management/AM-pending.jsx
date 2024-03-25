@@ -34,7 +34,7 @@ export default function AMPending({ name }) {
                                 activeItem={activeItem}
                                 onItemSelect={handleItemSelect}
                             />
-                            <Box p="4" w="100%" alignItems="center" justifyContent="center" >
+                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px">
                                 <PendingInvitation />
                             </Box>
                         </Flex>
