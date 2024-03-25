@@ -1,22 +1,15 @@
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, useDisclosure,
-    Text, VStack, Select, Input, HStack, InputGroup, InputLeftElement, InputRightElement, Checkbox, Slider, SliderTrack, SliderFilledTrack, SliderThumb } from "@chakra-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem, IconButton, Modal, ModalOverlay, ModalContent,
+    ModalHeader, ModalFooter, ModalBody, useDisclosure, Button, VStack, Text, Select, Checkbox,
+    Input, InputGroup, InputLeftElement, InputRightElement, HStack, Slider, SliderTrack, SliderFilledTrack, SliderThumb } from "@chakra-ui/react";
+import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 
-function CreateBusinessGroup() {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+export default function BusinessGroupMenu(){
 
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
     const [designSliderValue, setDesignSliderValue] = useState(0);
-
-    const [isGroupSelected, setIsGroupSelected] = useState(false);
-    const [selectedGroupValue, setSelectedGroupValue] = useState("");
-
-    const handleSelectChange = (event) => {
-        const value = event.target.value;
-        setSelectedGroupValue(value);
-        setIsGroupSelected(value !== "");
-      };
 
     const handleSandboxSliderChange = (value) => {
         setSandboxSliderValue(value);
@@ -36,10 +29,24 @@ function CreateBusinessGroup() {
         setDesignSliderValue(inputValue);
     };
 
-    return (
+    return(
         <>
-            <Button variant="formButtons" onClick={onOpen} minW={'fit-content'}>Create Business Group</Button>
-            <Modal onClose={onClose} isOpen={isOpen} isCentered>
+        <Menu>
+            <MenuButton
+                as={IconButton}
+                aria-label='Options'
+                icon={<HiEllipsisHorizontal/>}
+                variant='outline'
+                h={'28px'} color="gray.500"
+                border={'1px solid #5c5c5c'}
+            />
+            <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
+                <MenuItem fontSize={14} onClick={onOpen}>
+                    Create child group
+                </MenuItem>
+            </MenuList>
+        </Menu>
+        <Modal onClose={onClose} isOpen={isOpen} isCentered>
             <ModalOverlay />
             <ModalContent minW={'350px'}>
                 <ModalHeader bg={'#f3f3f3'} fontSize={20} fontWeight={800} color={'#444444'}
@@ -56,16 +63,12 @@ function CreateBusinessGroup() {
                         <VStack spacing={0} fontSize={14} align={'flex-start'}>
                             <Text fontWeight={500} color={'#444444'}>Parent business group</Text>
                             <Text color={'#747474'} fontWeight={500}>Select a group you’re an administrator of to be the parent of this group.</Text>
-                            <Select variant={'outlined'} placeholder="Select..." color={'#747474'} fontSize={14} border={'1px solid #747474'} mt={1}
-                                    value={selectedGroupValue}
-                                    onChange={handleSelectChange}>
+                            <Select variant={'filled'} bgColor={'#e5e5e5'} fontSize={14} disabled border={'1px solid #c9c9c9'} mt={1}>
                                 <option value='option1'>MC</option>
                                 <option value='option2'>MuleCraft</option>
                                 <option value='option3'>Google</option>
                             </Select>
                         </VStack>
-                        { isGroupSelected && (
-                        <>
                         <VStack spacing={0} fontSize={14} align={'flex-start'} minW={'-webkit-fill-available'}>
                             <Text fontWeight={500} color={'#444444'}>Owner</Text>
                             <InputGroup >
@@ -145,8 +148,6 @@ function CreateBusinessGroup() {
                             </Slider>
                             </HStack>
                         </VStack>
-                        </>
-                        )}
                     </VStack>
                 </ModalBody>
                 <ModalFooter borderBottomRadius={15} justifyContent={'space-between'} borderTop={'1px solid #e5e5e5'}>
@@ -155,8 +156,6 @@ function CreateBusinessGroup() {
                 </ModalFooter>
             </ModalContent>
         </Modal>
-        </>
-    );
+    </>
+    )
 }
-
-export default CreateBusinessGroup;
