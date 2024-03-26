@@ -91,7 +91,7 @@ const ConversionTable = () => {
 
     return (
         <Box >
-            <Flex alignItems="center" justifyContent="space-between" >
+            <Flex alignItems="center" justifyContent="space-between"  >
                 <Button colorScheme="blue" onClick={onOpen}>Invite Users</Button>
                 <Modal onClose={onClose} isOpen={isOpen} isCentered size="xl">
                     <ModalOverlay />
@@ -135,7 +135,7 @@ const ConversionTable = () => {
                         </form>
                     </ModalContent>
                 </Modal>
-                <InputGroup>
+                <InputGroup maxW="-webkit-fit-content">
                     <InputLeftElement
                         pointerEvents="none"
                         top={4}
