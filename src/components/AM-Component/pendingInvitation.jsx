@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
     Table,
     Thead,
@@ -10,8 +10,6 @@ import {
     Input,
     Box,
     Flex,
-    Container,
-    VStack,
     FormControl,
     FormLabel,
     Button,
@@ -24,20 +22,20 @@ import {
     ModalFooter,
     useDisclosure,
     Text,
-    Divider
+    Divider,
+    Menu,
+    MenuButton,
+    VStack,
+    MenuList,
+    MenuItem,
+    IconButton,
+    InputLeftElement,
+    InputGroup
 } from '@chakra-ui/react';
-
+import { HiEllipsisHorizontal } from "react-icons/hi2";
+import { FiSearch } from "react-icons/fi";
 const ConversionTable = () => {
     const [filter, setFilter] = useState('');
-    const conversions = [
-        { from: 'inches', to: 'millimetres (mm)', multiplier: 25.4 },
-        { from: 'feet', to: 'centimetres (cm)', multiplier: 30.48 },
-        { from: 'yards', to: 'metres (m)', multiplier: 0.91444 },
-    ];
-
-    const filteredConversions = conversions.filter(conversion =>
-        conversion.from.toLowerCase().includes(filter.toLowerCase())
-    );
     const [emails, setEmails] = useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
@@ -65,7 +63,6 @@ const ConversionTable = () => {
             return;
         }
 
-
         toast({
             title: 'Invitations sent.',
             description: `We've sent invitations to ${emailArray.length} email(s).`,
@@ -79,11 +76,23 @@ const ConversionTable = () => {
         onClose();
     };
 
+    const conversions = [
+        { email: 'inches', send: 'millimetres (mm)', expires: 25.4, teams: 25.4 },
+        { email: 'feet', send: 'centimetres (cm)', expires: 30.48, teams: 25.4 },
+        { email: 'yards', send: 'metres (m)', expires: 0.91444, teams: 25.4 },
+    ];
+
+    const filteredConversions = conversions.filter(conversion =>
+        conversion.email.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', padding: '10px' };
+    const rowValueStyle = { fontSize: 14, padding: '10px' };
+
     return (
         <Box >
-            <Flex alignItems="center" justifyContent="space-between" >
+            <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Button colorScheme="blue" onClick={onOpen}>Invite Users</Button>
-
                 <Modal onClose={onClose} isOpen={isOpen} isCentered size="xl">
                     <ModalOverlay />
                     <ModalContent>
@@ -124,38 +133,68 @@ const ConversionTable = () => {
                         </form>
                     </ModalContent>
                 </Modal>
-                <Input
-                    placeholder="Filter by 'To convert'..."
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    my={4}
-                    width="200px"
-                />
+                <InputGroup>
+                    <InputLeftElement
+                        pointerEvents="none"
+                        top={4}
+                        left={4}
+                        children={<FiSearch color="gray" />}
+                    />
+                    <Input
+                        placeholder="Filter users"
+                        value={filter}
+                        onChange={(e) => setFilter(e.target.value)}
+                        my={4}
+                        ml={4}
+
+                    />
+                </InputGroup>
             </Flex>
+
             <TableContainer>
-                <Table variant="simple" size="md" >
+                <Table variant="simple" size="md">
                     <Thead borderBottomWidth="3px">
                         <Tr>
-                            <Th>Email</Th>
-                            <Th>Send</Th>
-                            <Th>Expires</Th>
-                            <Th>Teams</Th>
+                            <Th style={columnTitleStyle}>Email</Th>
+                            <Th style={columnTitleStyle}>Sent</Th>
+                            <Th style={columnTitleStyle}>Expires</Th>
+                            <Th style={columnTitleStyle}>Teams</Th>
+                            <Th style={columnTitleStyle} w={'80px'}></Th>
                         </Tr>
                     </Thead>
                     <Tbody>
                         {filteredConversions.map((conversion, index) => (
                             <Tr key={index}>
-                                <Td >{conversion.from}</Td>
-                                <Td>{conversion.to}</Td>
-                                <Td >{conversion.multiplier}</Td>
-                                <Td >{conversion.multiplier}</Td>
+                                <Td style={rowValueStyle}>{conversion.email}</Td>
+                                <Td style={rowValueStyle}>{conversion.send}</Td>
+                                <Td style={rowValueStyle}>{conversion.expires}</Td>
+                                <Td style={rowValueStyle}>{conversion.teams}</Td>
+                                <Td style={rowValueStyle}>
+                                    <Menu>
+                                        <MenuButton
+                                            as={IconButton}
+                                            aria-label='Options'
+                                            icon={<HiEllipsisHorizontal width="10px" />}
+                                            variant='outline'
+                                            h={'30px'} color="gray.500"
+                                            border={'1px solid #5c5c5c'}
+                                        />
+                                        <MenuList borderRadius={0}>
+                                            <MenuItem fontSize="sm">
+                                                Resend Invitation...
+                                            </MenuItem>
+                                            <MenuItem fontSize="sm" color="red">
+                                                Cancel Invitation...
+                                            </MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                </Td>
                             </Tr>
                         ))}
                     </Tbody>
-
                 </Table>
             </TableContainer>
-        </Box >
+        </Box>
     );
 };
 
