@@ -129,10 +129,16 @@ const DrawerComponent = ({ isOpen, onClose }) => {
                     p={1}
                     borderRadius="20px"
                   >
-                    <HStack>
-                      <Image src={apiManager} alt="api manager icon"></Image>
-                      <Text>API Manager</Text>
-                    </HStack>
+                    <ChakraLink
+                      as={ReactRouterLink}
+                      to="/accounts/users"
+                      variant="useCustomForgotLink"
+                    >
+                      <HStack>
+                        <Image src={apiManager} alt="api manager icon"></Image>
+                        <Text>API Manager</Text>
+                      </HStack>
+                    </ChakraLink>
                   </ListItem>
                   <ListItem
                     _hover={{ bg: "#e5e5e5" }}
