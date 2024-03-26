@@ -145,6 +145,8 @@ function InviteForm() {
         setEmails('');
         onClose();
     };
+    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', padding: '10px' };
+    const rowValueStyle = { fontSize: 14, padding: '20px' };
 
 
     return (
@@ -173,8 +175,11 @@ function InviteForm() {
                                                     type="text"
                                                     value={emails}
                                                     onChange={(e) => setEmails(e.target.value)}
-                                                    placeholder="Enter email addresses separated by commas"
+                                                    placeholder="max@community.com"
+                                                    h="55px"
+                                                    borderRadius="0px"
                                                 />
+
                                             </FormControl>
                                         </VStack>
                                     </Box>
@@ -218,14 +223,14 @@ function InviteForm() {
                     </MenuList>
                 </Menu>
             </Flex>
-            <Divider mb={6} mt={6} />
+
             <TableContainer>
                 <Table variant="simple" >
-                    <Thead borderBottomWidth="3px">
+                    <Thead borderBottomWidth="3px" >
                         {table.getHeaderGroups().map(headerGroup => (
-                            <Tr key={headerGroup.id}>
+                            <Tr key={headerGroup.id} >
                                 {headerGroup.headers.map(header => (
-                                    <Th key={header.id}>
+                                    <Th key={header.id} style={columnTitleStyle}>
                                         {flexRender(
                                             header.column.columnDef.header,
                                             header.getContext()
@@ -239,7 +244,7 @@ function InviteForm() {
                         {table.getRowModel().rows.map(row => (
                             <Tr key={row.id}>
                                 {row.getVisibleCells().map(cell => (
-                                    <Td key={cell.id}>
+                                    <Td key={cell.id} style={rowValueStyle}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </Td>
                                 ))}

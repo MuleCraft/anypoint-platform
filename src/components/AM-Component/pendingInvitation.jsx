@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Table,
     Thead,
@@ -91,7 +91,7 @@ const ConversionTable = () => {
 
     return (
         <Box >
-            <Flex alignItems="center" justifyContent="space-between" mb={4}>
+            <Flex alignItems="center" justifyContent="space-between" >
                 <Button colorScheme="blue" onClick={onOpen}>Invite Users</Button>
                 <Modal onClose={onClose} isOpen={isOpen} isCentered size="xl">
                     <ModalOverlay />
@@ -114,7 +114,9 @@ const ConversionTable = () => {
                                                     type="text"
                                                     value={emails}
                                                     onChange={(e) => setEmails(e.target.value)}
-                                                    placeholder="Enter email addresses separated by commas"
+                                                    placeholder="max@community.com"
+                                                    h="55px"
+                                                    borderRadius="0px"
                                                 />
                                             </FormControl>
                                         </VStack>
@@ -159,7 +161,7 @@ const ConversionTable = () => {
                             <Th style={columnTitleStyle}>Sent</Th>
                             <Th style={columnTitleStyle}>Expires</Th>
                             <Th style={columnTitleStyle}>Teams</Th>
-                            <Th style={columnTitleStyle} w={'80px'}></Th>
+                            <Th style={columnTitleStyle} w={'10px'}></Th>
                         </Tr>
                     </Thead>
                     <Tbody>

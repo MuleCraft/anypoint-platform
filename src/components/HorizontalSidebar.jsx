@@ -7,7 +7,7 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
     return (
         <Flex
             bg={useColorModeValue('white', 'gray.900')}
-            borderBottom="1px"
+            borderBottom="2px"
             borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
             w="full"
             h="auto"
