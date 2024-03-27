@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
     Box,
     Flex,
-    VStack,
     FormControl,
     FormLabel,
     Input,
@@ -38,6 +37,7 @@ import {
 } from "@tanstack/react-table";
 import { makeData } from "./makeData";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import adminAuthClient from '../../Utils/api';
 
 const defaultColumns = [
     {
@@ -106,90 +106,110 @@ function InviteForm() {
         autoResetFilters: false
     });
 
-    const [emails, setEmails] = useState('');
+
+
+
+    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', padding: '10px' };
+    const rowValueStyle = { fontSize: 14, padding: '20px' };
+
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [emails, setEmails] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [submissionStatus, setSubmissionStatus] = useState(null);
+
     const toast = useToast();
 
-    const isEmailValid = (email) => {
-        const regex = /\S+@\S+\.\S+/;
-        return regex.test(email);
+    const handleEmailChange = (event) => {
+        const value = event.target.value;
+        setEmails(value);
+        setEmailError("");
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const validateEmail = (email) => {
+        return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email);
+    };
 
-        const emailArray = emails.split(',').map(email => email.trim());
-        const invalidEmails = emailArray.filter(email => !isEmailValid(email));
+    const handleSubmit = async () => {
+        const emailList = emails.split(",").map((email) => email.trim());
+
+
+        const invalidEmails = emailList.filter((email) => !validateEmail(email));
 
         if (invalidEmails.length > 0) {
+            setEmailError("Please enter valid email addresses.");
+            return;
+        }
+
+        try {
+            await Promise.all(
+                emailList.map(async (email) => {
+                    const { error } = await adminAuthClient.inviteUserByEmail(email);
+                    if (error) {
+                        console.error(`Error inviting user ${email}:`, error.message);
+                        throw error;
+                    }
+                })
+            );
+
+            setSubmissionStatus("success");
+            onClose();
             toast({
-                title: 'Invalid email address',
-                description: "Please enter valid email addresses. Check the following: " + invalidEmails.join(', '),
-                status: 'error',
+                title: "Invitations sent successfully!",
+                status: "success",
                 duration: 5000,
                 isClosable: true,
                 position: "top-right"
             });
-            return;
+        } catch (error) {
+            console.error("Error inviting users:", error.message);
+            toast({
+                title: "Error inviting users",
+                description: error.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right"
+            });
         }
-
-        toast({
-            title: 'Invitations sent.',
-            description: `We've sent invitations to ${emailArray.length} email(s).`,
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-            position: "top-right"
-        });
-
-        setEmails('');
-        onClose();
     };
-
-
+    console.log(submissionStatus)
     return (
         <Box position="fixed" maxW="85%">
             <Flex alignItems="center" justifyContent="space-between" mb={4}>
                 <Button colorScheme="blue" onClick={onOpen}>Invite Users</Button>
-                <Modal onClose={onClose} isOpen={isOpen} isCentered size="xl">
+                <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
                     <ModalOverlay />
                     <ModalContent>
-                        <form onSubmit={handleSubmit}>
-                            <Box bg="modelColor" borderRadius="4px">
-                                <ModalHeader fontSize="lg" fontWeight="800">Invite users</ModalHeader>
-                            </Box>
-                            <Divider />
-                            <ModalBody>
-                                <Flex direction="column" align="left" justify="center" pb={3}>
-                                    <Box width="full">
-                                        <VStack spacing="4">
-                                            <FormControl id="email">
-                                                <FormLabel fontSize="md">Email addresses</FormLabel>
-                                                <Text pb={3} maxW="450px" fontSize="sm" color="textColor">
-                                                    Users will be invited to create a username and password.
-                                                    Separate multiple addresses with commas.
-                                                </Text>
-                                                <Input
-                                                    type="text"
-                                                    value={emails}
-                                                    onChange={(e) => setEmails(e.target.value)}
-                                                    placeholder="Enter email addresses separated by commas"
-                                                />
-                                            </FormControl>
-                                        </VStack>
-                                    </Box>
-                                </Flex>
-                            </ModalBody>
-                            <Divider />
-                            <ModalFooter>
-                                <Box alignItems="center" display="flex" justifyContent="space-between" width="full">
-                                    <Button onClick={onClose} variant="homePageButtons">Close</Button>
-                                    <Button type="submit" colorScheme="blue">
-                                        Send invitation
-                                    </Button>
-                                </Box>
-                            </ModalFooter>
-                        </form>
+                        <Box bg="modelColor" borderRadius="4px">
+                            <ModalHeader fontSize="lg" fontWeight="800">Invite users</ModalHeader>
+                        </Box>
+                        <Divider />
+                        <ModalBody>
+                            <FormControl id="email">
+                                <FormLabel fontSize="md">Email addresses</FormLabel>
+                                <Text pb={3} maxW="450px" fontSize="sm" color="textColor">
+                                    Users will be invited to create a username and password.
+                                    Separate multiple addresses with commas.
+                                </Text>
+                                <Input
+                                    type="text"
+                                    value={emails}
+                                    onChange={handleEmailChange}
+                                    placeholder="max@community.com"
+                                    isInvalid={emailError !== ""}
+                                    h="55px"
+                                    borderRadius="0px"
+                                />
+                                {emailError && <Text color="red.500">{emailError}</Text>}
+                            </FormControl>
+                        </ModalBody>
+                        <Divider />
+                        <ModalFooter justifyContent="space-between">
+                            <Button variant="homePageButtons" onClick={onClose}>Close</Button>
+                            <Button onClick={handleSubmit} colorScheme="blue">
+                                Send invitation
+                            </Button>
+                        </ModalFooter>
                     </ModalContent>
                 </Modal>
                 <Menu>
@@ -218,14 +238,14 @@ function InviteForm() {
                     </MenuList>
                 </Menu>
             </Flex>
-            <Divider mb={6} mt={6} />
+
             <TableContainer>
                 <Table variant="simple" >
-                    <Thead borderBottomWidth="3px">
+                    <Thead borderBottomWidth="3px" >
                         {table.getHeaderGroups().map(headerGroup => (
-                            <Tr key={headerGroup.id}>
+                            <Tr key={headerGroup.id} >
                                 {headerGroup.headers.map(header => (
-                                    <Th key={header.id}>
+                                    <Th key={header.id} style={columnTitleStyle}>
                                         {flexRender(
                                             header.column.columnDef.header,
                                             header.getContext()
@@ -239,7 +259,7 @@ function InviteForm() {
                         {table.getRowModel().rows.map(row => (
                             <Tr key={row.id}>
                                 {row.getVisibleCells().map(cell => (
-                                    <Td key={cell.id}>
+                                    <Td key={cell.id} style={rowValueStyle}>
                                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                     </Td>
                                 ))}

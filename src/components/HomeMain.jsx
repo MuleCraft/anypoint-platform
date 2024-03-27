@@ -171,7 +171,13 @@ export default function HomeMain() {
             <Flex alignItems="center" gap={2}>
               <Image src={apiManager} alt="api-manager" />
               <Box flex="1">
-                <Heading fontSize="sm">API Manager</Heading>
+                <ChakraLink
+                  as={ReactRouterLink}
+                  to="/organizations/environments/apis"
+                  className="home-main__index"
+                >
+                  <Heading fontSize="sm">API Manager</Heading>
+                </ChakraLink>
                 <Text>
                   Manage clients, policies, SLAs, traffic, and alerts.
                 </Text>

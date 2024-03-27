@@ -106,7 +106,8 @@ const theme = extendTheme({
     navText: "#2e2e2e",
     boxColor: "#0376d3",
     modelColor: "#f3f3f3",
-    textColor: "#9e9e9e"
+    textColor: "#9e9e9e",
+    activeColor: "#6b8a99"
   },
   fontSizes: {
     lg: "20px",
