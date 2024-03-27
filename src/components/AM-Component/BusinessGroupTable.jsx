@@ -21,7 +21,7 @@ const BusinessGroupTable = () => {
     useEffect(() => {
         if (session) {
           fetchUserData();
-          console.log('useEffect triggered')
+          console.log('useEffect triggered');
         }
       }, [session]);
 
