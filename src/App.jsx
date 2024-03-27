@@ -8,6 +8,7 @@ import ResetPassword from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import { AuthProvider } from "./Utils/AuthProvider";
 import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
+import AMBusinessGroupDetails from "./pages/Access-Management/AM-businessGroupDetails";
 import AMUserList from "./pages/Access-Management/AM-userList";
 import AMPending from "./pages/Access-Management/AM-pending";
 import APIMain from "./pages/Api-Manager/Api-main";
@@ -17,9 +18,11 @@ export default function App() {
   const AccessManagement = "Access Management";
   const AnypointPlatform = "Anypoint Platform";
 
+
   const ApiManager = "Api Manager";
   const AccessManagentPath = "/accounts/users"
   const ApiManagerPath = "/organizations/environments/apis"
+
 
   return (
     <Router>
