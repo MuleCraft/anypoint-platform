@@ -1,7 +1,7 @@
 import LoginPage from "./pages/LoginPage";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import SignUpPage from "./pages/SignUpPage";
-import UseCustomDomainPage from "./pages/UseCustomDomainPage";
+import UseCustomDomainPage from "./pages/UseCustomDomainPageComingSoon";
 import Home from "./pages/Home";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPassword from "./pages/ResetPasswordPage";
