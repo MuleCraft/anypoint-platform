@@ -8,24 +8,19 @@ const AuthProvider = ({ children }) => {
     const storedSession = localStorage.getItem("session");
     return storedSession ? JSON.parse(storedSession) : null;
   });
-
   useEffect(() => {
     const handleAuthStateChange = (_event, session) => {
       setSession(session);
       localStorage.setItem("session", JSON.stringify(session));
     };
-
     const authSubscription = supabase.auth.onAuthStateChange(
       handleAuthStateChange
     );
-
-    // Retrieve initial session
     const initialSession = supabase.auth.getSession();
     if (initialSession) {
       setSession(initialSession);
       localStorage.setItem("session", JSON.stringify(initialSession));
     }
-
     return () => {
       if (
         authSubscription &&
@@ -35,7 +30,6 @@ const AuthProvider = ({ children }) => {
       }
     };
   }, []);
-
   const refreshSession = async () => {
     try {
       const refreshedSession = await supabase.auth.refreshSession();
@@ -45,7 +39,6 @@ const AuthProvider = ({ children }) => {
       console.error("Error refreshing session:", error.message);
     }
   };
-
   return (
     <AuthContext.Provider value={{ session, setSession, refreshSession }}>
       {children}
