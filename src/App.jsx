@@ -8,6 +8,7 @@ import ResetPassword from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import { AuthProvider } from "./Utils/AuthProvider";
 import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
+import AMBusinessGroupDetails from "./pages/Access-Management/AM-businessGroupDetails";
 import AMUserList from "./pages/Access-Management/AM-userList";
 import AMPending from "./pages/Access-Management/AM-pending";
 
@@ -49,6 +50,7 @@ export default function App() {
                 />
               }
             />
+            <Route path="accounts/businessGroups/:groupCode" element={<AMBusinessGroupDetails name={AccessManagement} pathValue={AccessManagentPath} />} />
             <Route
               path="/accounts/users/list"
               element={
