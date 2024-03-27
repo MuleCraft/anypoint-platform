@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -17,9 +16,11 @@ import Sidebar from "./components/sidebar";
 export default function App() {
   const AccessManagement = "Access Management";
   const AnypointPlatform = "Anypoint Platform";
+
   const ApiManager = "Api Manager";
   const AccessManagentPath = "/accounts/users"
   const ApiManagerPath = "/organizations/environments/apis"
+
   return (
     <Router>
       <AuthProvider>
@@ -43,6 +44,7 @@ export default function App() {
 
           <Route path="login/new-password" element={<ResetPassword />} />
           <Route path="login/retrieve-username" element={<ForgotPasswordPage />} />
+
           <Route path="login/new-password" element={<ResetPassword />} />
         </Routes>
       </AuthProvider>
