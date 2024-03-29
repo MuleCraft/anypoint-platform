@@ -1,10 +1,8 @@
 import {
     Menu, MenuButton, MenuList, MenuItem, IconButton, Modal, ModalOverlay, ModalContent,
     ModalHeader, ModalFooter, ModalBody, useDisclosure, Button, VStack, Text, Select, Checkbox,
-
     Input, InputGroup, InputLeftElement, InputRightElement, HStack, Slider, SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel
 } from "@chakra-ui/react";
-
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
 import { useState } from "react";

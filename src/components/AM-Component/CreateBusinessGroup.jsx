@@ -1,10 +1,8 @@
 import {
     Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, useDisclosure,
-
     Text, VStack, Select, Input, HStack, InputGroup, InputLeftElement, InputRightElement, Checkbox, Slider,
     SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel
 } from "@chakra-ui/react";
-
 import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 

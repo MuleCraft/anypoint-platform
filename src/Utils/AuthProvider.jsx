@@ -51,7 +51,6 @@ const AuthProvider = ({ children }) => {
         authSubscription.unsubscribe();
       }
     };
-
   }, []);
   const refreshSession = async () => {
     try {
