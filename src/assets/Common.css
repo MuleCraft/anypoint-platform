@@ -23,12 +23,12 @@
     transform: translateY(-5%);
   }
   100% {
-    transform: translateY(0); /* Fix translateY value */
+    transform: translateY(0);
   }
 }
 
 .animation-comp {
-  animation: 1s ease-out 0s 1 slideInFromLeft; /* Corrected animation name */
+  animation: 1s ease-out 0s 1 slideInFromLeft;
 }
 
 @keyframes slideInFromLeft {
@@ -106,22 +106,22 @@
   color: #0176d3;
   transform: translateX(5px);
 }
-.access-management__sidecomp:hover .access_box{
-background-color: #0376d3;
+.access-management__sidecomp:hover .access_box {
+  background-color: #0376d3;
 }
 
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); 
-    z-index: 1000; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
-.css-1w6lhxg{
-  margin-right:0;
+.css-1w6lhxg {
+  margin-right: 0;
 }
 
 .chakra-checkbox__control {
