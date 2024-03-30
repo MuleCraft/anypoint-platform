@@ -4,11 +4,33 @@ import supabase from "./supabase";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
+  const [userData, setUserData] = useState(null);
   const [session, setSession] = useState(() => {
     const storedSession = localStorage.getItem("session");
     return storedSession ? JSON.parse(storedSession) : null;
   });
   useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data, error } = await supabase
+          .schema("mc_cap_develop")
+          .from("users")
+          .select("full_name, display_name, company")
+          .eq("id", session.user.id)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        setUserData(data);
+      } catch (error) {
+        console.error("Error fetching user data:", error.message);
+      }
+    };
+
+    fetchUserData();
+
     const handleAuthStateChange = (_event, session) => {
       setSession(session);
       localStorage.setItem("session", JSON.stringify(session));
@@ -40,7 +62,7 @@ const AuthProvider = ({ children }) => {
     }
   };
   return (
-    <AuthContext.Provider value={{ session, setSession, refreshSession }}>
+    <AuthContext.Provider value={{ session, setSession, refreshSession, userData }}>
       {children}
     </AuthContext.Provider>
   );

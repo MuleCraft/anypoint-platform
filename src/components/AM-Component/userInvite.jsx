@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
     Box,
     Flex,
@@ -38,6 +38,8 @@ import {
 import { makeData } from "./makeData";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import adminAuthClient from '../../Utils/api';
+import { AuthContext } from '../../Utils/AuthProvider';
+
 
 const defaultColumns = [
     {
@@ -85,10 +87,10 @@ const defaultColumns = [
 function InviteForm() {
     const [data] = useState(() => makeData());
     const [columns] = useState(() => [...defaultColumns]);
-
+    const { userData } = useContext(AuthContext);
     const [columnVisibility, setColumnVisibility] = useState({});
     const [columnOrder, setColumnOrder] = useState([]);
-
+    const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
     const table = useReactTable({
         data,
         columns,
@@ -143,7 +145,7 @@ function InviteForm() {
         try {
             await Promise.all(
                 emailList.map(async (email) => {
-                    const { error } = await adminAuthClient.inviteUserByEmail(email);
+                    const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
                     if (error) {
                         console.error(`Error inviting user ${email}:`, error.message);
                         throw error;
@@ -172,7 +174,6 @@ function InviteForm() {
             });
         }
     };
-    console.log(submissionStatus)
     return (
         <Box position="fixed" maxW="85%">
             <Flex alignItems="center" justifyContent="space-between" mb={4}>
@@ -201,6 +202,17 @@ function InviteForm() {
                                     borderRadius="0px"
                                 />
                                 {emailError && <Text color="red.500">{emailError}</Text>}
+                                <FormLabel fontSize="md" pt={3}>Teams</FormLabel>
+                                <Text pb={3} maxW="450px" fontSize="sm" color="textColor">
+
+                                    Invited users will be added to these teams, with the selected membership type.
+                                </Text>
+                                <Input
+                                    type="text"
+                                    value={userData?.company}
+                                    isDisabled
+                                    h="55px"
+                                />
                             </FormControl>
                         </ModalBody>
                         <Divider />

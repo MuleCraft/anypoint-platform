@@ -1,36 +1,36 @@
 import { useState } from "react";
 import {
-    Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
-    TableContainer,
-    Link,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Link,
 } from "@chakra-ui/react";
 import BusinessGroupMenu from "./BusinessGroupMenu";
 import fetchUserSessionData from "../../Utils/SessionUserData";
 
 const BusinessGroupTable = () => {
 
-    const [hoveredRows, setHoveredRows] = useState([]);
+  const [hoveredRows, setHoveredRows] = useState([]);
 
-    const handleRowHover = (index) => {
-        setHoveredRows((prevHoveredRows) => {
-            const newHoveredRows = [...prevHoveredRows];
-            newHoveredRows[index] = true;
-            return newHoveredRows;
-        });
-    };
+  const handleRowHover = (index) => {
+    setHoveredRows((prevHoveredRows) => {
+      const newHoveredRows = [...prevHoveredRows];
+      newHoveredRows[index] = true;
+      return newHoveredRows;
+    });
+  };
 
-    const handleRowNotHover = (index) => {
-        setHoveredRows((prevHoveredRows) => {
-            const newHoveredRows = [...prevHoveredRows];
-            newHoveredRows[index] = false;
-            return newHoveredRows;
-        });
-    };
+  const handleRowNotHover = (index) => {
+    setHoveredRows((prevHoveredRows) => {
+      const newHoveredRows = [...prevHoveredRows];
+      newHoveredRows[index] = false;
+      return newHoveredRows;
+    });
+  };
 
   const columnTitleStyle = {
     fontSize: 14,
@@ -41,24 +41,24 @@ const BusinessGroupTable = () => {
   };
   const rowValueStyle = { fontSize: 14, padding: "10px" };
 
-    const userTableData = fetchUserSessionData();
-    let userMailAddress;
-    // console.log('table data',userTableData);
-    userTableData.then((response) => {
-      // console.log(response.company);
-      userMailAddress = response.email;
-      console.log('user email: ',userMailAddress);
-    })
+  const userTableData = fetchUserSessionData();
+  let userMailAddress;
+  // console.log('table data',userTableData);
+  userTableData.then((response) => {
+    // console.log(response.company);
+    userMailAddress = response.email;
+    console.log('user email: ', userMailAddress);
+  })
     .catch((error) => {
-        console.log(error.message);
+      console.log(error.message);
     });
 
-    const groupDetails = [
-      { name: "MC", environments: 2, totalvCores: 2 },
-      // tableDetails.map((data,index)=>(
-      //   { groupName: "MC", environments: 2, totalvCores: 2 }
-      // ))
-    ];
+  const groupDetails = [
+    { name: "MC", environments: 2, totalvCores: 2 },
+    // tableDetails.map((data,index)=>(
+    //   { groupName: "MC", environments: 2, totalvCores: 2 }
+    // ))
+  ];
 
   return (
     <TableContainer>
