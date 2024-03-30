@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState } from "react";
 import {
   Table,
   Thead,
@@ -10,38 +10,9 @@ import {
   Link,
 } from "@chakra-ui/react";
 import BusinessGroupMenu from "./BusinessGroupMenu";
-import { AuthContext } from "../../Utils/AuthProvider";
-import supabase from "../../Utils/supabase";
+import fetchUserSessionData from "../../Utils/SessionUserData";
 
 const BusinessGroupTable = () => {
-  const { session } = useContext(AuthContext);
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    if (session) {
-      fetchUserData();
-      console.log("useEffect triggered");
-    }
-  }, [session]);
-
-  const fetchUserData = async () => {
-    try {
-      const { data, error } = await supabase
-        .schema("mc_cap_develop")
-        .from("users")
-        .select("full_name, display_name, company")
-        .eq("id", session.user.id)
-        .single();
-
-      if (error) {
-        throw error;
-      }
-      setUserData(data);
-      console.log("User data: ", userData);
-    } catch (error) {
-      console.error("Error fetching user data:", error.message);
-    }
-  };
 
   const [hoveredRows, setHoveredRows] = useState([]);
 
@@ -61,11 +32,6 @@ const BusinessGroupTable = () => {
     });
   };
 
-  const groupDetails = [
-    { name: "MC", environments: 2, totalvCores: 2 },
-    { name: "MC", environments: 2, totalvCores: 2 },
-  ];
-
   const columnTitleStyle = {
     fontSize: 14,
     color: "#444444",
@@ -74,6 +40,25 @@ const BusinessGroupTable = () => {
     padding: "10px",
   };
   const rowValueStyle = { fontSize: 14, padding: "10px" };
+
+    const userTableData = fetchUserSessionData();
+    let userMailAddress;
+    // console.log('table data',userTableData);
+    userTableData.then((response) => {
+      // console.log(response.company);
+      userMailAddress = response.email;
+      console.log('user email: ',userMailAddress);
+    })
+    .catch((error) => {
+        console.log(error.message);
+    });
+
+    const groupDetails = [
+      { name: "MC", environments: 2, totalvCores: 2 },
+      // tableDetails.map((data,index)=>(
+      //   { groupName: "MC", environments: 2, totalvCores: 2 }
+      // ))
+    ];
 
   return (
     <TableContainer>
@@ -91,7 +76,7 @@ const BusinessGroupTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {groupDetails.map((conversion, index) => (
+          {groupDetails.map((dataValue, index) => (
             <Tr
               key={index}
               fontWeight={500}
@@ -104,11 +89,11 @@ const BusinessGroupTable = () => {
                   _hover={{ textDecoration: "underline" }}
                   color={hoveredRows[index] ? "#0176d3" : "#444444"}
                 >
-                  {conversion.name}
+                  {dataValue.name}
                 </Link>
               </Td>
-              <Td style={rowValueStyle}>{conversion.environments}</Td>
-              <Td style={rowValueStyle}>{conversion.totalvCores}</Td>
+              <Td style={rowValueStyle}>2</Td>
+              <Td style={rowValueStyle}>2</Td>
               <Td style={rowValueStyle}>
                 <BusinessGroupMenu />
               </Td>

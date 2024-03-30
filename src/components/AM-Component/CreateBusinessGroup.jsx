@@ -1,8 +1,11 @@
 import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, useDisclosure,
     Text, VStack, Select, Input, HStack, InputGroup, InputLeftElement, InputRightElement, Checkbox, Slider,
-    SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel } from "@chakra-ui/react";
+    SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
+import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
+import fetchUserSessionData from "../../Utils/SessionUserData";
+import fetchBusinessGroupNames from "../../Utils/BusinessGroupData";
 
 function CreateBusinessGroup() {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -15,7 +18,35 @@ function CreateBusinessGroup() {
 
     const [groupName, setGroupName] = useState("");
     const [ownerName, setOwnerName] = useState("");
+
+    const [isGroupCheckboxSelected, setIsGroupCheckboxSelected] = useState(false);
+    const [isEnvCheckboxSelected, setIsEnvCheckboxSelected] = useState(false);
+
     const isCreateButtonDisabled = !groupName || !selectedGroupValue || !ownerName;
+
+    const userSessionData = fetchUserSessionData();
+    let userName;
+    let userEmail;
+    let businessGroupNames = [];
+    userSessionData.then((response) => {
+      userName = response.display_name;
+      userEmail = response.email;
+      console.log('user name: ',userName);
+      if(userEmail){
+        const bgNamesData = fetchBusinessGroupNames(userEmail);
+        
+        bgNamesData.then((response) => {
+            businessGroupNames = response;
+            console.log('group name: ',businessGroupNames);
+        })
+        .catch((error) => {
+            console.log(error.message);
+        });
+    }
+    })
+    .catch((error) => {
+        console.log(error.message);
+    });
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
@@ -43,12 +74,24 @@ function CreateBusinessGroup() {
 
     const handleNameChange = (event) => {
         setGroupName(event.target.value);
-        console.log(groupName);
     }
 
     const handleOwnerChange = (event) => {
         setOwnerName(event.target.value);
-        console.log(ownerName);
+    }
+
+    const handleGroupCheckboxChange = () => {
+        setIsGroupCheckboxSelected(!isGroupCheckboxSelected);
+        // console.log(isGroupCheckboxSelected);
+    }
+
+    const handleEnvCheckboxChange = () => {
+        setIsEnvCheckboxSelected(!isEnvCheckboxSelected);
+        // console.log(isEnvCheckboxSelected);
+    }
+
+    const invokeGroupCreateFunction = () => {
+        createNewBusinessGroup(groupName, selectedGroupValue, ownerName, isGroupCheckboxSelected, isEnvCheckboxSelected, sandboxSliderValue, designSliderValue, userName, userEmail);
     }
 
     return (
@@ -74,11 +117,22 @@ function CreateBusinessGroup() {
                             <Text color={'#747474'} fontWeight={500}>Select a group you’re an administrator of to be the parent of this group.</Text>
                             <Select variant={'outlined'} placeholder="Select..." color={'#747474'} fontSize={14} border={'1px solid #747474'} mt={1}
                                     value={selectedGroupValue}
-                                    onChange={handleSelectChange}>
-                                <option value='option1'>MC</option>
-                                <option value='option2'>MuleCraft</option>
-                                <option value='option3'>Google</option>
+                                    onChange={handleSelectChange}
+                                    >
+                                {businessGroupNames.length > 0 ? (
+                                    businessGroupNames.map((group, index) => (
+                                        <option value={group.businessGroupName}>
+                                            {group.businessGroupName}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>No groups available</option>
+                                )}
+                                <option value='MC'>MC</option>
+                                <option value='MuleCraft'>MuleCraft</option>
+                                <option value='Google'>Google</option>
                             </Select>
+                            
                         </VStack>
                         { isGroupSelected && (
                         <>
@@ -92,8 +146,8 @@ function CreateBusinessGroup() {
                                 />
                                 <Input placeholder="Add owner by name, username, or email." fontSize={14} value={ownerName} onChange={handleOwnerChange}/>
                             </InputGroup>
-                            <Checkbox size='lg' mt={1} >Can create business groups</Checkbox>
-                            <Checkbox size='lg' mt={1} >Can create environments</Checkbox>
+                            <Checkbox size='lg' mt={1} value={isGroupCheckboxSelected} onChange={handleGroupCheckboxChange}>Can create business groups</Checkbox>
+                            <Checkbox size='lg' mt={1} value={isEnvCheckboxSelected} onChange={handleEnvCheckboxChange}>Can create environments</Checkbox>
                         </VStack>
                         <VStack align={'flex-start'} minW={'-webkit-fill-available'}>
                             <FormLabel fontWeight={500} color={'#444444'} fontSize={14}>Sandbox vCores</FormLabel>
@@ -168,11 +222,13 @@ function CreateBusinessGroup() {
                 </ModalBody>
                 <ModalFooter borderBottomRadius={15} justifyContent={'space-between'} borderTop={'1px solid #e5e5e5'}>
                     <Button onClick={onClose} variant={'outline'} fontSize={14}>Cancel</Button>
-                    <Button onClick={onClose} variant={'formButtons'}
+                        <Button
+                            onClick={invokeGroupCreateFunction}
+                            variant={'formButtons'}
                             isDisabled={isCreateButtonDisabled}
-                            _hover={{bgColor:'navy'}}>
-                        Create
-                    </Button>
+                            _hover={{ bgColor: 'navy' }}>
+                            Create
+                        </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
