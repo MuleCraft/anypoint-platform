@@ -1,6 +1,8 @@
-import { Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, useDisclosure,
+import {
+    Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, useDisclosure,
     Text, VStack, Select, Input, HStack, InputGroup, InputLeftElement, InputRightElement, Checkbox, Slider,
-    SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel, Menu, MenuButton, MenuList, MenuItem } from "@chakra-ui/react";
+    SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel
+} from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
@@ -52,7 +54,7 @@ function CreateBusinessGroup() {
         const value = event.target.value;
         setSelectedGroupValue(value);
         setIsGroupSelected(value !== "");
-      };
+    };
 
     const handleSandboxSliderChange = (value) => {
         setSandboxSliderValue(value);

@@ -1,36 +1,36 @@
 import { useState } from "react";
 import {
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  TableContainer,
-  Link,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    TableContainer,
+    Link,
 } from "@chakra-ui/react";
 import BusinessGroupMenu from "./BusinessGroupMenu";
 import fetchUserSessionData from "../../Utils/SessionUserData";
 
 const BusinessGroupTable = () => {
 
-  const [hoveredRows, setHoveredRows] = useState([]);
+    const [hoveredRows, setHoveredRows] = useState([]);
 
-  const handleRowHover = (index) => {
-    setHoveredRows((prevHoveredRows) => {
-      const newHoveredRows = [...prevHoveredRows];
-      newHoveredRows[index] = true;
-      return newHoveredRows;
-    });
-  };
+    const handleRowHover = (index) => {
+        setHoveredRows((prevHoveredRows) => {
+            const newHoveredRows = [...prevHoveredRows];
+            newHoveredRows[index] = true;
+            return newHoveredRows;
+        });
+    };
 
-  const handleRowNotHover = (index) => {
-    setHoveredRows((prevHoveredRows) => {
-      const newHoveredRows = [...prevHoveredRows];
-      newHoveredRows[index] = false;
-      return newHoveredRows;
-    });
-  };
+    const handleRowNotHover = (index) => {
+        setHoveredRows((prevHoveredRows) => {
+            const newHoveredRows = [...prevHoveredRows];
+            newHoveredRows[index] = false;
+            return newHoveredRows;
+        });
+    };
 
   const columnTitleStyle = {
     fontSize: 14,

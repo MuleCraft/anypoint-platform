@@ -38,7 +38,6 @@ const Nav = ({ name, pathValue }) => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const selectedImage = Images[name];
-
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
@@ -132,8 +131,9 @@ const Nav = ({ name, pathValue }) => {
         <Flex alignItems="center">
           <Stack direction="row" spacing={7}>
             <Menu>
-              {name === "Anypoint Platform" && (
-                <MenuButton
+              {((name === "Anypoint Platform") || (name === "Api Manager")) && (
+
+                <MenuButton MenuButton
                   as={Button}
                   display={{ base: "none", md: "block" }}
                   rounded="full"
@@ -144,7 +144,6 @@ const Nav = ({ name, pathValue }) => {
                   borderRadius="40px"
                   px="2"
                 >
-
                   <Flex align="center" gap="1" fontSize="base" color="navText">
                     <HiOutlineBuildingOffice />
                     <Text>{userData?.company}</Text>
@@ -303,7 +302,7 @@ const Nav = ({ name, pathValue }) => {
         </Flex>
         <DrawerComponent isOpen={isDrawerOpen} onClose={handleDrawerClose} />
       </Flex>
-    </Box>
+    </Box >
   );
 };
 

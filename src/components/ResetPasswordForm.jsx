@@ -7,9 +7,12 @@ import {
   Text,
   Button,
   FormHelperText,
+  Box,
+  Heading,
+  Link,
 } from "@chakra-ui/react";
 import supabase from "../Utils/supabase";
-import { useNavigate } from "react-router-dom";
+import { ArrowBackIcon } from "@chakra-ui/icons";
 import "../App.css";
 import "../assets/Common.css";
 
@@ -17,7 +20,7 @@ export default function ResetPasswordForm() {
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordError, setNewPasswordError] = useState("");
   const [requestError, setRequestError] = useState("");
-  const navigate = useNavigate();
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   const handleNewPasswordChange = (e) => {
     const newPasswordValue = e.target.value;
@@ -56,7 +59,7 @@ export default function ResetPasswordForm() {
         throw new Error(error.message);
       }
       console.log("Password reset successful!");
-      navigate("/login");
+      setResetSuccess(true);
     } catch (error) {
       setRequestError(error.message);
     }
@@ -72,45 +75,73 @@ export default function ResetPasswordForm() {
       borderRadius={"2px"}
       boxShadow={"0 5px 30px 0 rgba(0,0,0,.15)"}
     >
-      <Text
-        fontSize={"20px"}
-        fontWeight={700}
-        color={"#5c5c5c"}
-        align={"center"}
-      >
-        Reset your password
-      </Text>
-      <FormControl p={"10px 0px"}>
-        <FormLabel fontSize={"14px"} fontWeight={400} color={"#5c5c5c"}>
-          New Password
-        </FormLabel>
-        <Input
-          type="password"
-          value={newPassword}
-          onChange={handleNewPasswordChange}
-        />
-        {newPasswordError && (
-          <Text className="field-error">{newPasswordError}</Text>
-        )}
-        {requestError && (
-          <Text fontSize={"14px"} color={"red"} mt={1}>
-            {requestError}
+      {!resetSuccess ? (
+        <>
+          <Text
+            fontSize={"20px"}
+            fontWeight={700}
+            color={"#5c5c5c"}
+            align={"center"}
+          >
+            Reset your password
           </Text>
-        )}
-        <FormHelperText fontSize={"12px"} mb={"20px"} color={"#747474"}>
-          Use at least 8 characters, including a number, an uppercase character,
-          and a lowercase character. You cannot reuse any of your previous three
-          passwords.
-        </FormHelperText>
-      </FormControl>
-
-      <Button
-        variant="formButtons"
-        width={"100%"}
-        onClick={handleResetPassword}
-      >
-        Reset Password
-      </Button>
+          <FormControl p={"10px 0px"}>
+            <FormLabel fontSize={"14px"} fontWeight={400} color={"#5c5c5c"}>
+              New Password
+            </FormLabel>
+            <Input
+              type="password"
+              value={newPassword}
+              onChange={handleNewPasswordChange}
+            />
+            {newPasswordError && (
+              <Text className="field-error">{newPasswordError}</Text>
+            )}
+            {requestError && (
+              <Text fontSize={"14px"} color={"red"} mt={1}>
+                {requestError}
+              </Text>
+            )}
+            <FormHelperText fontSize={"12px"} mb={"20px"} color={"#747474"}>
+              Use at least 8 characters, including a number, an uppercase
+              character, and a lowercase character. You cannot reuse any of your
+              previous three passwords.
+            </FormHelperText>
+          </FormControl>
+          <Button
+            variant="formButtons"
+            width={"100%"}
+            onClick={handleResetPassword}
+          >
+            Reset Password
+          </Button>
+        </>
+      ) : (
+        <Box p={2} borderRadius={4}>
+          <Heading fontSize="20px">Your password has been reset</Heading>
+          <Text fontSize={"14px"} mt="5">
+            You may now sign in using your new password.
+          </Text>
+          <Link className="back-to-signin-stack" width={"100%"} href="/" mt="5">
+            <Button
+              fontSize={"14px"}
+              fontWeight={500}
+              variant={"text"}
+              width={"100%"}
+              color={"#5c5c5c"}
+            >
+              <ArrowBackIcon
+                className="back-icon"
+                width={"15px"}
+                h={"15px"}
+                display={"inline-flex"}
+                mr={"3px"}
+              />
+              Sign in
+            </Button>
+          </Link>
+        </Box>
+      )}
     </VStack>
   );
 }

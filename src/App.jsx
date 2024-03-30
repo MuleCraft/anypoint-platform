@@ -11,6 +11,8 @@ import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
 import AMBusinessGroupDetails from "./pages/Access-Management/AM-businessGroupDetails";
 import AMUserList from "./pages/Access-Management/AM-userList";
 import AMPending from "./pages/Access-Management/AM-pending";
+import APIMain from "./pages/Api-Manager/Api-main";
+import Sidebar from "./components/sidebar";
 
 export default function App() {
   const AccessManagement = "Access Management";
