@@ -14,6 +14,9 @@ import AMPending from "./pages/Access-Management/AM-pending";
 import APIMain from "./pages/Api-Manager/Api-main";
 import Sidebar from "./components/sidebar";
 
+import InviteUserPasswordPage from "./pages/InvitedUserPassword";
+import InviteUserDatailPage from "./pages/InviteUserDetailsForm";
+
 export default function App() {
   const AccessManagement = "Access Management";
   const AnypointPlatform = "Anypoint Platform";
@@ -26,6 +29,8 @@ export default function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignUpPage />} />
           <Route path="use-custom-domain" element={<UseCustomDomainPage />} />
+          <Route path="inviteduser" element={<InviteUserPasswordPage />} />
+          <Route path="inviteduserdetails" element={<InviteUserDatailPage />} />
           <Route element={<PrivateRoutes />}>
             {" "}
             <Route

@@ -38,6 +38,8 @@ import {
 import { makeData } from "./makeData";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import adminAuthClient from '../../Utils/api';
+import { AuthContext } from '../../Utils/AuthProvider';
+
 
 const defaultColumns = [
     {
@@ -143,7 +145,7 @@ function InviteForm() {
         try {
             await Promise.all(
                 emailList.map(async (email) => {
-                    const { error } = await adminAuthClient.inviteUserByEmail(email);
+                    const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
                     if (error) {
                         console.error(`Error inviting user ${email}:`, error.message);
                         throw error;
@@ -160,6 +162,10 @@ function InviteForm() {
                 isClosable: true,
                 position: "top-right"
             });
+
+
+
+
         } catch (error) {
             console.error("Error inviting users:", error.message);
             toast({
@@ -172,7 +178,7 @@ function InviteForm() {
             });
         }
     };
-    console.log(submissionStatus)
+
     return (
         <Box position="fixed" maxW="85%">
             <Flex alignItems="center" justifyContent="space-between" mb={4}>
@@ -201,6 +207,17 @@ function InviteForm() {
                                     borderRadius="0px"
                                 />
                                 {emailError && <Text color="red.500">{emailError}</Text>}
+                                <FormLabel fontSize="md" pt={3}>Teams</FormLabel>
+                                <Text pb={3} maxW="450px" fontSize="sm" color="textColor">
+
+                                    Invited users will be added to these teams, with the selected membership type.
+                                </Text>
+                                <Input
+                                    type="text"
+                                    value={userData?.company}
+                                    isDisabled
+                                    h="55px"
+                                />
                             </FormControl>
                         </ModalBody>
                         <Divider />
