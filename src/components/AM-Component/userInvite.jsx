@@ -39,6 +39,7 @@ import { makeData } from "./makeData";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import adminAuthClient from '../../Utils/api';
 import { AuthContext } from '../../Utils/AuthProvider';
+import supabase from '../../Utils/supabase';
 
 
 const defaultColumns = [
@@ -143,15 +144,24 @@ function InviteForm() {
         }
 
         try {
+            const invitedUserIds = [];
+
             await Promise.all(
                 emailList.map(async (email) => {
-                    const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
+                    const { data, error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
                     if (error) {
                         console.error(`Error inviting user ${email}:`, error.message);
                         throw error;
                     }
+
+                    if (data && data.user && data.user.id) {
+                        invitedUserIds.push(data.user.id);
+                        await insertAdditionalDetails(data.user.id);
+                    }
                 })
             );
+
+
 
             setSubmissionStatus("success");
             onClose();
@@ -161,7 +171,9 @@ function InviteForm() {
                 duration: 5000,
                 isClosable: true,
                 position: "top-right"
-            });
+
+            }
+            );
         } catch (error) {
             console.error("Error inviting users:", error.message);
             toast({
@@ -172,6 +184,22 @@ function InviteForm() {
                 isClosable: true,
                 position: "top-right"
             });
+        }
+    };
+    const insertAdditionalDetails = async (id) => {
+        const { data, error } = await supabase
+            .schema("mc_cap_develop")
+            .from("users")
+            .upsert([
+                {
+                    id: id,
+                    company: userData?.company,
+                },
+            ]);
+        if (error) {
+            console.error("Error inserting additional details:", error.message);
+        } else {
+            console.log("Additional details inserted:", data);
         }
     };
     return (

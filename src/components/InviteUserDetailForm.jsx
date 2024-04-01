@@ -18,7 +18,9 @@ import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
+import { useParams } from "react-router-dom";
 export default function InviteUserDetailForm() {
+    const { userId } = useParams();
     const [isCheckedBox, setIsCheckedBox] = useState(false);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
@@ -201,9 +203,8 @@ export default function InviteUserDetailForm() {
                 const { data: existingUsers, error: userError } = await supabase
                     .schema("mc_cap_develop")
                     .from("users")
-                    .select("*")
-                    .eq("email", email)
-                    .or(`display_name.eq.${username}`);
+                    .select(userId)
+
 
                 if (userError) {
                     console.error("Error checking existing users:", userError.message);

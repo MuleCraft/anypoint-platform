@@ -50,22 +50,25 @@ export default function InvitedUserForm() {
         }
         try {
             console.log("Attempting to reset password...");
-            const { error } = await supabase.auth.updateUser({
+            const { data, error } = await supabase.auth.updateUser({
                 password: newPassword,
             });
             if (error) {
                 throw new Error(error.message);
             }
-            console.log("Password reset successful!");
-            navigate("/inviteduserdetails");
+            if (data && data.user && data.user.id) {
+                navigate(`/inviteduserdetails/${data.user.id}`);
+            }
         } catch (error) {
             setRequestError(error.message);
         }
     };
 
+
+
     return (
-        <Flex justifyContent="center"
-            alignItems="center" >
+
+        <Flex justifyContent="center" alignItems="center">
             <VStack
                 bgColor={"white"}
                 width={["100%", "450px"]}
@@ -73,7 +76,6 @@ export default function InvitedUserForm() {
                 spacing={3}
                 borderRadius={"2px"}
                 boxShadow={"0 5px 30px 0 rgba(0,0,0,.15)"}
-
             >
                 <Text
                     fontSize={"20px"}
