@@ -30,7 +30,7 @@ export default function App() {
           <Route path="signup" element={<SignUpPage />} />
           <Route path="use-custom-domain" element={<UseCustomDomainPage />} />
           <Route path="inviteduser" element={<InviteUserPasswordPage />} />
-          <Route path="inviteduserdetails" element={<InviteUserDatailPage />} />
+          <Route path="inviteduserdetails/:id" element={<InviteUserDatailPage />} />
           <Route element={<PrivateRoutes />}>
             {" "}
             <Route
