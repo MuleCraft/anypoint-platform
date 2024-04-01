@@ -162,10 +162,6 @@ function InviteForm() {
                 isClosable: true,
                 position: "top-right"
             });
-
-
-
-
         } catch (error) {
             console.error("Error inviting users:", error.message);
             toast({
@@ -178,7 +174,6 @@ function InviteForm() {
             });
         }
     };
-
     return (
         <Box position="fixed" maxW="85%">
             <Flex alignItems="center" justifyContent="space-between" mb={4}>
