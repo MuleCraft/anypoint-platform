@@ -55,7 +55,7 @@ export default function ForgotCredentialsForm() {
         borderRadius={"2px"}
         boxShadow={"0 5px 30px 0 rgba(0,0,0,.15)"}
       >
-        {submissionStatus !== "success" && ( // Render form only if submission is not successful
+        {submissionStatus !== "success" && (
           <>
             <Text
               fontSize={"20px"}
