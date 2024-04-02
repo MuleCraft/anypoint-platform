@@ -4,12 +4,11 @@ import {
     SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
-import fetchUserSessionData from "../../Utils/SessionUserData";
 import fetchBusinessGroupNames from "../../Utils/BusinessGroupData";
 
-function CreateBusinessGroup() {
+function CreateBusinessGroup({currentUserEmail,currentUserName}) {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
@@ -26,29 +25,30 @@ function CreateBusinessGroup() {
 
     const isCreateButtonDisabled = !groupName || !selectedGroupValue || !ownerName;
 
-    const userSessionData = fetchUserSessionData();
-    let userName;
-    let userEmail;
-    let businessGroupNames = [];
-    userSessionData.then((response) => {
-        userName = response.display_name;
-        userEmail = response.email;
-        console.log('user name: ', userName);
-        if (userEmail) {
-            const bgNamesData = fetchBusinessGroupNames(userEmail);
+    const [businessGroupNames,setBusinessGroupNames] = useState([]);
+
+        if (currentUserEmail) {
+            const bgNamesData = fetchBusinessGroupNames(currentUserName);
 
             bgNamesData.then((response) => {
-                businessGroupNames = response;
+                setBusinessGroupNames(response);
+                if(businessGroupNames.length > 0) {
+                    setDataLoaded(true);
+                }
                 console.log('group name: ', businessGroupNames);
             })
-                .catch((error) => {
-                    console.log(error.message);
-                });
+            .catch((error) => {
+                console.log(error.message);
+            });
         }
-    })
-        .catch((error) => {
-            console.log(error.message);
-        });
+
+        const [dataLoaded, setDataLoaded] = useState(false);
+
+        useEffect(() => {
+            if (businessGroupNames.length > 0) {
+                setDataLoaded(true);
+            }
+        }, [businessGroupNames]);
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
@@ -84,12 +84,10 @@ function CreateBusinessGroup() {
 
     const handleGroupCheckboxChange = () => {
         setIsGroupCheckboxSelected(!isGroupCheckboxSelected);
-        // console.log(isGroupCheckboxSelected);
     }
 
     const handleEnvCheckboxChange = () => {
         setIsEnvCheckboxSelected(!isEnvCheckboxSelected);
-        // console.log(isEnvCheckboxSelected);
     }
 
     const invokeGroupCreateFunction = () => {
@@ -120,21 +118,19 @@ function CreateBusinessGroup() {
                                     <Select variant={'outlined'} placeholder="Select..." color={'#747474'} fontSize={14} border={'1px solid #747474'} mt={1}
                                         value={selectedGroupValue}
                                         onChange={handleSelectChange}
-                                    >
-                                        {businessGroupNames.length > 0 ? (
-                                            businessGroupNames.map((group, index) => (
-                                                <option value={group.businessGroupName}>
-                                                    {group.businessGroupName}
-                                                </option>
-                                            ))
-                                        ) : (
-                                            <option disabled>No groups available</option>
-                                        )}
-                                        <option value='MC'>MC</option>
-                                        <option value='MuleCraft'>MuleCraft</option>
-                                        <option value='Google'>Google</option>
+                                        disabled={!dataLoaded}
+                                        >
+                                            {dataLoaded ? (
+                                                businessGroupNames.map((group, index) => (
+                                                    <option key={index} value={group.businessGroupName}>
+                                                        {group.businessGroupName}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value={'MC'}>MC</option>
+                                                // <option disabled>Loading...</option>
+                                            )}
                                     </Select>
-
                                 </VStack>
                                 {isGroupSelected && (
                                     <>
