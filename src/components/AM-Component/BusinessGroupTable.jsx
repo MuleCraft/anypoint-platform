@@ -10,11 +10,11 @@ import {
   Link,
 } from "@chakra-ui/react";
 import BusinessGroupMenu from "./BusinessGroupMenu";
-import fetchUserSessionData from "../../Utils/SessionUserData";
 
-const BusinessGroupTable = () => {
+export default function ({tableData}){
 
   const [hoveredRows, setHoveredRows] = useState([]);
+  const rows = tableData||[];
 
   const handleRowHover = (index) => {
     setHoveredRows((prevHoveredRows) => {
@@ -41,25 +41,6 @@ const BusinessGroupTable = () => {
   };
   const rowValueStyle = { fontSize: 14, padding: "10px" };
 
-  const userTableData = fetchUserSessionData();
-  let userMailAddress;
-  // console.log('table data',userTableData);
-  userTableData.then((response) => {
-    // console.log(response.company);
-    userMailAddress = response.email;
-    console.log('user email: ', userMailAddress);
-  })
-    .catch((error) => {
-      console.log(error.message);
-    });
-
-  const groupDetails = [
-    { name: "MC", environments: 2, totalvCores: 2 },
-    // tableDetails.map((data,index)=>(
-    //   { groupName: "MC", environments: 2, totalvCores: 2 }
-    // ))
-  ];
-
   return (
     <TableContainer>
       <Table variant="simple" size="md">
@@ -76,7 +57,7 @@ const BusinessGroupTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {groupDetails.map((dataValue, index) => (
+          {rows.map((dataValue, index) => (
             <Tr
               key={index}
               fontWeight={500}
@@ -89,11 +70,11 @@ const BusinessGroupTable = () => {
                   _hover={{ textDecoration: "underline" }}
                   color={hoveredRows[index] ? "#0176d3" : "#444444"}
                 >
-                  {dataValue.name}
+                  {dataValue.businessGroupName}
                 </Link>
               </Td>
-              <Td style={rowValueStyle}>2</Td>
-              <Td style={rowValueStyle}>2</Td>
+              <Td style={rowValueStyle}>{dataValue.environments.length}</Td>
+              <Td style={rowValueStyle}>{dataValue.totalVcores}</Td>
               <Td style={rowValueStyle}>
                 <BusinessGroupMenu />
               </Td>
@@ -104,5 +85,3 @@ const BusinessGroupTable = () => {
     </TableContainer>
   );
 };
-
-export default BusinessGroupTable;
