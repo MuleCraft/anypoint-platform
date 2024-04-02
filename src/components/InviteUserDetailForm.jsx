@@ -18,7 +18,8 @@ import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
-import { useNavigate, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+
 export default function InviteUserDetailForm() {
     const [isCheckedBox, setIsCheckedBox] = useState(false);
     const [fullName, setFullName] = useState("");
@@ -36,7 +37,6 @@ export default function InviteUserDetailForm() {
     const [recaptchaError, setRecaptchaError] = useState("");
     const [checkboxError, setCheckboxError] = useState("");
     const { id } = useParams();
-    const navigate = useNavigate();
     const handleCheckboxChange = () => {
         setIsCheckedBox(!isCheckedBox);
 
@@ -116,6 +116,7 @@ export default function InviteUserDetailForm() {
         }
         return isFormValid;
     };
+    console.log("recaptcha checked status", recaptchaChecked)
     const handleSubmit = async () => {
         if (validateForm()) {
             try {
@@ -155,8 +156,9 @@ export default function InviteUserDetailForm() {
                     console.error("Error inserting additional details:", error.message);
                 } else {
                     console.log("Additional details inserted:", data);
-                    navigate("/login")
+
                 }
+                setSubmissionStatus("success");
             } catch (error) {
                 console.error("Error:", error.message);
             }
@@ -190,13 +192,16 @@ export default function InviteUserDetailForm() {
                                     p={8}
                                 >
                                     <Text fontSize="lg" color="green.500" mb={4}>
-                                        Mail Sent Successfully!
+                                        Sign in Successfully!
                                     </Text>
                                     <Text>
-                                        Thank you for signing up! We have sent a verification email
-                                        to {email}. Please check your inbox and follow the
-                                        instructions to complete the registration process.
+                                        Sign up successful! You can now proceed to log in.
                                     </Text>
+                                    <Box pt={3}>
+                                        <NavLink to="/login">
+                                            <Button variant="formButtons">Sign in</Button>
+                                        </NavLink>
+                                    </Box>
                                 </Box>
                             ) : (
                                 <Box
