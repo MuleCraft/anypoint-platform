@@ -57,7 +57,9 @@ export default function App() {
                 />
               }
             />
-            <Route path="accounts/businessGroups/:groupCode" element={<AMBusinessGroupDetails name={AccessManagement} pathValue={AccessManagentPath} />} />
+            <Route
+              path="accounts/businessGroups/:groupCode"
+              element={<AMBusinessGroupDetails name={AccessManagement} pathValue={AccessManagentPath} />} />
             <Route
               path="/accounts/users/list"
               element={

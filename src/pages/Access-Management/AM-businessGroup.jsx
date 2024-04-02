@@ -15,9 +15,36 @@ import sections from "./utils/AM-sidebar";
 import CreateBusinessGroup from "../../components/AM-Component/CreateBusinessGroup";
 import BusinessGroupTable from "../../components/AM-Component/BusinessGroupTable";
 import { FiSearch } from "react-icons/fi";
+import fetchBgTableRows from "../../Utils/BgTableRows";
+import fetchUserSessionData from "../../Utils/SessionUserData";
 
 export default function AMBusinessGroup({ name, pathValue }) {
   const [activeItem, setActiveItem] = useState("BusinessGroups");
+  const [tableData, setTableData] = useState([]);
+  const [currentUserName, setCurrentUserName] = useState('');
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
+
+  const userTableData = fetchUserSessionData();
+  userTableData.then((response) => {
+    setCurrentUserEmail(response.email);
+    setCurrentUserName(response.display_name);
+    console.log('current user name: ', currentUserName);
+    if (currentUserName) {
+      const tableRowData = fetchBgTableRows(currentUserName);
+      tableRowData.then((response) => {
+        setTableData(response);
+        console.log('Table rows: ', tableData);
+      })
+        .catch((error) => {
+          console.log(error.message);
+        });
+    }
+  })
+    .catch((error) => {
+      console.log(error.message);
+    });
+
+
 
   const handleItemSelect = (itemName) => {
     setActiveItem(itemName);
@@ -37,7 +64,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
             </Box>
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
               <Stack mt={"-60px"} direction={"row"} spacing={6}>
-                <CreateBusinessGroup />
+                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName} />
                 <Text fontSize={14} color={"#747474"} fontWeight={500}>
                   Business groups are isolated scopes for managing access. Users
                   and teams may access resources in a business group through
@@ -60,7 +87,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
                   <Input placeholder="Filter Business Group" fontSize={14} />
                 </InputGroup>
               </Stack>
-              <BusinessGroupTable />
+              <BusinessGroupTable tableData={tableData} />
             </Flex>
           </Flex>
         </div>
