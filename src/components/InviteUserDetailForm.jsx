@@ -72,7 +72,6 @@ export default function InviteUserDetailForm() {
         }
     };
 
-
     const handleUserNameChange = (event) => {
         const value = event.target.value;
         setUserName(value);
@@ -108,6 +107,15 @@ export default function InviteUserDetailForm() {
         } else {
             setUserNameError("");
         }
+<<<<<<< Updated upstream
+=======
+        if (!recaptchaChecked) {
+            setRecaptchaError("Required");
+            isFormValid = false;
+        } else {
+            setRecaptchaError("");
+        }
+>>>>>>> Stashed changes
         if (!isCheckedBox) {
             setCheckboxError("Required");
             isFormValid = false;
@@ -130,6 +138,17 @@ export default function InviteUserDetailForm() {
                     console.error("Error checking existing users:", userError.message);
                     return;
                 }
+
+                const { data: company, error: CompanyError } = await supabase
+                    .schema("mc_cap_develop")
+                    .from("users")
+                    .select("id", id);
+
+                if (CompanyError) {
+                    throw new Error(error.message);
+                }
+
+                console.log(company)
 
                 if (existingUsers && existingUsers.length > 0) {
                     const existingUser = existingUsers[0];
@@ -246,6 +265,21 @@ export default function InviteUserDetailForm() {
                                                 fontSize="xs"
                                                 fontFamily="formCompTexts"
                                             >
+                                                Email
+                                            </FormLabel>
+                                            <Input
+                                                type="email"
+                                                value=""
+                                                isDisabled
+                                            />
+
+                                        </FormControl>
+                                        <FormControl>
+                                            <FormLabel
+                                                color="formLabelColor"
+                                                fontSize="xs"
+                                                fontFamily="formCompTexts"
+                                            >
                                                 Phone number
                                             </FormLabel>
                                             <Input
@@ -261,6 +295,23 @@ export default function InviteUserDetailForm() {
                                                 <Text className="field-error">{phoneNumberError}</Text>
                                             )}
                                         </FormControl>
+<<<<<<< Updated upstream
+=======
+                                        <FormControl>
+                                            <FormLabel
+                                                color="formLabelColor"
+                                                fontSize="xs"
+                                                fontFamily="formCompTexts"
+                                            >
+                                                Company
+                                            </FormLabel>
+                                            <Input
+                                                type="text"
+                                                value=""
+                                                isDisabled />
+
+                                        </FormControl>
+>>>>>>> Stashed changes
                                         <FormControl>
                                             <FormLabel
                                                 color="formLabelColor"
