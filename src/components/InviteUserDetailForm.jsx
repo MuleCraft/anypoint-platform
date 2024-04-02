@@ -138,6 +138,19 @@ export default function InviteUserDetailForm() {
                     }
                     return;
                 }
+
+                const { data: updateUser, error: updateUserError } = await supabase.auth.updateUser({
+                    data: {
+                        full_name: fullName,
+                    }
+                })
+                if (updateUserError) {
+                    console.error("Error inserting additional details:", error.message);
+                } else {
+                    console.log("Additional details inserted:", updateUser);
+
+                }
+
                 const { data, error } = await supabase
                     .schema("mc_cap_develop")
                     .from("users")
@@ -164,6 +177,9 @@ export default function InviteUserDetailForm() {
             }
         }
     };
+
+
+
 
     return (
         <Box
