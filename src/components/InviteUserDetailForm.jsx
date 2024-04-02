@@ -59,7 +59,6 @@ export default function InviteUserDetailForm() {
         }
     };
 
-
     const handlePhoneNumberChange = (event) => {
         const value = event.target.value;
         setPhoneNumber(value);
@@ -86,7 +85,6 @@ export default function InviteUserDetailForm() {
     };
 
 
-
     const validateForm = () => {
         let isFormValid = true;
         if (!fullName.trim() || fullName.trim().split(" ").length < 2) {
@@ -95,7 +93,6 @@ export default function InviteUserDetailForm() {
         } else {
             setFullNameError("");
         }
-
         if (!phoneNumber.trim()) {
             setPhoneNumberError("Please enter your phone number");
             isFormValid = false;
@@ -105,14 +102,12 @@ export default function InviteUserDetailForm() {
         } else {
             setPhoneNumberError("");
         }
-
         if (username.trim().length < 3) {
             setUserNameError("Use at least 3 characters long");
             isFormValid = false;
         } else {
             setUserNameError("");
         }
-
         if (!isCheckedBox) {
             setCheckboxError("Required");
             isFormValid = false;
@@ -137,7 +132,6 @@ export default function InviteUserDetailForm() {
 
                 if (existingUsers && existingUsers.length > 0) {
                     const existingUser = existingUsers[0];
-
                     if (existingUser.display_name === username) {
                         setUserNameError("Username already exists");
                     }
@@ -241,7 +235,6 @@ export default function InviteUserDetailForm() {
                                                 <Text className="field-error">{fullNameError}</Text>
                                             )}
                                         </FormControl>
-
                                         <FormControl>
                                             <FormLabel
                                                 color="formLabelColor"
@@ -263,7 +256,6 @@ export default function InviteUserDetailForm() {
                                                 <Text className="field-error">{phoneNumberError}</Text>
                                             )}
                                         </FormControl>
-
                                         <FormControl>
                                             <FormLabel
                                                 color="formLabelColor"
@@ -283,7 +275,6 @@ export default function InviteUserDetailForm() {
                                                 <Text className="field-error">{userNameError}</Text>
                                             )}
                                         </FormControl>
-
                                         <Flex justify="center">
                                             <Box>
                                                 <ReCAPTCHA

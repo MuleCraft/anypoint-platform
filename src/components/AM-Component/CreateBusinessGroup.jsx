@@ -150,7 +150,7 @@ function CreateBusinessGroup() {
                                             </InputGroup>
                                             <Checkbox size='lg' mt={1} value={isGroupCheckboxSelected} onChange={handleGroupCheckboxChange}>Can create business groups</Checkbox>
                                             <Checkbox size='lg' mt={1} value={isEnvCheckboxSelected} onChange={handleEnvCheckboxChange}>Can create environments</Checkbox>
-                                        </VStack >
+                                        </VStack>
                                         <VStack align={'flex-start'} minW={'-webkit-fill-available'}>
                                             <FormLabel fontWeight={500} color={'#444444'} fontSize={14}>Sandbox vCores</FormLabel>
                                             <HStack minW={'-webkit-fill-available'} spacing={6}>
@@ -218,11 +218,10 @@ function CreateBusinessGroup() {
                                             </HStack>
                                         </VStack>
                                     </>
-                                )
-                                }
-                            </VStack >
-                        </FormControl >
-                    </ModalBody >
+                                )}
+                            </VStack>
+                        </FormControl>
+                    </ModalBody>
                     <ModalFooter borderBottomRadius={15} justifyContent={'space-between'} borderTop={'1px solid #e5e5e5'}>
                         <Button onClick={onClose} variant={'outline'} fontSize={14}>Cancel</Button>
                         <Button
@@ -232,9 +231,9 @@ function CreateBusinessGroup() {
                             _hover={{ bgColor: 'navy' }}>
                             Create
                         </Button>
-                    </ModalFooter >
-                </ModalContent >
-            </Modal >
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </>
     );
 }
