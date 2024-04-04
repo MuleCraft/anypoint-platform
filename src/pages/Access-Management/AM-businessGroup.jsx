@@ -21,14 +21,14 @@ import fetchUserSessionData from "../../Utils/SessionUserData";
 export default function AMBusinessGroup({ name, pathValue }) {
   const [activeItem, setActiveItem] = useState("BusinessGroups");
   const [tableData, setTableData] = useState([]);
-  const [currentUserName,setCurrentUserName]=useState('');
-  const [currentUserEmail,setCurrentUserEmail]=useState('');
+  const [currentUserName, setCurrentUserName] = useState('');
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
 
-  useEffect(()=>{
-    if(currentUserName){
+  useEffect(() => {
+    if (currentUserName) {
       fetchRows();
     }
-  },[currentUserName])
+  }, [currentUserName])
 
   const userTableData = fetchUserSessionData();
   userTableData.then((response) => {
@@ -36,21 +36,21 @@ export default function AMBusinessGroup({ name, pathValue }) {
     setCurrentUserName(response.display_name);
     console.log('current user name: ', currentUserName);
     console.log('current user mail: ', currentUserEmail);
-    })
+  })
     .catch((error) => {
       console.log(error.message);
     });
 
-    const fetchRows = async () => {
-      const tableRowData = fetchBgTableRows(currentUserName);
-      tableRowData.then((response) => {
-        setTableData(response);
-        console.log('Table rows: ', tableData);
-      })
-        .catch((error) => {
-          console.log(error.message);
-        });
-    }
+  const fetchRows = async () => {
+    const tableRowData = fetchBgTableRows(currentUserName);
+    tableRowData.then((response) => {
+      setTableData(response);
+      console.log('Table rows: ', tableData);
+    })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }
 
   const handleItemSelect = (itemName) => {
     setActiveItem(itemName);
@@ -70,7 +70,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
             </Box>
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
               <Stack mt={"-60px"} direction={"row"} spacing={6}>
-                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName}/>
+                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName} />
                 <Text fontSize={14} color={"#747474"} fontWeight={500}>
                   Business groups are isolated scopes for managing access. Users
                   and teams may access resources in a business group through
@@ -93,7 +93,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
                   <Input placeholder="Filter Business Group" fontSize={14} />
                 </InputGroup>
               </Stack>
-              <BusinessGroupTable  tableData={tableData}/>
+              <BusinessGroupTable tableData={tableData} />
             </Flex>
           </Flex>
         </div>

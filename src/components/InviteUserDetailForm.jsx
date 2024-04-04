@@ -18,24 +18,25 @@ import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
+
 export default function InviteUserDetailForm() {
     const [isCheckedBox, setIsCheckedBox] = useState(false);
     const [fullName, setFullName] = useState("");
-    const [email, setEmail] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
-    const [company, setCompany] = useState("");
+
     const [username, setUserName] = useState("");
-    const [password, setPassword] = useState("");
+
     const [recaptchaChecked, setRecaptchaChecked] = useState(false);
     const [fullNameError, setFullNameError] = useState("");
-    const [emailError, setEmailError] = useState("");
+    const [submissionStatus, setSubmissionStatus] = useState(null);
     const [phoneNumberError, setPhoneNumberError] = useState("");
-    const [companyError, setCompanyError] = useState("");
+
     const [userNameError, setUserNameError] = useState("");
-    const [passwordError, setPasswordError] = useState([]);
+
     const [recaptchaError, setRecaptchaError] = useState("");
     const [checkboxError, setCheckboxError] = useState("");
-    const [submissionStatus, setSubmissionStatus] = useState(null);
+    const { id } = useParams();
     const handleCheckboxChange = () => {
         setIsCheckedBox(!isCheckedBox);
 
@@ -57,18 +58,6 @@ export default function InviteUserDetailForm() {
             setFullNameError("");
         }
     };
-    const handleEmailChange = (event) => {
-        const value = event.target.value;
-        setEmail(value);
-
-        if (!value.trim()) {
-            setEmailError("");
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-            setEmailError("Please enter a valid email address");
-        } else {
-            setEmailError("");
-        }
-    };
 
     const handlePhoneNumberChange = (event) => {
         const value = event.target.value;
@@ -83,15 +72,6 @@ export default function InviteUserDetailForm() {
         }
     };
 
-    const handleCompanyChange = (event) => {
-        const value = event.target.value;
-        setCompany(value);
-        if (value.trim().length < 2) {
-            setCompanyError("Use at least 2 characters");
-        } else {
-            setCompanyError("");
-        }
-    };
 
     const handleUserNameChange = (event) => {
         const value = event.target.value;
@@ -104,30 +84,6 @@ export default function InviteUserDetailForm() {
         }
     };
 
-    const handlePasswordChange = (event) => {
-        const value = event.target.value;
-        setPassword(value);
-
-        let errors = [];
-
-        if (value.length < 8) {
-            errors.push("Use at least 8 characters");
-        }
-
-        if (!/\d/.test(value)) {
-            errors.push("Use at least 1 number");
-        }
-
-        if (!/[a-z]/.test(value)) {
-            errors.push("Use at least 1 lowercase character");
-        }
-
-        if (!/[A-Z]/.test(value)) {
-            errors.push("Use at least 1 uppercase character");
-        }
-
-        setPasswordError([...errors]);
-    };
 
     const validateForm = () => {
         let isFormValid = true;
@@ -136,15 +92,6 @@ export default function InviteUserDetailForm() {
             isFormValid = false;
         } else {
             setFullNameError("");
-        }
-        if (!email.trim()) {
-            setEmailError("Please enter your email address");
-            isFormValid = false;
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
-            setEmailError("Please enter a valid email address");
-            isFormValid = false;
-        } else {
-            setEmailError("");
         }
         if (!phoneNumber.trim()) {
             setPhoneNumberError("Please enter your phone number");
@@ -155,37 +102,11 @@ export default function InviteUserDetailForm() {
         } else {
             setPhoneNumberError("");
         }
-        if (company.trim().length < 2) {
-            setCompanyError("Use at least 2 characters");
-            isFormValid = false;
-        } else {
-            setCompanyError("");
-        }
         if (username.trim().length < 3) {
             setUserNameError("Use at least 3 characters long");
             isFormValid = false;
         } else {
             setUserNameError("");
-        }
-        let passwordErrors = [];
-        if (password.length < 8) {
-            passwordErrors.push("Use at least 8 characters");
-        }
-        if (!/\d/.test(password)) {
-            passwordErrors.push("Use at least 1 number");
-        }
-        if (!/[a-z]/.test(password)) {
-            passwordErrors.push("Use at least 1 lowercase character");
-        }
-        if (!/[A-Z]/.test(password)) {
-            passwordErrors.push("Use at least 1 uppercase character");
-        }
-        setPasswordError(passwordErrors);
-        if (!recaptchaChecked) {
-            setRecaptchaError("Required");
-            isFormValid = false;
-        } else {
-            setRecaptchaError("");
         }
         if (!isCheckedBox) {
             setCheckboxError("Required");
@@ -195,6 +116,7 @@ export default function InviteUserDetailForm() {
         }
         return isFormValid;
     };
+    console.log("recaptcha checked status", recaptchaChecked)
     const handleSubmit = async () => {
         if (validateForm()) {
             try {
@@ -202,7 +124,6 @@ export default function InviteUserDetailForm() {
                     .schema("mc_cap_develop")
                     .from("users")
                     .select("*")
-                    .eq("email", email)
                     .or(`display_name.eq.${username}`);
 
                 if (userError) {
@@ -212,28 +133,43 @@ export default function InviteUserDetailForm() {
 
                 if (existingUsers && existingUsers.length > 0) {
                     const existingUser = existingUsers[0];
-                    if (existingUser.email === email) {
-                        setEmailError("Email already exists");
-                    }
                     if (existingUser.display_name === username) {
                         setUserNameError("Username already exists");
                     }
                     return;
                 }
 
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                });
-
-                if (error) {
-                    console.error("Error creating user:", error.message);
-                } else if (data && data.user && data.user.id) {
-                    console.log("User created:", data.user);
-                    await insertAdditionalDetails(data.user.id);
-                    console.log("Signup successful!");
+                const { data: updateUser, error: updateUserError } = await supabase.auth.updateUser({
+                    data: {
+                        full_name: fullName,
+                    }
+                })
+                if (updateUserError) {
+                    console.error("Error inserting additional details:", error.message);
                 } else {
-                    console.error("User object is missing 'id'.");
+                    console.log("Additional details inserted:", updateUser);
+
+                }
+
+                const { data, error } = await supabase
+                    .schema("mc_cap_develop")
+                    .from("users")
+                    .upsert([
+                        {
+                            id: id,
+                            full_name: fullName,
+                            phone_number: phoneNumber,
+                            display_name: username,
+                            recaptcha_verification: "true",
+                            acceptedterms_verification: "true",
+
+                        },
+                    ]);
+                if (error) {
+                    console.error("Error inserting additional details:", error.message);
+                } else {
+                    console.log("Additional details inserted:", data);
+
                 }
                 setSubmissionStatus("success");
             } catch (error) {
@@ -242,27 +178,9 @@ export default function InviteUserDetailForm() {
         }
     };
 
-    const insertAdditionalDetails = async (id) => {
-        const { data, error } = await supabase
-            .schema("mc_cap_develop")
-            .from("users")
-            .upsert([
-                {
-                    id: id,
-                    full_name: fullName,
-                    phone_number: phoneNumber,
-                    display_name: username,
-                    recaptcha_verification: "true",
-                    acceptedterms_verification: "true",
-                    company: company,
-                },
-            ]);
-        if (error) {
-            console.error("Error inserting additional details:", error.message);
-        } else {
-            console.log("Additional details inserted:", data);
-        }
-    };
+
+
+
     return (
         <Box
             className="for-animation"
@@ -290,13 +208,16 @@ export default function InviteUserDetailForm() {
                                     p={8}
                                 >
                                     <Text fontSize="lg" color="green.500" mb={4}>
-                                        Mail Sent Successfully!
+                                        Sign in Successfully!
                                     </Text>
                                     <Text>
-                                        Thank you for signing up! We have sent a verification email
-                                        to {email}. Please check your inbox and follow the
-                                        instructions to complete the registration process.
+                                        Sign up successful! You can now proceed to log in.
                                     </Text>
+                                    <Box pt={3}>
+                                        <NavLink to="/login">
+                                            <Button variant="formButtons">Sign in</Button>
+                                        </NavLink>
+                                    </Box>
                                 </Box>
                             ) : (
                                 <Box
@@ -341,25 +262,6 @@ export default function InviteUserDetailForm() {
                                                 fontSize="xs"
                                                 fontFamily="formCompTexts"
                                             >
-                                                Email
-                                            </FormLabel>
-                                            <Input
-                                                type="email"
-                                                value={email}
-                                                onChange={handleEmailChange}
-                                                isInvalid={emailError !== ""}
-                                                style={{ borderColor: emailError ? "#ba0517" : "" }}
-                                            />
-                                            {emailError && (
-                                                <Text className="field-error">{emailError}</Text>
-                                            )}
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel
-                                                color="formLabelColor"
-                                                fontSize="xs"
-                                                fontFamily="formCompTexts"
-                                            >
                                                 Phone number
                                             </FormLabel>
                                             <Input
@@ -381,25 +283,6 @@ export default function InviteUserDetailForm() {
                                                 fontSize="xs"
                                                 fontFamily="formCompTexts"
                                             >
-                                                Company
-                                            </FormLabel>
-                                            <Input
-                                                type="text"
-                                                value={company}
-                                                onChange={handleCompanyChange}
-                                                isInvalid={companyError !== ""}
-                                                style={{ borderColor: companyError ? "#ba0517" : "" }}
-                                            />
-                                            {companyError && (
-                                                <Text className="field-error">{companyError}</Text>
-                                            )}
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel
-                                                color="formLabelColor"
-                                                fontSize="xs"
-                                                fontFamily="formCompTexts"
-                                            >
                                                 Username
                                             </FormLabel>
                                             <Input
@@ -412,30 +295,6 @@ export default function InviteUserDetailForm() {
                                             {userNameError && (
                                                 <Text className="field-error">{userNameError}</Text>
                                             )}
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel
-                                                color="formLabelColor"
-                                                fontSize="xs"
-                                                fontFamily="formCompTexts"
-                                            >
-                                                Password
-                                            </FormLabel>
-                                            <Input
-                                                type="password"
-                                                value={password}
-                                                onChange={handlePasswordChange}
-                                                isInvalid={passwordError.length > 0}
-                                                style={{
-                                                    borderColor:
-                                                        passwordError.length > 0 ? "#ba0517" : "",
-                                                }}
-                                            />
-                                            {passwordError.map((error, index) => (
-                                                <Text key={index} className="field-errorpass">
-                                                    {error}
-                                                </Text>
-                                            ))}
                                         </FormControl>
                                         <Flex justify="center">
                                             <Box>

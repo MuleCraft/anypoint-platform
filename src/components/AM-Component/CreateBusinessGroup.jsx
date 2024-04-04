@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
 import fetchBusinessGroupNames from "../../Utils/BusinessGroupData";
 
-function CreateBusinessGroup({currentUserEmail,currentUserName}) {
+function CreateBusinessGroup({ currentUserEmail, currentUserName }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
@@ -25,29 +25,29 @@ function CreateBusinessGroup({currentUserEmail,currentUserName}) {
 
     const isCreateButtonDisabled = !groupName || !selectedGroupValue || !ownerName;
 
-    const [businessGroupNames,setBusinessGroupNames] = useState([]);
+    const [businessGroupNames, setBusinessGroupNames] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
-        if(!dataLoaded){
+        if (!dataLoaded) {
             fetchGroupNames();
         }
     })
 
-        const fetchGroupNames = async () => {
-            const bgNamesData = fetchBusinessGroupNames(currentUserName);
+    const fetchGroupNames = async () => {
+        const bgNamesData = fetchBusinessGroupNames(currentUserName);
 
-            bgNamesData.then((response) => {
-                setBusinessGroupNames(response);
-                if(businessGroupNames.length > 0) {
-                    setDataLoaded(true);
-                }
-                console.log('group name: ', businessGroupNames);
-            })
+        bgNamesData.then((response) => {
+            setBusinessGroupNames(response);
+            if (businessGroupNames.length > 0) {
+                setDataLoaded(true);
+            }
+            console.log('group name: ', businessGroupNames);
+        })
             .catch((error) => {
                 console.log(error.message);
             });
-        }
+    }
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
@@ -118,17 +118,17 @@ function CreateBusinessGroup({currentUserEmail,currentUserName}) {
                                         value={selectedGroupValue}
                                         onChange={handleSelectChange}
                                         disabled={!dataLoaded}
-                                        >
-                                            {dataLoaded ? (
-                                                businessGroupNames.map((group, index) => (
-                                                    <option key={index} value={group.businessGroupName}>
-                                                        {group.businessGroupName}
-                                                    </option>
-                                                ))
-                                            ) : (
-                                                <option value={'MC'}>MC</option>
-                                                // <option disabled>Loading...</option>
-                                            )}
+                                    >
+                                        {dataLoaded ? (
+                                            businessGroupNames.map((group, index) => (
+                                                <option key={index} value={group.businessGroupName}>
+                                                    {group.businessGroupName}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option value={'MC'}>MC</option>
+                                            // <option disabled>Loading...</option>
+                                        )}
                                     </Select>
                                 </VStack>
                                 {isGroupSelected && (

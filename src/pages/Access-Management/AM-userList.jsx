@@ -28,7 +28,7 @@ export default function AMUserList({ name, pathValue }) {
                                 onItemSelect={handleItemSelect}
                             />
                         </Box>
-                        <Flex direction="column" ml="200" mt="200">
+                        <Flex direction="column" w="full" ml="200" mt="200">
                             <HorizontalSidebar
                                 sections={userTab}
                                 activeItem={activeItem}

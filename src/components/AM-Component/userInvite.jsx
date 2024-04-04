@@ -1,126 +1,81 @@
-import { useContext, useState } from 'react';
-import {
-    Box,
-    Flex,
-    FormControl,
-    FormLabel,
-    Input,
-    Button,
-    useToast,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    useDisclosure,
-    Text,
-    Divider,
-    Menu,
-    MenuButton,
-    MenuList,
-    Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
-    TableContainer,
-} from '@chakra-ui/react';
-
-import "../../assets/Common.css";
-
-import {
-    flexRender,
-    getCoreRowModel,
-    useReactTable
-} from "@tanstack/react-table";
-import { makeData } from "./makeData";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { useContext, useEffect, useState } from 'react';
 import adminAuthClient from '../../Utils/api';
+import { Menu, MenuButton, MenuList, Table, Tbody, Td, Th, Thead, Tr, Text, Input, useDisclosure, useToast, Flex, Button, Modal, ModalOverlay, ModalContent, Box, ModalHeader, Divider, ModalBody, FormControl, FormLabel, ModalFooter, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import { AuthContext } from '../../Utils/AuthProvider';
-
-
-const defaultColumns = [
-    {
-        header: "Name",
-        accessorKey: "name"
-    },
-    {
-        header: "Username",
-        accessorKey: "username"
-    },
-    {
-        header: "Email",
-        accessorKey: "email"
-    },
-    {
-        header: "Email verified date",
-        accessorKey: "emailVerifiedDate"
-    },
-    {
-        header: "Identity provider",
-        accessorKey: "identityProvider"
-    },
-    {
-        header: "Multi-factor auth",
-        accessorKey: "multiFactorAuth"
-    },
-    {
-        header: "Created date",
-        accessorKey: "createdDate"
-    },
-    {
-        header: "Last modified date",
-        accessorKey: "lastModifiedDate"
-    },
-    {
-        header: "Last login date",
-        accessorKey: "lastLoginDate"
-    },
-    {
-        header: "Status",
-        accessorKey: "status"
-    }
-];
-
-function InviteForm() {
-    const [data] = useState(() => makeData());
-    const [columns] = useState(() => [...defaultColumns]);
+import { FiSearch } from "react-icons/fi";
+import supabase from '../../Utils/supabase';
+import { ChevronDownIcon } from "@chakra-ui/icons";
+const InviteForm = () => {
+    const [userTable, setUserData] = useState(null);
     const { userData } = useContext(AuthContext);
-    const [columnVisibility, setColumnVisibility] = useState({});
-    const [columnOrder, setColumnOrder] = useState([]);
-    const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
-    const table = useReactTable({
-        data,
-        columns,
-        state: {
-            columnVisibility,
-            columnOrder
-        },
-        onColumnVisibilityChange: setColumnVisibility,
-        onColumnOrderChange: setColumnOrder,
-        getCoreRowModel: getCoreRowModel(),
-        debugTable: true,
-        debugHeaders: true,
-        debugColumns: true,
-        manualFilters: true,
-        autoResetFilters: false
-    });
-
-
-
-
-    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', padding: '10px' };
-    const rowValueStyle = { fontSize: 14, padding: '20px' };
-
+    const [filter, setFilter] = useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [emails, setEmails] = useState("");
     const [emailError, setEmailError] = useState("");
     const [submissionStatus, setSubmissionStatus] = useState(null);
-
+    const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
     const toast = useToast();
+    const [userNameTable, setUserNameData] = useState(null);
+    const [showNameColumn, setShowNameColumn] = useState(true);
+    const [showEmailColumn, setShowEmailColumn] = useState(true);
+    const [showVerifiedDateColumn, setShowVerifiedDateColumn] = useState(true);
+    const [showIdentityProviderColumn, setShowIdentityProviderColumn] = useState(true);
+    const [showCreatedDateColumn, setShowCreatedDateColumn] = useState(true);
+    const [showLastModifiedDateColumn, setShowLastModifiedDateColumn] = useState(true);
+    const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
+    const [showStatusColumn, setShowStatusColumn] = useState(true);
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const { data, error } = await adminAuthClient.listUsers();
 
+                if (error) {
+                    console.error("Error fetching user data:", error.message);
+                } else {
+                    console.log("User data fetched successfully:", data);
+                    setUserData(data.users);
+                    setUserNameData(data.users);
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+
+
+    const toggleNameColumn = () => {
+        setShowNameColumn(!userNameTable);
+    };
+    const toggleEmailColumn = () => {
+        setShowEmailColumn(!showEmailColumn);
+    };
+    const toggleVerifiedDateColumn = () => {
+        setShowVerifiedDateColumn(!showVerifiedDateColumn);
+    };
+    const toggleIdentityProviderColumn = () => {
+        setShowIdentityProviderColumn(!showIdentityProviderColumn);
+    };
+    const toggleCreatedDateColumn = () => {
+        setShowCreatedDateColumn(!showCreatedDateColumn);
+    };
+    const toggleLastModifiedDateColumn = () => {
+        setShowLastModifiedDateColumn(!showLastModifiedDateColumn);
+    };
+    const toggleLastLoginDateColumn = () => {
+        setShowLastLoginDateColumn(!showLastLoginDateColumn);
+    };
+    const toggleStatusColumn = () => {
+        setShowStatusColumn(!showStatusColumn);
+    };
+
+    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', };
+    const rowValueStyle = { fontSize: 14, };
+    const handleFilterChange = (event) => {
+        setFilter(event.target.value);
+    };
     const handleEmailChange = (event) => {
         const value = event.target.value;
         setEmails(value);
@@ -143,16 +98,22 @@ function InviteForm() {
         }
 
         try {
+            const invitedUserIds = [];
+
             await Promise.all(
                 emailList.map(async (email) => {
-                    const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
+                    const { data, error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
                     if (error) {
                         console.error(`Error inviting user ${email}:`, error.message);
                         throw error;
                     }
+
+                    if (data && data.user && data.user.id) {
+                        invitedUserIds.push(data.user.id);
+                        await insertAdditionalDetails(data.user.id);
+                    }
                 })
             );
-
             setSubmissionStatus("success");
             onClose();
             toast({
@@ -161,7 +122,9 @@ function InviteForm() {
                 duration: 5000,
                 isClosable: true,
                 position: "top-right"
-            });
+
+            }
+            );
         } catch (error) {
             console.error("Error inviting users:", error.message);
             toast({
@@ -174,10 +137,28 @@ function InviteForm() {
             });
         }
     };
+    console.log(submissionStatus)
+    const insertAdditionalDetails = async (id) => {
+        const { data, error } = await supabase
+            .schema("mc_cap_develop")
+            .from("users")
+            .upsert([
+                {
+                    id: id,
+                    company: userData?.company,
+                },
+            ]);
+        if (error) {
+            console.error("Error inserting additional details:", error.message);
+        } else {
+            console.log("Additional details inserted:", data);
+        }
+    };
+
     return (
-        <Box position="fixed" maxW="85%">
-            <Flex alignItems="center" justifyContent="space-between" mb={4}>
-                <Button colorScheme="blue" onClick={onOpen}>Invite Users</Button>
+        <div>
+            <Flex alignItems="center" justifyContent="space-between" >
+                <Button colorScheme="blue" onClick={onOpen} zIndex={0}>Invite Users</Button>
                 <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
                     <ModalOverlay />
                     <ModalContent>
@@ -224,65 +205,162 @@ function InviteForm() {
                         </ModalFooter>
                     </ModalContent>
                 </Modal>
-                <Menu>
-                    <MenuButton
-                        variant="hideShow"
-                        borderColor="#000"
-                        borderWidth="1px"
-                        as={Button}
-                        rightIcon={<ChevronDownIcon />}
-                    >
-                        Columns(5/10)
-                    </MenuButton>
-                    <MenuList p={4}>
-                        {table.getAllLeafColumns().map(column => (
-                            <div key={column.id} className="px-1">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={column.getIsVisible()}
-                                        onChange={column.getToggleVisibilityHandler()}
-                                    />{" "}
-                                    {column.id}
-                                </label>
-                            </div>
-                        ))}
-                    </MenuList>
-                </Menu>
+                <Flex gap={10} alignItems="center">
+                    <InputGroup maxW="-webkit-fit-content">
+                        <InputLeftElement
+                            pointerEvents="none"
+                            top={4}
+                            left={4}
+                            children={<FiSearch color="gray" />}
+                        />
+                        <Input
+                            placeholder="Filter users"
+                            value={filter}
+                            onChange={handleFilterChange}
+                            my={4}
+                            ml={4}
+
+                        />
+                    </InputGroup>
+                    <Menu>
+                        <MenuButton
+                            variant="hideShow"
+                            borderColor="#000"
+                            borderWidth="1px"
+                            as={Button}
+                            rightIcon={<ChevronDownIcon />}
+                        >
+                            Columns(9/9)
+                        </MenuButton>
+                        <MenuList p={4}>
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showNameColumn}
+                                    onChange={toggleNameColumn}
+                                    readOnly
+
+                                />
+                                <Text>Name</Text>
+                            </Flex>
+
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showEmailColumn}
+                                    onChange={toggleEmailColumn}
+                                    readOnly
+
+                                />
+                                <Text>Email</Text>
+                            </Flex>
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showVerifiedDateColumn}
+                                    onChange={toggleVerifiedDateColumn}
+                                    readOnly
+                                />
+                                <Text>Verified Date</Text>
+                            </Flex>
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showIdentityProviderColumn}
+                                    onChange={toggleIdentityProviderColumn}
+                                    readOnly
+                                />
+                                <Text>Identity Provider</Text>
+                            </Flex>
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showCreatedDateColumn}
+                                    onChange={toggleCreatedDateColumn}
+                                    readOnly
+                                />
+                                <Text> Created Date</Text>
+                            </Flex>
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showLastModifiedDateColumn}
+                                    onChange={toggleLastModifiedDateColumn}
+                                    readOnly
+                                />
+                                <Text>Last Modified Date</Text>
+                            </Flex>
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showLastLoginDateColumn}
+                                    onChange={toggleLastLoginDateColumn}
+                                    readOnly
+                                />
+                                <Text>Last Login Date</Text>
+                            </Flex>
+                            <Flex alignItems="center" gap={2} p={"0.5"}>
+                                <input
+                                    style={{ height: 18, width: 18 }}
+                                    type="checkbox"
+                                    checked={showStatusColumn}
+                                    onChange={toggleStatusColumn}
+                                    readOnly
+                                />
+                                <Text>Status</Text>
+                            </Flex>
+                        </MenuList>
+                    </Menu>
+                </Flex>
             </Flex>
 
-            <TableContainer>
-                <Table variant="simple" >
-                    <Thead borderBottomWidth="3px" >
-                        {table.getHeaderGroups().map(headerGroup => (
-                            <Tr key={headerGroup.id} >
-                                {headerGroup.headers.map(header => (
-                                    <Th key={header.id} style={columnTitleStyle}>
-                                        {flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                    </Th>
-                                ))}
-                            </Tr>
-                        ))}
-                    </Thead>
-                    <Tbody>
-                        {table.getRowModel().rows.map(row => (
-                            <Tr key={row.id}>
-                                {row.getVisibleCells().map(cell => (
-                                    <Td key={cell.id} style={rowValueStyle}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </Td>
-                                ))}
-                            </Tr>
-                        ))}
-                    </Tbody>
+            <Table variant="simple" size="md">
+                <Thead borderBottomWidth="3px">
+                    <Tr>
+                        <Th style={columnTitleStyle} hidden={!showNameColumn}> Full name</Th>
 
-                </Table>
-            </TableContainer>
-        </Box>
+                        <Th style={columnTitleStyle} hidden={!showEmailColumn}>Email</Th>
+                        <Th style={columnTitleStyle} hidden={!showVerifiedDateColumn}>Email verified date</Th>
+                        <Th style={columnTitleStyle} hidden={!showIdentityProviderColumn}>Identity provider</Th>
+                        <Th style={columnTitleStyle} hidden={!showCreatedDateColumn}>Created date</Th>
+                        <Th style={columnTitleStyle} hidden={!showLastModifiedDateColumn}>Last modified date</Th>
+                        <Th style={columnTitleStyle} hidden={!showLastLoginDateColumn}> Last login date</Th>
+                        <Th style={columnTitleStyle} hidden={!showStatusColumn}> Status</Th>
+
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {Array.isArray(userTable) && userTable
+                        .filter(user =>
+                            user.email.toLowerCase().includes(filter.toLowerCase()) && !user.invited_at
+                        )
+                        .map((conversion, index) => (
+                            <Tr key={index}>
+
+                                <Td style={rowValueStyle} hidden={!showNameColumn}>{conversion.user_metadata.full_name}</Td>
+                                <Td style={rowValueStyle} hidden={!showEmailColumn}>{conversion.email}</Td>
+                                <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>{conversion.confirmation_sent_at}</Td>
+                                <Td style={rowValueStyle} hidden={!showIdentityProviderColumn}>{conversion.identities}Anypoint</Td>
+                                <Td style={rowValueStyle} hidden={!showCreatedDateColumn}>{conversion.created_at}</Td>
+                                <Td style={rowValueStyle} hidden={!showLastModifiedDateColumn}>{conversion.updated_at}</Td>
+                                <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>{conversion.last_sign_in_at
+                                }</Td>
+                                <Td style={rowValueStyle} hidden={!showStatusColumn}>Enabled</Td>
+                                <Td></Td>
+                            </Tr>
+                        ))}
+                </Tbody>
+
+            </Table>
+        </div>
     );
-}
+};
 
 export default InviteForm;

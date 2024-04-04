@@ -8,7 +8,7 @@ import userTab from "./utils/AM-userTab";
 import PendingInvitation from "../../components/AM-Component/pendingInvitation";
 
 
-export default function AMPending({ name }) {
+export default function AMPending({ name, pathValue }) {
     const [activeItem, setActiveItem] = useState('PendingInvitations');
 
 
@@ -18,7 +18,7 @@ export default function AMPending({ name }) {
     return (
         <>
             <div className="home">
-                <Nav name={name} />
+                <Nav name={name} pathValue={pathValue} />
                 <div className="Wrapper">
                     <Flex>
                         <Box>

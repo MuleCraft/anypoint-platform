@@ -11,10 +11,10 @@ import {
 } from "@chakra-ui/react";
 import BusinessGroupMenu from "./BusinessGroupMenu";
 
-export default function ({tableData}){
+export default function ({ tableData }) {
 
   const [hoveredRows, setHoveredRows] = useState([]);
-  const rows = tableData||[];
+  const rows = tableData || [];
 
   const handleRowHover = (index) => {
     setHoveredRows((prevHoveredRows) => {
