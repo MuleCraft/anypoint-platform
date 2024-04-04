@@ -16,6 +16,7 @@ const InviteForm = () => {
     const [submissionStatus, setSubmissionStatus] = useState(null);
     const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
     const toast = useToast();
+    const [userNameTable, setUserNameData] = useState(null);
     const [showNameColumn, setShowNameColumn] = useState(true);
     const [showUserNameColumn, setShowUserNameColumn] = useState(true);
     const [showEmailColumn, setShowEmailColumn] = useState(true);
@@ -35,6 +36,7 @@ const InviteForm = () => {
                 } else {
                     console.log("User data fetched successfully:", data);
                     setUserData(data.users);
+                    setUserNameData(data.users);
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -48,9 +50,6 @@ const InviteForm = () => {
 
     const toggleNameColumn = () => {
         setShowNameColumn(!showNameColumn);
-    };
-    const toggleUserNameColumn = () => {
-        setShowUserNameColumn(!showUserNameColumn);
     };
     const toggleEmailColumn = () => {
         setShowEmailColumn(!showEmailColumn);
@@ -247,17 +246,7 @@ const InviteForm = () => {
                                 />
                                 <Text>Name</Text>
                             </Flex>
-                            <Flex alignItems="center" gap={2} p={"0.5"}>
-                                <input
-                                    style={{ height: 18, width: 18 }}
-                                    type="checkbox"
-                                    checked={showUserNameColumn}
-                                    onChange={toggleUserNameColumn}
-                                    readOnly
 
-                                />
-                                <Text>User Name</Text>
-                            </Flex>
                             <Flex alignItems="center" gap={2} p={"0.5"}>
                                 <input
                                     style={{ height: 18, width: 18 }}
@@ -284,7 +273,7 @@ const InviteForm = () => {
                                     style={{ height: 18, width: 18 }}
                                     type="checkbox"
                                     checked={showVerifiedDateColumn}
-                                    onChange={toggleVerifiedDateColumn}
+                                    onChange={toggleIdentityProviderColumn}
                                     readOnly
                                 />
                                 <Text>Identity Provider</Text>
@@ -337,8 +326,8 @@ const InviteForm = () => {
             <Table variant="simple" size="md">
                 <Thead borderBottomWidth="3px">
                     <Tr>
-                        <Th style={columnTitleStyle} hidden={!showNameColumn}>Name</Th>
-                        <Th style={columnTitleStyle} hidden={!showUserNameColumn}>Username</Th>
+                        <Th style={columnTitleStyle} hidden={!showNameColumn}> Full name</Th>
+
                         <Th style={columnTitleStyle} hidden={!showEmailColumn}>Email</Th>
                         <Th style={columnTitleStyle} hidden={!showVerifiedDateColumn}>Email verified date</Th>
                         <Th style={columnTitleStyle} hidden={!showIdentityProviderColumn}>Identity provider</Th>
@@ -356,8 +345,8 @@ const InviteForm = () => {
                         )
                         .map((conversion, index) => (
                             <Tr key={index}>
-                                <Td style={rowValueStyle} hidden={!showNameColumn}></Td>
-                                <Td style={rowValueStyle} hidden={!showUserNameColumn}></Td>
+
+                                <Td style={rowValueStyle} hidden={!showNameColumn}>{conversion.user_metadata.full_name}</Td>
                                 <Td style={rowValueStyle} hidden={!showEmailColumn}>{conversion.email}</Td>
                                 <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>{conversion.confirmation_sent_at}</Td>
                                 <Td style={rowValueStyle} hidden={!showIdentityProviderColumn}>{conversion.identities}Anypoint</Td>
