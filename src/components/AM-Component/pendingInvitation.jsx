@@ -4,6 +4,7 @@ import { Menu, MenuButton, MenuItem, MenuList, Table, Tbody, Td, Th, Thead, Tr, 
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { AuthContext } from '../../Utils/AuthProvider';
 import { FiSearch } from "react-icons/fi";
+import supabase from '../../Utils/supabase';
 
 const UserTable = () => {
     const [userTable, setUserData] = useState(null);
@@ -36,12 +37,10 @@ const UserTable = () => {
 
     const calculateExpirationStatus = (invited_at) => {
         if (!invited_at) return null;
-
         const invitedDate = new Date(invited_at);
         const currentDate = new Date();
         const differenceInTime = currentDate.getTime() - invitedDate.getTime();
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
-
         if (differenceInDays > 7) {
             return `${differenceInDays - 7} days ago)`;
         } else {
@@ -51,13 +50,10 @@ const UserTable = () => {
 
     const calculateSendStatus = (invited_at) => {
         if (!invited_at) return null;
-
         const invitedDate = new Date(invited_at);
         const currentDate = new Date();
         const differenceInTime = invitedDate.getTime() - currentDate.getTime();
         const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
-
-
         if (differenceInDays < 0) {
             return `${Math.abs(differenceInDays)} days ago`;
         } else if (differenceInDays === 0) {
@@ -69,7 +65,6 @@ const UserTable = () => {
 
     const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', };
     const rowValueStyle = { fontSize: 14, };
-
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
     };
@@ -232,7 +227,9 @@ const UserTable = () => {
                 </Thead>
                 <Tbody>
                     {Array.isArray(userTable) && userTable
-                        .filter(user => user.email.toLowerCase().includes(filter.toLowerCase()))
+                        .filter(user =>
+                            user.email.toLowerCase().includes(filter.toLowerCase()) && user.invited_at
+                        )
                         .map((conversion, index) => (
                             <Tr key={index}>
                                 <Td style={rowValueStyle}>{conversion.email}</Td>
@@ -266,6 +263,7 @@ const UserTable = () => {
                             </Tr>
                         ))}
                 </Tbody>
+
             </Table>
         </div>
     );
