@@ -26,8 +26,15 @@ function CreateBusinessGroup({currentUserEmail,currentUserName}) {
     const isCreateButtonDisabled = !groupName || !selectedGroupValue || !ownerName;
 
     const [businessGroupNames,setBusinessGroupNames] = useState([]);
+    const [dataLoaded, setDataLoaded] = useState(false);
 
-        if (currentUserEmail) {
+    useEffect(() => {
+        if(!dataLoaded){
+            fetchGroupNames();
+        }
+    })
+
+        const fetchGroupNames = async () => {
             const bgNamesData = fetchBusinessGroupNames(currentUserName);
 
             bgNamesData.then((response) => {
@@ -41,14 +48,6 @@ function CreateBusinessGroup({currentUserEmail,currentUserName}) {
                 console.log(error.message);
             });
         }
-
-        const [dataLoaded, setDataLoaded] = useState(false);
-
-        useEffect(() => {
-            if (businessGroupNames.length > 0) {
-                setDataLoaded(true);
-            }
-        }, [businessGroupNames]);
 
     const handleSelectChange = (event) => {
         const value = event.target.value;
