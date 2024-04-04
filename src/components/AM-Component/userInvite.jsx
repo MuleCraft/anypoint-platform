@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import adminAuthClient from '../../Utils/api';
-import { Menu, MenuButton, MenuItem, MenuList, Table, Tbody, Td, Th, Thead, Tr, IconButton, Tooltip, Text, Input, useDisclosure, useToast, Flex, Button, Modal, ModalOverlay, ModalContent, Box, ModalHeader, Divider, ModalBody, FormControl, FormLabel, ModalFooter, InputGroup, InputLeftElement } from '@chakra-ui/react';
-import { HiEllipsisHorizontal } from "react-icons/hi2";
+import { Menu, MenuButton, MenuList, Table, Tbody, Td, Th, Thead, Tr, Text, Input, useDisclosure, useToast, Flex, Button, Modal, ModalOverlay, ModalContent, Box, ModalHeader, Divider, ModalBody, FormControl, FormLabel, ModalFooter, InputGroup, InputLeftElement } from '@chakra-ui/react';
 import { AuthContext } from '../../Utils/AuthProvider';
 import { FiSearch } from "react-icons/fi";
 import supabase from '../../Utils/supabase';
@@ -18,7 +17,6 @@ const InviteForm = () => {
     const toast = useToast();
     const [userNameTable, setUserNameData] = useState(null);
     const [showNameColumn, setShowNameColumn] = useState(true);
-    const [showUserNameColumn, setShowUserNameColumn] = useState(true);
     const [showEmailColumn, setShowEmailColumn] = useState(true);
     const [showVerifiedDateColumn, setShowVerifiedDateColumn] = useState(true);
     const [showIdentityProviderColumn, setShowIdentityProviderColumn] = useState(true);
@@ -49,7 +47,7 @@ const InviteForm = () => {
 
 
     const toggleNameColumn = () => {
-        setShowNameColumn(!showNameColumn);
+        setShowNameColumn(!userNameTable);
     };
     const toggleEmailColumn = () => {
         setShowEmailColumn(!showEmailColumn);
@@ -272,7 +270,7 @@ const InviteForm = () => {
                                 <input
                                     style={{ height: 18, width: 18 }}
                                     type="checkbox"
-                                    checked={showVerifiedDateColumn}
+                                    checked={showIdentityProviderColumn}
                                     onChange={toggleIdentityProviderColumn}
                                     readOnly
                                 />
