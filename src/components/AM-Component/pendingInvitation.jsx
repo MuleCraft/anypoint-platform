@@ -1,53 +1,78 @@
-import { useContext, useState } from 'react';
-import {
-    Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
-    TableContainer,
-    Input,
-    Box,
-    Flex,
-    FormControl,
-    FormLabel,
-    Button,
-    useToast,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    useDisclosure,
-    Text,
-    Divider,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    IconButton,
-    InputLeftElement,
-    InputGroup
-} from '@chakra-ui/react';
-import { HiEllipsisHorizontal } from "react-icons/hi2";
-import { FiSearch } from "react-icons/fi";
+import { useContext, useEffect, useState } from 'react';
 import adminAuthClient from '../../Utils/api';
-import supabase from '../../Utils/supabase';
+import { Menu, MenuButton, MenuItem, MenuList, Table, Tbody, Td, Th, Thead, Tr, IconButton, Tooltip, Text, Input, useDisclosure, useToast, Flex, Button, Modal, ModalOverlay, ModalContent, Box, ModalHeader, Divider, ModalBody, FormControl, FormLabel, ModalFooter, InputGroup, InputLeftElement } from '@chakra-ui/react';
+import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { AuthContext } from '../../Utils/AuthProvider';
+import { FiSearch } from "react-icons/fi";
 
-const ConversionTable = () => {
+const UserTable = () => {
+    const [userTable, setUserData] = useState(null);
+    const { userData } = useContext(AuthContext);
     const [filter, setFilter] = useState('');
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [emails, setEmails] = useState("");
     const [emailError, setEmailError] = useState("");
     const [submissionStatus, setSubmissionStatus] = useState(null);
-    const { userData } = useContext(AuthContext);
     const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
-
     const toast = useToast();
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const { data, error } = await adminAuthClient.listUsers();
 
+                if (error) {
+                    console.error("Error fetching user data:", error.message);
+                } else {
+                    console.log("User data fetched successfully:", data);
+                    setUserData(data.users);
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    const calculateExpirationStatus = (invited_at) => {
+        if (!invited_at) return null;
+
+        const invitedDate = new Date(invited_at);
+        const currentDate = new Date();
+        const differenceInTime = currentDate.getTime() - invitedDate.getTime();
+        const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+
+        if (differenceInDays > 7) {
+            return `${differenceInDays - 7} days ago)`;
+        } else {
+            return `${7 - differenceInDays} days ago`;
+        }
+    };
+
+    const calculateSendStatus = (invited_at) => {
+        if (!invited_at) return null;
+
+        const invitedDate = new Date(invited_at);
+        const currentDate = new Date();
+        const differenceInTime = invitedDate.getTime() - currentDate.getTime();
+        const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+
+
+        if (differenceInDays < 0) {
+            return `${Math.abs(differenceInDays)} days ago`;
+        } else if (differenceInDays === 0) {
+            return `an hour ago`;
+        } else {
+            return `${differenceInDays} days to go`;
+        }
+    };
+
+    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', };
+    const rowValueStyle = { fontSize: 14, };
+
+    const handleFilterChange = (event) => {
+        setFilter(event.target.value);
+    };
     const handleEmailChange = (event) => {
         const value = event.target.value;
         setEmails(value);
@@ -127,23 +152,10 @@ const ConversionTable = () => {
         }
     };
 
-    const user = [
-        { email: 'inches', send: 'millimetres (mm)', expires: 25.4, teams: 25.4 },
-        { email: 'feet', send: 'centimetres (cm)', expires: 30.48, teams: 25.4 },
-        { email: 'yards', send: 'metres (m)', expires: 0.91444, teams: 25.4 },
-    ];
-
-    const filteredConversions = user.filter(user =>
-        user.email.toLowerCase().includes(filter.toLowerCase())
-    );
-
-    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', padding: '10px' };
-    const rowValueStyle = { fontSize: 14, padding: '10px' };
-
     return (
-        <Box >
-            <Flex alignItems="center" justifyContent="space-between"  >
-                <Button colorScheme="blue" onClick={onOpen}>Invite Users</Button>
+        <div>
+            <Flex alignItems="center" justifyContent="space-between" >
+                <Button colorScheme="blue" onClick={onOpen} zIndex={0}>Invite Users</Button>
                 <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
                     <ModalOverlay />
                     <ModalContent>
@@ -200,7 +212,7 @@ const ConversionTable = () => {
                     <Input
                         placeholder="Filter users"
                         value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
+                        onChange={handleFilterChange}
                         my={4}
                         ml={4}
 
@@ -208,24 +220,29 @@ const ConversionTable = () => {
                 </InputGroup>
             </Flex>
 
-            <TableContainer>
-                <Table variant="simple" size="md">
-                    <Thead borderBottomWidth="3px">
-                        <Tr>
-                            <Th style={columnTitleStyle}>Email</Th>
-                            <Th style={columnTitleStyle}>Sent</Th>
-                            <Th style={columnTitleStyle}>Expires</Th>
-                            <Th style={columnTitleStyle}>Teams</Th>
-                            <Th style={columnTitleStyle} w={'10px'}></Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {filteredConversions.map((conversion, index) => (
+            <Table variant="simple" size="md">
+                <Thead borderBottomWidth="3px">
+                    <Tr>
+                        <Th style={columnTitleStyle}>Email</Th>
+                        <Th style={columnTitleStyle}>Sent</Th>
+                        <Th style={columnTitleStyle}>Expires</Th>
+                        <Th style={columnTitleStyle}>Teams</Th>
+                        <Th style={columnTitleStyle} w={'10px'}></Th>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {Array.isArray(userTable) && userTable
+                        .filter(user => user.email.toLowerCase().includes(filter.toLowerCase()))
+                        .map((conversion, index) => (
                             <Tr key={index}>
                                 <Td style={rowValueStyle}>{conversion.email}</Td>
-                                <Td style={rowValueStyle}>{conversion.send}</Td>
-                                <Td style={rowValueStyle}>{conversion.expires}</Td>
-                                <Td style={rowValueStyle}>{conversion.teams}</Td>
+                                <Td style={rowValueStyle}>{calculateSendStatus(conversion.invited_at)}</Td>
+                                <Td style={rowValueStyle}>{calculateExpirationStatus(conversion.invited_at)}</Td>
+                                <Td style={rowValueStyle}>
+                                    <Tooltip fontSize="12px" label={`Everyone at ${userData?.company} (Member)`} placement='auto'>
+                                        <Text>1 team</Text>
+                                    </Tooltip>
+                                </Td>
                                 <Td style={rowValueStyle}>
                                     <Menu>
                                         <MenuButton
@@ -248,11 +265,10 @@ const ConversionTable = () => {
                                 </Td>
                             </Tr>
                         ))}
-                    </Tbody>
-                </Table>
-            </TableContainer>
-        </Box>
+                </Tbody>
+            </Table>
+        </div>
     );
 };
 
-export default ConversionTable;
+export default UserTable;
