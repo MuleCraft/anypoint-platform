@@ -233,7 +233,7 @@ const InviteForm = () => {
                             as={Button}
                             rightIcon={<ChevronDownIcon />}
                         >
-                            Columns(5/10)
+                            Columns(9/9)
                         </MenuButton>
                         <MenuList p={4}>
                             <Flex alignItems="center" gap={2} p={"0.5"}>

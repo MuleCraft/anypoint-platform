@@ -42,9 +42,9 @@ const UserTable = () => {
         const differenceInTime = currentDate.getTime() - invitedDate.getTime();
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
         if (differenceInDays > 7) {
-            return `${differenceInDays - 7} days ago)`;
+            return `${differenceInDays - 7} days )`;
         } else {
-            return `${7 - differenceInDays} days ago`;
+            return `${7 - differenceInDays} days `;
         }
     };
 
