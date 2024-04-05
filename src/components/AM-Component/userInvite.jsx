@@ -5,6 +5,7 @@ import { AuthContext } from '../../Utils/AuthProvider';
 import { FiSearch } from "react-icons/fi";
 import supabase from '../../Utils/supabase';
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import moment from 'moment';
 const InviteForm = () => {
     const [userTable, setUserData] = useState(null);
     const { userData } = useContext(AuthContext);
@@ -14,8 +15,7 @@ const InviteForm = () => {
     const [emailError, setEmailError] = useState("");
     const [submissionStatus, setSubmissionStatus] = useState(null);
     const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
-    const toast = useToast();
-    const [userNameTable, setUserNameData] = useState(null);
+    const toast = useToast()
     const [showNameColumn, setShowNameColumn] = useState(true);
     const [showEmailColumn, setShowEmailColumn] = useState(true);
     const [showVerifiedDateColumn, setShowVerifiedDateColumn] = useState(true);
@@ -34,7 +34,7 @@ const InviteForm = () => {
                 } else {
                     console.log("User data fetched successfully:", data);
                     setUserData(data.users);
-                    setUserNameData(data.users);
+
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -47,7 +47,7 @@ const InviteForm = () => {
 
 
     const toggleNameColumn = () => {
-        setShowNameColumn(!userNameTable);
+        setShowNameColumn(!showNameColumn);
     };
     const toggleEmailColumn = () => {
         setShowEmailColumn(!showEmailColumn);
@@ -346,12 +346,11 @@ const InviteForm = () => {
 
                                 <Td style={rowValueStyle} hidden={!showNameColumn}>{conversion.user_metadata.full_name}</Td>
                                 <Td style={rowValueStyle} hidden={!showEmailColumn}>{conversion.email}</Td>
-                                <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>{conversion.confirmation_sent_at}</Td>
+                                <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>{moment(conversion.confirmation_sent_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
                                 <Td style={rowValueStyle} hidden={!showIdentityProviderColumn}>{conversion.identities}Anypoint</Td>
-                                <Td style={rowValueStyle} hidden={!showCreatedDateColumn}>{conversion.created_at}</Td>
-                                <Td style={rowValueStyle} hidden={!showLastModifiedDateColumn}>{conversion.updated_at}</Td>
-                                <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>{conversion.last_sign_in_at
-                                }</Td>
+                                <Td style={rowValueStyle} hidden={!showCreatedDateColumn}>{moment(conversion.created_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
+                                <Td style={rowValueStyle} hidden={!showLastModifiedDateColumn}>{moment(conversion.updated_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
+                                <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>{moment(conversion.last_sign_in_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
                                 <Td style={rowValueStyle} hidden={!showStatusColumn}>Enabled</Td>
                                 <Td></Td>
                             </Tr>

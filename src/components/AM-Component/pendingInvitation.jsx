@@ -39,14 +39,15 @@ const UserTable = () => {
         if (!invited_at) return null;
         const invitedDate = new Date(invited_at);
         const currentDate = new Date();
-        const differenceInTime = currentDate.getTime() - invitedDate.getTime();
+        const differenceInTime = Math.abs(currentDate.getTime() - invitedDate.getTime());
         const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
         if (differenceInDays > 7) {
-            return `${differenceInDays - 7} days )`;
+            return `${differenceInDays - 1} days )`;
         } else {
-            return `${7 - differenceInDays} days `;
+            return `${1 - (-differenceInDays + 2)} days `;
         }
     };
+
 
     const calculateSendStatus = (invited_at) => {
         if (!invited_at) return null;
