@@ -44,7 +44,7 @@ const UserTable = () => {
         if (differenceInDays > 7) {
             return `${differenceInDays - 1} days )`;
         } else {
-            return `${1 - (-differenceInDays + 2)} days `;
+            return `${1 - (-differenceInDays + 1)} days `;
         }
     };
 
@@ -56,7 +56,7 @@ const UserTable = () => {
         const differenceInTime = invitedDate.getTime() - currentDate.getTime();
         const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
         if (differenceInDays < 0) {
-            return `${Math.abs(differenceInDays)} days ago`;
+            return `${Math.abs(differenceInDays + 1)} days ago`;
         } else if (differenceInDays === 0) {
             return `an hour ago`;
         } else {
@@ -229,7 +229,7 @@ const UserTable = () => {
                 <Tbody>
                     {Array.isArray(userTable) && userTable
                         .filter(user =>
-                            user.email.toLowerCase().includes(filter.toLowerCase()) && user.invited_at
+                            user.email.toLowerCase().includes(filter.toLowerCase()) && !user.last_sign_in_at
                         )
                         .map((conversion, index) => (
                             <Tr key={index}>

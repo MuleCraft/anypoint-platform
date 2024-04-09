@@ -6,6 +6,7 @@ import { FiSearch } from "react-icons/fi";
 import supabase from '../../Utils/supabase';
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import moment from 'moment';
+import { Link as RouterLink } from 'react-router-dom';
 const InviteForm = () => {
     const [userTable, setUserData] = useState(null);
     const { userData } = useContext(AuthContext);
@@ -343,14 +344,13 @@ const InviteForm = () => {
                         )
                         .map((conversion, index) => (
                             <Tr key={index}>
-
-                                <Td style={rowValueStyle} hidden={!showNameColumn}>{conversion.user_metadata.full_name}</Td>
+                                <Td style={rowValueStyle} hidden={!showNameColumn} _hover={{ color: "boxColor" }}> <RouterLink to={`/accounts/users/${conversion.id}`}>{conversion.user_metadata.full_name}</RouterLink></Td>
                                 <Td style={rowValueStyle} hidden={!showEmailColumn}>{conversion.email}</Td>
-                                <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>{moment(conversion.confirmation_sent_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
+                                <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>{moment(conversion.confirmation_sent_at).format('h:mm A MMM D, YYYY')}</Td>
                                 <Td style={rowValueStyle} hidden={!showIdentityProviderColumn}>{conversion.identities}Anypoint</Td>
-                                <Td style={rowValueStyle} hidden={!showCreatedDateColumn}>{moment(conversion.created_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
-                                <Td style={rowValueStyle} hidden={!showLastModifiedDateColumn}>{moment(conversion.updated_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
-                                <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>{moment(conversion.last_sign_in_at).format('YYYY-MM-DD HH:mm:ss')}</Td>
+                                <Td style={rowValueStyle} hidden={!showCreatedDateColumn}> {moment(conversion.created_at).format('h:mm A MMM D, YYYY')}</Td>
+                                <Td style={rowValueStyle} hidden={!showLastModifiedDateColumn}>{moment(conversion.updated_at).format('h:mm A MMM D, YYYY')}</Td>
+                                <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>{moment(conversion.last_sign_in_at).format('h:mm A MMM D, YYYY')}</Td>
                                 <Td style={rowValueStyle} hidden={!showStatusColumn}>Enabled</Td>
                                 <Td></Td>
                             </Tr>
