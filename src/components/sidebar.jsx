@@ -11,7 +11,6 @@ const Sidebar = ({ sections, activeItem, onItemSelect, name }) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
 
-
     return (
         <Box
             bg={useColorModeValue('white', 'gray.900')}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Stack,
   Flex,
@@ -24,27 +24,33 @@ export default function AMBusinessGroup({ name, pathValue }) {
   const [currentUserName, setCurrentUserName] = useState('');
   const [currentUserEmail, setCurrentUserEmail] = useState('');
 
+  useEffect(() => {
+    if (currentUserName) {
+      fetchRows();
+    }
+  }, [currentUserName])
+
   const userTableData = fetchUserSessionData();
   userTableData.then((response) => {
     setCurrentUserEmail(response.email);
     setCurrentUserName(response.display_name);
     console.log('current user name: ', currentUserName);
-    if (currentUserName) {
-      const tableRowData = fetchBgTableRows(currentUserName);
-      tableRowData.then((response) => {
-        setTableData(response);
-        console.log('Table rows: ', tableData);
-      })
-        .catch((error) => {
-          console.log(error.message);
-        });
-    }
+    console.log('current user mail: ', currentUserEmail);
   })
     .catch((error) => {
       console.log(error.message);
     });
 
-
+  const fetchRows = async () => {
+    const tableRowData = fetchBgTableRows(currentUserName);
+    tableRowData.then((response) => {
+      setTableData(response);
+      console.log('Table rows: ', tableData);
+    })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  }
 
   const handleItemSelect = (itemName) => {
     setActiveItem(itemName);
