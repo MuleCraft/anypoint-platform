@@ -256,6 +256,7 @@ export default function SimpleCard() {
         {
           id: id,
           full_name: fullName,
+          email: email,
           phone: phoneNumber,
           display_name: username,
           recaptcha_verification: "true",
