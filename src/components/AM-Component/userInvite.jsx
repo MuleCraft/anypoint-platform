@@ -1,12 +1,41 @@
 import { useContext, useEffect, useState } from 'react';
 import adminAuthClient from '../../Utils/api';
-import { Menu, MenuButton, MenuList, Table, Tbody, Td, Th, Thead, Tr, Text, Input, useDisclosure, useToast, Flex, Button, Modal, ModalOverlay, ModalContent, Box, ModalHeader, Divider, ModalBody, FormControl, FormLabel, ModalFooter, InputGroup, InputLeftElement } from '@chakra-ui/react';
+import {
+    Menu,
+    MenuButton,
+    MenuList,
+    Table,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr,
+    Text,
+    Input,
+    useDisclosure,
+    useToast,
+    Flex,
+    Button,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    Box,
+    ModalHeader,
+    Divider,
+    ModalBody,
+    FormControl,
+    FormLabel,
+    ModalFooter,
+    InputGroup,
+    InputLeftElement
+} from '@chakra-ui/react';
 import { AuthContext } from '../../Utils/AuthProvider';
 import { FiSearch } from "react-icons/fi";
 import supabase from '../../Utils/supabase';
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import moment from 'moment';
 import { Link as RouterLink } from 'react-router-dom';
+
 const InviteForm = () => {
     const [userTable, setUserData] = useState(null);
     const { userData } = useContext(AuthContext);
@@ -15,8 +44,8 @@ const InviteForm = () => {
     const [emails, setEmails] = useState("");
     const [emailError, setEmailError] = useState("");
     const [submissionStatus, setSubmissionStatus] = useState(null);
-    const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
-    const toast = useToast()
+    const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser";
+    const toast = useToast();
     const [showNameColumn, setShowNameColumn] = useState(true);
     const [showEmailColumn, setShowEmailColumn] = useState(true);
     const [showVerifiedDateColumn, setShowVerifiedDateColumn] = useState(true);
@@ -25,6 +54,7 @@ const InviteForm = () => {
     const [showLastModifiedDateColumn, setShowLastModifiedDateColumn] = useState(true);
     const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
     const [showStatusColumn, setShowStatusColumn] = useState(true);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -35,7 +65,6 @@ const InviteForm = () => {
                 } else {
                     console.log("User data fetched successfully:", data);
                     setUserData(data.users);
-
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -44,8 +73,6 @@ const InviteForm = () => {
 
         fetchUserData();
     }, []);
-
-
 
     const toggleNameColumn = () => {
         setShowNameColumn(!showNameColumn);
@@ -72,24 +99,40 @@ const InviteForm = () => {
         setShowStatusColumn(!showStatusColumn);
     };
 
+    // Function to count the number of checked columns
+    const countCheckedColumns = () => {
+        let count = 0;
+        if (showNameColumn) count++;
+        if (showEmailColumn) count++;
+        if (showVerifiedDateColumn) count++;
+        if (showIdentityProviderColumn) count++;
+        if (showCreatedDateColumn) count++;
+        if (showLastModifiedDateColumn) count++;
+        if (showLastLoginDateColumn) count++;
+        if (showStatusColumn) count++;
+        return count;
+    };
+
     const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', };
     const rowValueStyle = { fontSize: 14, };
+
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
     };
+
     const handleEmailChange = (event) => {
         const value = event.target.value;
         setEmails(value);
         setEmailError("");
     };
 
+    // Function to validate email format
     const validateEmail = (email) => {
         return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email);
     };
 
     const handleSubmit = async () => {
         const emailList = emails.split(",").map((email) => email.trim());
-
 
         const invalidEmails = emailList.filter((email) => !validateEmail(email));
 
@@ -123,9 +166,7 @@ const InviteForm = () => {
                 duration: 5000,
                 isClosable: true,
                 position: "top-right"
-
-            }
-            );
+            });
         } catch (error) {
             console.error("Error inviting users:", error.message);
             toast({
@@ -138,7 +179,7 @@ const InviteForm = () => {
             });
         }
     };
-    console.log(submissionStatus)
+
     const insertAdditionalDetails = async (id) => {
         const { data, error } = await supabase
             .schema("mc_cap_develop")
@@ -155,7 +196,6 @@ const InviteForm = () => {
             console.log("Additional details inserted:", data);
         }
     };
-
     return (
         <div>
             <Flex alignItems="center" justifyContent="space-between" >
@@ -231,7 +271,7 @@ const InviteForm = () => {
                             as={Button}
                             rightIcon={<ChevronDownIcon />}
                         >
-                            Columns(9/9)
+                            Columns ({countCheckedColumns()}/8)
                         </MenuButton>
                         <MenuList p={4}>
                             <Flex alignItems="center" gap={2} p={"0.5"}>

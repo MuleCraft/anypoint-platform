@@ -147,6 +147,58 @@ const UserTable = () => {
             console.log("Additional details inserted:", data);
         }
     };
+    const cancelInvitation = async (id) => {
+        try {
+
+            const { data, error } = await adminAuthClient.deleteUser(
+                id
+            )
+            if (error) {
+                console.error(`Error canceled for user ${id}:`, error.message);
+                throw error;
+            }
+            console.log(`Invitation canceled for user with id: ${id}`, data);
+
+        } catch (error) {
+            console.error("Error canceling invitation:", error.message);
+            toast({
+                title: "Error canceling invitation",
+                description: error.message,
+                status: "error",
+                duration: 1000,
+                isClosable: true,
+                position: "top-right"
+            });
+        }
+    };
+
+    const ResendInvitation = async (email) => {
+        const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
+        if (error) {
+            console.error(`Error inviting user ${email}:`, error.message);
+            toast({
+                title: "Invitations sent not send",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right"
+
+            })
+        }
+
+        setSubmissionStatus("success");
+        onClose();
+        toast({
+            title: "Invitations sent successfully!",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: "top-right"
+
+        }
+        );
+
+    }
 
     return (
         <div>
@@ -252,10 +304,10 @@ const UserTable = () => {
                                             border={'1px solid #5c5c5c'}
                                         />
                                         <MenuList borderRadius={0}>
-                                            <MenuItem fontSize="sm">
+                                            <MenuItem fontSize="sm" onClick={() => ResendInvitation(conversion.email)}>
                                                 Resend Invitation...
                                             </MenuItem>
-                                            <MenuItem fontSize="sm" color="red">
+                                            <MenuItem fontSize="sm" color="red" onClick={() => cancelInvitation(conversion.id)}>
                                                 Cancel Invitation...
                                             </MenuItem>
                                         </MenuList>
