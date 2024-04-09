@@ -132,7 +132,7 @@ const UserTable = () => {
     };
     console.log(submissionStatus)
     const insertAdditionalDetails = async (id) => {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .schema("mc_cap_develop")
             .from("users")
             .upsert([
@@ -147,30 +147,63 @@ const UserTable = () => {
             console.log("Additional details inserted:");
         }
     };
+
     const cancelInvitation = async (id) => {
         try {
 
-            const { data, error } = await adminAuthClient.deleteUser(
-                id
-            )
-            if (error) {
-                console.error(`Error canceled for user ${id}:`, error.message);
-                throw error;
-            }
-            console.log(`Invitation canceled for user with id: ${id}`);
+            const { error: deleteError } = await supabase
+                .schema('mc_cap_develop')
+                .from('users')
+                .delete()
+                .eq('id', id);
 
+            if (deleteError) {
+                console.error(`Error deleting user ${id}:`, deleteError.message);
+                throw deleteError;
+            } else {
+                console.log(`User with ID ${id} deleted successfully`);
+
+
+                await insertAdditional(id);
+            }
         } catch (error) {
             console.error("Error canceling invitation:", error.message);
             toast({
                 title: "Error canceling invitation",
                 description: error.message,
                 status: "error",
-                duration: 1000,
+                duration: 5000,
                 isClosable: true,
                 position: "top-right"
             });
         }
     };
+
+    const insertAdditional = async (id) => {
+        try {
+            const { error } = await adminAuthClient.deleteUser(id);
+
+            if (error) {
+                console.error(`Error canceling invitation for user ${id}:`, error.message);
+                throw error;
+            } else {
+                console.log(`Invitation canceled for user with ID: ${id}`);
+            }
+        } catch (error) {
+            console.error("Error inserting additional details:", error.message);
+            toast({
+                title: "Error inserting additional details",
+                description: error.message,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            });
+        }
+    };
+
+
+
 
     const ResendInvitation = async (email) => {
         const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
