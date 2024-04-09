@@ -224,6 +224,12 @@ export default function SimpleCard() {
         const { data, error } = await supabase.auth.signUp({
           email: email,
           password: password,
+          options: {
+            data: {
+              full_name: fullName,
+              phone: phoneNumber,
+            },
+          },
         });
 
         if (error) {
@@ -250,7 +256,7 @@ export default function SimpleCard() {
         {
           id: id,
           full_name: fullName,
-          phone_number: phoneNumber,
+          phone: phoneNumber,
           display_name: username,
           recaptcha_verification: "true",
           acceptedterms_verification: "true",
@@ -289,13 +295,14 @@ export default function SimpleCard() {
                   boxShadow={"lg"}
                   p={8}
                 >
-                  <Text fontSize="lg" color="green.500" mb={4}>
+                  <Text fontSize="lg" fontWeight={"medium"} mb={4}>
                     Mail Sent Successfully!
                   </Text>
                   <Text>
                     Thank you for signing up! We have sent a verification email
-                    to {email}. Please check your inbox and follow the
-                    instructions to complete the registration process.
+                    to <strong>{email}.</strong> Please check your inbox and
+                    follow the instructions to complete the registration
+                    process.
                   </Text>
                 </Box>
               ) : (
