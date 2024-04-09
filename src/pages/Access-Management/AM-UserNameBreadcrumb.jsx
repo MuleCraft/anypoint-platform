@@ -10,7 +10,7 @@ import UserNameBreadcrumb from "../../components/AM-Component/UserNameBreadcrumb
 
 
 export default function AMUserBreadcrumb({ name, pathValue }) {
-    const [activeItem, setActiveItem] = useState('Settings');
+    const [activeItem, setActiveItem] = useState('users');
 
 
     const handleItemSelect = (itemName) => {

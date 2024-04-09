@@ -9,7 +9,7 @@ import PendingInvitation from "../../components/AM-Component/pendingInvitation";
 
 
 export default function AMPending({ name, pathValue }) {
-    const [activeItem, setActiveItem] = useState('PendingInvitations');
+    const [activeItem, setActiveItem] = useState('users', 'pending');
 
 
     const handleItemSelect = (itemName) => {
