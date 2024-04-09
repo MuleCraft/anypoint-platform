@@ -1,22 +1,26 @@
-import { Flex, VStack, Box, useColorModeValue, Link, HStack } from '@chakra-ui/react';
+import { Flex, VStack, Box, useColorModeValue, Link, HStack, Divider } from '@chakra-ui/react';
 import "../assets/Common.css";
 
-const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
+const FlexableTabs = ({ sections, activeItem, onItemSelect }) => {
     const isActive = (itemName) => activeItem === itemName;
 
     return (
+
         <Flex
             bg={useColorModeValue('white', 'gray.900')}
+            borderTop="2px"
             borderBottom="2px"
+            borderTopColor={useColorModeValue('gray.200', 'gray.700')}
             borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
             w="full"
             h="auto"
             position="fixed"
-            top="20"
-            zIndex={99}
+            top="15%"
+            zIndex={0}
         >
+
             {sections.map((section, sectionIndex) => (
-                <Box key={sectionIndex} mr={1}>
+                <Box key={sectionIndex} mr={2} >
                     <HStack spacing={2}>
                         {section.items.map((item) => (
                             <VStack
@@ -32,7 +36,7 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
                                     color={isActive(item.name) ? "boxColor" : "black"}
                                     _hover={{ color: "boxColor", textDecoration: "underline" }}
                                 >
-                                    {isActive() ?
+                                    {isActive(item.name) ?
                                         <Box p={"3px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined}>
                                             {item.label}
                                         </Box>
@@ -44,15 +48,16 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
                                     h="3px"
                                     w="full"
                                     borderRadius="30px"
-                                    bg={isActive() ? useColorModeValue('boxColor') : 'transparent'}
+                                    bg={isActive(item.name) ? useColorModeValue('boxColor') : 'transparent'}
                                 />
                             </VStack>
-                        ))}
-                    </HStack>
-                </Box>
+                        ))
+                        }
+                    </HStack >
+                </Box >
             ))}
-        </Flex>
+        </Flex >
     );
 };
 
-export default HorizontalSidebar;
+export default FlexableTabs;

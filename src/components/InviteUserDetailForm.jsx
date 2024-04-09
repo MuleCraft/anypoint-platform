@@ -18,7 +18,7 @@ import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 export default function InviteUserDetailForm() {
     const [isCheckedBox, setIsCheckedBox] = useState(false);

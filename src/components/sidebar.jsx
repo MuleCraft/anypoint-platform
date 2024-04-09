@@ -10,7 +10,6 @@ const Sidebar = ({ sections, activeItem, onItemSelect, name }) => {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    console.log("section", name)
 
     return (
         <Box
@@ -97,7 +96,7 @@ const Sidebar = ({ sections, activeItem, onItemSelect, name }) => {
                             _hover={{ textDecoration: 'none' }}
                         >
                             <Box
-                                h="5"
+                                h="6"
                                 w="1"
                                 className='access_box'
                                 bg={isActive(item.name) ? useColorModeValue('boxColor', 'boxColor') : 'transparent'}
