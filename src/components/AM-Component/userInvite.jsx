@@ -63,7 +63,7 @@ const InviteForm = () => {
                 if (error) {
                     console.error("Error fetching user data:", error.message);
                 } else {
-                    console.log("User data fetched successfully:", data);
+                    console.log("User data fetched successfully:");
                     setUserData(data.users);
                 }
             } catch (error) {
@@ -198,7 +198,7 @@ const InviteForm = () => {
     };
     return (
         <div>
-            <Flex alignItems="center" justifyContent="space-between" >
+            <Flex alignItems="center" justifyContent="space-between">
                 <Button colorScheme="blue" onClick={onOpen} zIndex={0}>Invite Users</Button>
                 <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
                     <ModalOverlay />

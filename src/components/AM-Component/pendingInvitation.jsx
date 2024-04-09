@@ -24,7 +24,7 @@ const UserTable = () => {
                 if (error) {
                     console.error("Error fetching user data:", error.message);
                 } else {
-                    console.log("User data fetched successfully:", data);
+                    console.log("User data fetched successfully:");
                     setUserData(data.users);
                 }
             } catch (error) {
@@ -57,7 +57,7 @@ const UserTable = () => {
         const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
         if (differenceInDays < 0) {
             return `${Math.abs(differenceInDays + 1)} days ago`;
-        } else if (differenceInDays === 0) {
+        } else if (differenceInDays === 1) {
             return `an hour ago`;
         } else {
             return `${differenceInDays} days to go`;
@@ -144,7 +144,7 @@ const UserTable = () => {
         if (error) {
             console.error("Error inserting additional details:", error.message);
         } else {
-            console.log("Additional details inserted:", data);
+            console.log("Additional details inserted:");
         }
     };
     const cancelInvitation = async (id) => {
@@ -157,7 +157,7 @@ const UserTable = () => {
                 console.error(`Error canceled for user ${id}:`, error.message);
                 throw error;
             }
-            console.log(`Invitation canceled for user with id: ${id}`, data);
+            console.log(`Invitation canceled for user with id: ${id}`);
 
         } catch (error) {
             console.error("Error canceling invitation:", error.message);

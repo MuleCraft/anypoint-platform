@@ -13,7 +13,7 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
             h="auto"
             position="fixed"
             top="20"
-            zIndex={0}
+            zIndex={99}
         >
             {sections.map((section, sectionIndex) => (
                 <Box key={sectionIndex} mr={1}>
