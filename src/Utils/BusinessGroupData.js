@@ -2,7 +2,6 @@ import supabase from "./supabase";
 
 export default async function fetchBusinessGroupNames(userName) {
 
-        console.log("BG data fn has been called for ", userName);
         const { data, error } = await supabase
                 .schema("mc_cap_develop")
                 .from("businessGroup")
@@ -13,7 +12,6 @@ export default async function fetchBusinessGroupNames(userName) {
                 return error;
         }
         else {
-                // console.log("BG Names: ", data);
                 return data;
         }
 }
