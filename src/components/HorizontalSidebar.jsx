@@ -42,7 +42,7 @@ const HorizontalSidebar = ({ selectedItem, onItemSelect }) => {
                                     color={isActive(item.name) ? "boxColor" : "black"}
                                     _hover={{ color: "boxColor", textDecoration: "underline" }}
                                 >
-                                    {isActive(item.name) ?
+                                    {isActive() ?
                                         <Box p={"3px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined}>
                                             {item.label}
                                         </Box>
@@ -54,7 +54,7 @@ const HorizontalSidebar = ({ selectedItem, onItemSelect }) => {
                                     h="3px"
                                     w="full"
                                     borderRadius="30px"
-                                    bg={isActive(item.name) ? useColorModeValue('boxColor') : 'transparent'}
+                                    bg={isActive() ? useColorModeValue('boxColor') : 'transparent'}
                                 />
                             </VStack>
                         ))}

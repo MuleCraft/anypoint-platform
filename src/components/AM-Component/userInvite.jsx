@@ -157,7 +157,6 @@ const InviteForm = () => {
             console.error(`Error inviting user ${email}:`, error.message);
             throw error;
           }
-
           if (data && data.user && data.user.id) {
             invitedUserIds.push(data.user.id);
             await insertAdditionalDetails(data.user.id);
