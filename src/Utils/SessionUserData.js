@@ -6,11 +6,12 @@ export default async function fetchUserSessionData(){
 
     const { session } = useContext(AuthContext);
     const [userSessionData, setUserSessionData] = useState(null);
+    console.log('session',session);
 
     useEffect(() => {
         if (session) {
           fetchUserData();
-          // console.log("useEffect triggered");
+          console.log("session useEffect triggered");
         }
       }, [session]);
     
@@ -27,7 +28,7 @@ export default async function fetchUserSessionData(){
             throw error;
           }
           setUserSessionData(data);
-          // console.log("User data: ", userSessionData);
+          console.log("User data: ", userSessionData);
         } catch (error) {
           console.error("Error fetching user data:", error.message);
         }
