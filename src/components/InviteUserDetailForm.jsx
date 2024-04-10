@@ -71,13 +71,14 @@ export default function InviteUserDetailForm() {
       setPhoneNumberError("");
     }
   };
-
   const handleUserNameChange = (event) => {
     const value = event.target.value;
     setUserName(value);
 
-    if (value.trim().length < 2) {
+    if (value.trim().length < 3) {
       setUserNameError("Use at least 3 characters long");
+    } else if (/\s/.test(value)) {
+      setUserNameError("Use letters, numbers, hyphens and underscores only");
     } else {
       setUserNameError("");
     }
@@ -105,6 +106,12 @@ export default function InviteUserDetailForm() {
       isFormValid = false;
     } else {
       setUserNameError("");
+    }
+    if (!recaptchaChecked) {
+      setRecaptchaError("Required");
+      isFormValid = false;
+    } else {
+      setRecaptchaError("");
     }
     if (!isCheckedBox) {
       setCheckboxError("Required");
@@ -199,13 +206,13 @@ export default function InviteUserDetailForm() {
                   bg={useColorModeValue("white", "gray.700")}
                   boxShadow={"lg"}
                   p={8}
+                  alignItems={"center"}
+                  textAlign="center"
                 >
-                  <Text fontSize="lg" color="green.500" mb={4}>
-                    Sign in Successfully!
-                  </Text>
-                  <Text>
-                    Sign up successful! You can now proceed to log in.
-                  </Text>
+                  <Heading fontSize="sm" mb={4}>
+                    You have joined the organization
+                  </Heading>
+                  <Text>You can sign in now.</Text>
                   <Box pt={3}>
                     <NavLink to="/login">
                       <Button variant="formButtons">Sign in</Button>

@@ -1,8 +1,18 @@
 import { Flex, VStack, Box, useColorModeValue, Link, HStack } from '@chakra-ui/react';
 import "../assets/Common.css";
 
-const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
-    const isActive = (itemName) => activeItem === itemName;
+const HorizontalSidebar = ({ selectedItem, onItemSelect }) => {
+    const isActive = (itemName) => selectedItem === itemName;
+
+    const sections = [
+        {
+            name: "section1",
+            items: [
+                { name: 'users', label: 'Users', path: '/accounts/users/list' },
+                { name: 'pending', label: 'Pending invitations', path: '/accounts/users/Pending' },
+            ]
+        },
+    ];
 
     return (
         <Flex
@@ -15,8 +25,8 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
             top="20"
             zIndex={0}
         >
-            {sections.map((section, sectionIndex) => (
-                <Box key={sectionIndex} mr={1}>
+            {sections.map((section) => (
+                <Box mr={1} key={section.name}>
                     <HStack spacing={2}>
                         {section.items.map((item) => (
                             <VStack

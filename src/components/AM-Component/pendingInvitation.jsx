@@ -142,9 +142,9 @@ const UserTable = () => {
         },
       ]);
     if (error) {
-      console.error("Error inserting additional details:", error.message);
+      console.error("Error invitation canceled:", error.message);
     } else {
-      console.log("Additional details inserted:");
+      console.log("invitation canceled");
     }
   };
 
@@ -162,7 +162,13 @@ const UserTable = () => {
         throw deleteError;
       } else {
         console.log(`User with ID ${id} deleted successfully`);
-
+        toast({
+          title: "canceled invitation",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right"
+        });
 
         await insertAdditional(id);
       }
@@ -190,7 +196,7 @@ const UserTable = () => {
         console.log(`Invitation canceled for user with ID: ${id}`);
       }
     } catch (error) {
-      console.error("Error inserting additional details:", error.message);
+      console.error("Error delete user:", error.message);
       toast({
         title: "Error inserting additional details",
         description: error.message,

@@ -99,8 +99,10 @@ export default function SimpleCard() {
     const value = event.target.value;
     setUserName(value);
 
-    if (value.trim().length < 2) {
+    if (value.trim().length < 3) {
       setUserNameError("Use at least 3 characters long");
+    } else if (/\s/.test(value)) {
+      setUserNameError("Use letters, numbers, hyphens and underscores only");
     } else {
       setUserNameError("");
     }
