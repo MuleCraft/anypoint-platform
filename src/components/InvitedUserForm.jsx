@@ -29,8 +29,7 @@ export default function InvitedUserForm() {
   };
 
   const validatePassword = (password) => {
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*]{8,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*]{8,}$/;
     if (!passwordRegex.test(password)) {
       console.log("Password validation failed");
       setNewPasswordError(
@@ -105,7 +104,6 @@ export default function InvitedUserForm() {
             previous three passwords.
           </FormHelperText>
         </FormControl>
-
         <Button
           variant="formButtons"
           width={"100%"}
