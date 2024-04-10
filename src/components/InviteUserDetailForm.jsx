@@ -71,13 +71,14 @@ export default function InviteUserDetailForm() {
       setPhoneNumberError("");
     }
   };
-
   const handleUserNameChange = (event) => {
     const value = event.target.value;
     setUserName(value);
 
-    if (value.trim().length < 2) {
+    if (value.trim().length < 3) {
       setUserNameError("Use at least 3 characters long");
+    } else if (/\s/.test(value)) {
+      setUserNameError("Use letters, numbers, hyphens and underscores only");
     } else {
       setUserNameError("");
     }
@@ -211,9 +212,7 @@ export default function InviteUserDetailForm() {
                   <Heading fontSize="sm" color="green.500" mb={4}>
                     You have joined the organization
                   </Heading>
-                  <Text>
-                    You can sign in now.
-                  </Text>
+                  <Text>You can sign in now.</Text>
                   <Box pt={3}>
                     <NavLink to="/login">
                       <Button variant="formButtons">Sign in</Button>
