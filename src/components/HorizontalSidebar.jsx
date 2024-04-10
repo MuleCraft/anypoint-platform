@@ -1,8 +1,18 @@
 import { Flex, VStack, Box, useColorModeValue, Link, HStack } from '@chakra-ui/react';
 import "../assets/Common.css";
 
-const HorizontalSidebar = ({ sections, selectedItem, onItemSelect }) => {
+const HorizontalSidebar = ({ selectedItem, onItemSelect }) => {
     const isActive = (itemName) => selectedItem === itemName;
+
+    const sections = [
+        {
+            name: "section1",
+            items: [
+                { name: 'users', label: 'Users', path: '/accounts/users/list' },
+                { name: 'pending', label: 'Pending invitations', path: '/accounts/users/Pending' },
+            ]
+        },
+    ];
 
     return (
         <Flex
@@ -16,8 +26,7 @@ const HorizontalSidebar = ({ sections, selectedItem, onItemSelect }) => {
             zIndex={0}
         >
             {sections.map((section) => (
-                // eslint-disable-next-line react/jsx-key
-                <Box mr={1}>
+                <Box mr={1} key={section.name}>
                     <HStack spacing={2}>
                         {section.items.map((item) => (
                             <VStack
@@ -33,7 +42,7 @@ const HorizontalSidebar = ({ sections, selectedItem, onItemSelect }) => {
                                     color={isActive(item.name) ? "boxColor" : "black"}
                                     _hover={{ color: "boxColor", textDecoration: "underline" }}
                                 >
-                                    {isActive() ?
+                                    {isActive(item.name) ?
                                         <Box p={"3px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined}>
                                             {item.label}
                                         </Box>
@@ -45,7 +54,7 @@ const HorizontalSidebar = ({ sections, selectedItem, onItemSelect }) => {
                                     h="3px"
                                     w="full"
                                     borderRadius="30px"
-                                    bg={isActive() ? useColorModeValue('boxColor') : 'transparent'}
+                                    bg={isActive(item.name) ? useColorModeValue('boxColor') : 'transparent'}
                                 />
                             </VStack>
                         ))}

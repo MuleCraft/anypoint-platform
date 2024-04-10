@@ -9,14 +9,12 @@ import UserInvite from "../../components/AM-Component/userInvite";
 
 
 export default function AMUserList({ name, pathValue }) {
-    const [activeItem, setActiveItem] = useState('users', 'pending');
+    const [activeItem, setActiveItem] = useState('users');
 
     const [selectedItem, setselectedItem] = useState('users');
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
-
-
 
     const handleselectedItem = (itemName) => {
         setselectedItem(itemName);
