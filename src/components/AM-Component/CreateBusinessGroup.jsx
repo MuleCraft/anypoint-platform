@@ -29,18 +29,18 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const [dataLoaded, setDataLoaded] = useState(false);
 
     // useEffect(() => {
-        // if (currentUserName && (!dataLoaded)) {
-        //     fetchGroupNames();
-        // }
+    // if (currentUserName && (!dataLoaded)) {
+    //     fetchGroupNames();
+    // }
     // },[currentUserName])
 
     const fetchGroupNames = async () => {
         const bgNamesData = await fetchBusinessGroupNames(currentUserName);
-            setBusinessGroupNames(bgNamesData);
-            if (businessGroupNames.length > 0) {
-                setDataLoaded(true);
-            }
-            // console.log('group name: ', businessGroupNames);
+        setBusinessGroupNames(bgNamesData);
+        if (businessGroupNames.length > 0) {
+            setDataLoaded(true);
+        }
+        // console.log('group name: ', businessGroupNames);
     }
     if (currentUserName && (!dataLoaded)) {
         fetchGroupNames();

@@ -106,6 +106,12 @@ export default function InviteUserDetailForm() {
     } else {
       setUserNameError("");
     }
+    if (!recaptchaChecked) {
+      setRecaptchaError("Required");
+      isFormValid = false;
+    } else {
+      setRecaptchaError("");
+    }
     if (!isCheckedBox) {
       setCheckboxError("Required");
       isFormValid = false;
@@ -199,12 +205,14 @@ export default function InviteUserDetailForm() {
                   bg={useColorModeValue("white", "gray.700")}
                   boxShadow={"lg"}
                   p={8}
+                  alignItems={"center"}
+                  textAlign="center"
                 >
-                  <Text fontSize="lg" color="green.500" mb={4}>
-                    Sign in Successfully!
-                  </Text>
+                  <Heading fontSize="sm" color="green.500" mb={4}>
+                    You have joined the organization
+                  </Heading>
                   <Text>
-                    Sign up successful! You can now proceed to log in.
+                    You can sign in now.
                   </Text>
                   <Box pt={3}>
                     <NavLink to="/login">

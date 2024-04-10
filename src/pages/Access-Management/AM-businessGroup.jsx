@@ -30,7 +30,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [currentOrganization, setCurrentOrganization] = useState('');
 
-  if(userData && (currentUserName === '')){
+  if (userData && (currentUserName === '')) {
     setCurrentUserEmail(userData.email);
     setCurrentUserName(userData.display_name);
     setCurrentOrganization(userData.company);
@@ -41,7 +41,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
     setTableData(tableRowData);
   }
 
-  if(userData && (tableData.length === 0)){
+  if (userData && (tableData.length === 0)) {
     fetchRows();
   }
 
@@ -63,7 +63,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
             </Box>
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
               <Stack mt={"-60px"} direction={"row"} spacing={6}>
-                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName} currentOrganization={currentOrganization}/>
+                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName} currentOrganization={currentOrganization} />
                 <Text fontSize={14} color={"#747474"} fontWeight={500}>
                   Business groups are isolated scopes for managing access. Users
                   and teams may access resources in a business group through
