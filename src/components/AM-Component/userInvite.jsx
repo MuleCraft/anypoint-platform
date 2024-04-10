@@ -44,7 +44,7 @@ const InviteForm = () => {
   const [email, setEmails] = useState("");
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
-  const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser";
+  const redirectTo = "Vite_REDIRECT_URL";
   const toast = useToast();
   const [showNameColumn, setShowNameColumn] = useState(true);
   const [showEmailColumn, setShowEmailColumn] = useState(true);
@@ -164,7 +164,6 @@ const InviteForm = () => {
             console.error(`Error inviting user ${email}:`, error.message);
             throw error;
           }
-
           if (data && data.user && data.user.id) {
             invitedUserIds.push(data.user.id);
             await insertAdditionalDetails(data.user.id);
@@ -200,6 +199,7 @@ const InviteForm = () => {
       .upsert([
         {
           id: id,
+          email: email,
           company: userData?.company,
         },
       ]);

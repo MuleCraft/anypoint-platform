@@ -30,8 +30,7 @@ export default function InvitedUserForm() {
 
   const validatePassword = (password) => {
     const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{8,}$/;
-
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*]{8,}$/;
     if (!passwordRegex.test(password)) {
       console.log("Password validation failed");
       setNewPasswordError(
