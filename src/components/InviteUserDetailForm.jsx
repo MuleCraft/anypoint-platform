@@ -209,7 +209,7 @@ export default function InviteUserDetailForm() {
                   alignItems={"center"}
                   textAlign="center"
                 >
-                  <Heading fontSize="sm" color="green.500" mb={4}>
+                  <Heading fontSize="sm" mb={4}>
                     You have joined the organization
                   </Heading>
                   <Text>You can sign in now.</Text>
