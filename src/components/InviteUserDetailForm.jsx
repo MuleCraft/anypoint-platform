@@ -72,7 +72,6 @@ export default function InviteUserDetailForm() {
         }
     };
 
-
     const handleUserNameChange = (event) => {
         const value = event.target.value;
         setUserName(value);
@@ -83,7 +82,6 @@ export default function InviteUserDetailForm() {
             setUserNameError("");
         }
     };
-
 
     const validateForm = () => {
         let isFormValid = true;
@@ -116,7 +114,7 @@ export default function InviteUserDetailForm() {
         }
         return isFormValid;
     };
-    console.log("recaptcha checked status", recaptchaChecked)
+    console.log("recaptcha checked status", recaptchaChecked);
     const handleSubmit = async () => {
         if (validateForm()) {
             try {
@@ -139,16 +137,16 @@ export default function InviteUserDetailForm() {
                     return;
                 }
 
-                const { data: updateUser, error: updateUserError } = await supabase.auth.updateUser({
-                    data: {
-                        full_name: fullName,
-                    }
-                })
+                const { data: updateUser, error: updateUserError } =
+                    await supabase.auth.updateUser({
+                        data: {
+                            full_name: fullName,
+                        },
+                    });
                 if (updateUserError) {
                     console.error("Error inserting additional details:", error.message);
                 } else {
                     console.log("Additional details inserted:", updateUser);
-
                 }
 
                 const { data, error } = await supabase
@@ -158,18 +156,16 @@ export default function InviteUserDetailForm() {
                         {
                             id: id,
                             full_name: fullName,
-                            phone_number: phoneNumber,
+                            phone: phoneNumber,
                             display_name: username,
                             recaptcha_verification: "true",
                             acceptedterms_verification: "true",
-
                         },
                     ]);
                 if (error) {
                     console.error("Error inserting additional details:", error.message);
                 } else {
                     console.log("Additional details inserted:", data);
-
                 }
                 setSubmissionStatus("success");
             } catch (error) {
@@ -177,9 +173,6 @@ export default function InviteUserDetailForm() {
             }
         }
     };
-
-
-
 
     return (
         <Box

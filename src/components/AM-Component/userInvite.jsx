@@ -144,7 +144,15 @@ const InviteForm = () => {
 
       await Promise.all(
         emailList.map(async (email) => {
-          const { data, error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
+          const { data, error } = await adminAuthClient.inviteUserByEmail(
+            email,
+            {
+              redirectTo,
+              data: {
+                company: userData?.company,
+              },
+            }
+          );
           if (error) {
             console.error(`Error inviting user ${email}:`, error.message);
             throw error;
