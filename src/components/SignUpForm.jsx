@@ -18,6 +18,8 @@ import "../assets/Common.css";
 import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
+import createNewBusinessGroup from "../Utils/BusinessGroupCreate";
+
 export default function SimpleCard() {
   const [isCheckedBox, setIsCheckedBox] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -232,11 +234,25 @@ export default function SimpleCard() {
           },
         });
 
+        const groupCreateParams = {
+          groupName: company,
+          selectedGroupValue: null,
+          ownerName: email,
+          isGroupCheckboxSelected: true,
+          isEnvCheckboxSelected: true,
+          sandboxSliderValue: 1,
+          designSliderValue: 1,
+          currentUserName: username,
+          currentUserEmail: email,
+          currentOrganization: company
+      };
+
         if (error) {
           console.error("Error creating user:", error.message);
         } else if (data && data.user && data.user.id) {
           console.log("User created:", data.user);
           await insertAdditionalDetails(data.user.id);
+          await createNewBusinessGroup(groupCreateParams);
           console.log("Signup successful!");
         } else {
           console.error("User object is missing 'id'.");
