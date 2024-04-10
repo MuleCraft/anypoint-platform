@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
-import adminAuthClient from '../../Utils/api';
+import { useContext, useEffect, useState } from "react";
+import adminAuthClient from "../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -27,19 +27,19 @@ import {
   FormLabel,
   ModalFooter,
   InputGroup,
-  InputLeftElement
-} from '@chakra-ui/react';
-import { AuthContext } from '../../Utils/AuthProvider';
+  InputLeftElement,
+} from "@chakra-ui/react";
+import { AuthContext } from "../../Utils/AuthProvider";
 import { FiSearch } from "react-icons/fi";
-import supabase from '../../Utils/supabase';
+import supabase from "../../Utils/supabase";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import moment from 'moment';
-import { Link as RouterLink } from 'react-router-dom';
+import moment from "moment";
+import { Link as RouterLink } from "react-router-dom";
 
 const InviteForm = () => {
   const [userTable, setUserData] = useState(null);
   const { userData } = useContext(AuthContext);
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [emails, setEmails] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -49,9 +49,11 @@ const InviteForm = () => {
   const [showNameColumn, setShowNameColumn] = useState(true);
   const [showEmailColumn, setShowEmailColumn] = useState(true);
   const [showVerifiedDateColumn, setShowVerifiedDateColumn] = useState(true);
-  const [showIdentityProviderColumn, setShowIdentityProviderColumn] = useState(true);
+  const [showIdentityProviderColumn, setShowIdentityProviderColumn] =
+    useState(true);
   const [showCreatedDateColumn, setShowCreatedDateColumn] = useState(true);
-  const [showLastModifiedDateColumn, setShowLastModifiedDateColumn] = useState(true);
+  const [showLastModifiedDateColumn, setShowLastModifiedDateColumn] =
+    useState(true);
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
 
@@ -112,8 +114,13 @@ const InviteForm = () => {
     return count;
   };
 
-  const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', };
-  const rowValueStyle = { fontSize: 14, };
+  const columnTitleStyle = {
+    fontSize: 14,
+    color: "#444444",
+    fontWeight: 800,
+    textTransform: "capitalize",
+  };
+  const rowValueStyle = { fontSize: 14 };
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
@@ -144,7 +151,15 @@ const InviteForm = () => {
 
       await Promise.all(
         emailList.map(async (email) => {
-          const { data, error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
+          const { data, error } = await adminAuthClient.inviteUserByEmail(
+            email,
+            {
+              redirectTo,
+              data: {
+                company: userData?.company,
+              },
+            }
+          );
           if (error) {
             console.error(`Error inviting user ${email}:`, error.message);
             throw error;
@@ -163,7 +178,7 @@ const InviteForm = () => {
         status: "success",
         duration: 5000,
         isClosable: true,
-        position: "top-right"
+        position: "top-right",
       });
     } catch (error) {
       console.error("Error inviting users:", error.message);
@@ -173,7 +188,7 @@ const InviteForm = () => {
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: "top-right"
+        position: "top-right",
       });
     }
   };
@@ -197,12 +212,16 @@ const InviteForm = () => {
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between">
-        <Button colorScheme="blue" onClick={onOpen} zIndex={0}>Invite Users</Button>
+        <Button colorScheme="blue" onClick={onOpen} zIndex={0}>
+          Invite Users
+        </Button>
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
           <ModalOverlay />
           <ModalContent>
             <Box bg="modelColor" borderRadius="4px">
-              <ModalHeader fontSize="lg" fontWeight="800">Invite users</ModalHeader>
+              <ModalHeader fontSize="lg" fontWeight="800">
+                Invite users
+              </ModalHeader>
             </Box>
             <Divider />
             <ModalBody>
@@ -222,10 +241,12 @@ const InviteForm = () => {
                   borderRadius="0px"
                 />
                 {emailError && <Text color="red.500">{emailError}</Text>}
-                <FormLabel fontSize="md" pt={3}>Teams</FormLabel>
+                <FormLabel fontSize="md" pt={3}>
+                  Teams
+                </FormLabel>
                 <Text pb={3} maxW="450px" fontSize="sm" color="textColor">
-
-                  Invited users will be added to these teams, with the selected membership type.
+                  Invited users will be added to these teams, with the selected
+                  membership type.
                 </Text>
                 <Input
                   type="text"
@@ -237,7 +258,9 @@ const InviteForm = () => {
             </ModalBody>
             <Divider />
             <ModalFooter justifyContent="space-between">
-              <Button variant="homePageButtons" onClick={onClose}>Close</Button>
+              <Button variant="homePageButtons" onClick={onClose}>
+                Close
+              </Button>
               <Button onClick={handleSubmit} colorScheme="blue">
                 Send invitation
               </Button>
@@ -360,38 +383,92 @@ const InviteForm = () => {
       <Table variant="simple" size="md">
         <Thead borderBottomWidth="3px">
           <Tr>
-            <Th style={columnTitleStyle} hidden={!showNameColumn}> Full name</Th>
+            <Th style={columnTitleStyle} hidden={!showNameColumn}>
+              {" "}
+              Full name
+            </Th>
 
-            <Th style={columnTitleStyle} hidden={!showEmailColumn}>Email</Th>
-            <Th style={columnTitleStyle} hidden={!showVerifiedDateColumn}>Email verified date</Th>
-            <Th style={columnTitleStyle} hidden={!showIdentityProviderColumn}>Identity provider</Th>
-            <Th style={columnTitleStyle} hidden={!showCreatedDateColumn}>Created date</Th>
-            <Th style={columnTitleStyle} hidden={!showLastModifiedDateColumn}>Last modified date</Th>
-            <Th style={columnTitleStyle} hidden={!showLastLoginDateColumn}> Last login date</Th>
-            <Th style={columnTitleStyle} hidden={!showStatusColumn}> Status</Th>
-
+            <Th style={columnTitleStyle} hidden={!showEmailColumn}>
+              Email
+            </Th>
+            <Th style={columnTitleStyle} hidden={!showVerifiedDateColumn}>
+              Email verified date
+            </Th>
+            <Th style={columnTitleStyle} hidden={!showIdentityProviderColumn}>
+              Identity provider
+            </Th>
+            <Th style={columnTitleStyle} hidden={!showCreatedDateColumn}>
+              Created date
+            </Th>
+            <Th style={columnTitleStyle} hidden={!showLastModifiedDateColumn}>
+              Last modified date
+            </Th>
+            <Th style={columnTitleStyle} hidden={!showLastLoginDateColumn}>
+              {" "}
+              Last login date
+            </Th>
+            <Th style={columnTitleStyle} hidden={!showStatusColumn}>
+              {" "}
+              Status
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
-          {Array.isArray(userTable) && userTable
-            .filter(user =>
-              user.email.toLowerCase().includes(filter.toLowerCase()) && !user.invited_at
-            )
-            .map((conversion, index) => (
-              <Tr key={index}>
-                <Td style={rowValueStyle} hidden={!showNameColumn} _hover={{ color: "boxColor" }}> <RouterLink to={`/accounts/users/${conversion.id}`}>{conversion.user_metadata.full_name}</RouterLink></Td>
-                <Td style={rowValueStyle} hidden={!showEmailColumn}>{conversion.email}</Td>
-                <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>{moment(conversion.confirmation_sent_at).format('h:mm A MMM D, YYYY')}</Td>
-                <Td style={rowValueStyle} hidden={!showIdentityProviderColumn}>{conversion.identities}Anypoint</Td>
-                <Td style={rowValueStyle} hidden={!showCreatedDateColumn}> {moment(conversion.created_at).format('h:mm A MMM D, YYYY')}</Td>
-                <Td style={rowValueStyle} hidden={!showLastModifiedDateColumn}>{moment(conversion.updated_at).format('h:mm A MMM D, YYYY')}</Td>
-                <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>{moment(conversion.last_sign_in_at).format('h:mm A MMM D, YYYY')}</Td>
-                <Td style={rowValueStyle} hidden={!showStatusColumn}>Enabled</Td>
-                <Td></Td>
-              </Tr>
-            ))}
+          {Array.isArray(userTable) &&
+            userTable
+              .filter(
+                (user) =>
+                  user.email.toLowerCase().includes(filter.toLowerCase()) &&
+                  !user.invited_at
+              )
+              .map((conversion, index) => (
+                <Tr key={index}>
+                  <Td
+                    style={rowValueStyle}
+                    hidden={!showNameColumn}
+                    _hover={{ color: "boxColor" }}
+                  >
+                    {" "}
+                    <RouterLink to={`/accounts/users/${conversion.id}`}>
+                      {conversion.user_metadata.full_name}
+                    </RouterLink>
+                  </Td>
+                  <Td style={rowValueStyle} hidden={!showEmailColumn}>
+                    {conversion.email}
+                  </Td>
+                  <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>
+                    {moment(conversion.confirmation_sent_at).format(
+                      "h:mm A MMM D, YYYY"
+                    )}
+                  </Td>
+                  <Td
+                    style={rowValueStyle}
+                    hidden={!showIdentityProviderColumn}
+                  >
+                    {conversion.identities}Anypoint
+                  </Td>
+                  <Td style={rowValueStyle} hidden={!showCreatedDateColumn}>
+                    {" "}
+                    {moment(conversion.created_at).format("h:mm A MMM D, YYYY")}
+                  </Td>
+                  <Td
+                    style={rowValueStyle}
+                    hidden={!showLastModifiedDateColumn}
+                  >
+                    {moment(conversion.updated_at).format("h:mm A MMM D, YYYY")}
+                  </Td>
+                  <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>
+                    {moment(conversion.last_sign_in_at).format(
+                      "h:mm A MMM D, YYYY"
+                    )}
+                  </Td>
+                  <Td style={rowValueStyle} hidden={!showStatusColumn}>
+                    Enabled
+                  </Td>
+                  <Td></Td>
+                </Tr>
+              ))}
         </Tbody>
-
       </Table>
     </div>
   );
