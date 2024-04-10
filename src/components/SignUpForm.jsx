@@ -227,6 +227,7 @@ export default function SimpleCard() {
           options: {
             data: {
               full_name: fullName,
+              phone: phoneNumber,
             },
           },
         });
@@ -255,7 +256,8 @@ export default function SimpleCard() {
         {
           id: id,
           full_name: fullName,
-          phone_number: phoneNumber,
+          email: email,
+          phone: phoneNumber,
           display_name: username,
           recaptcha_verification: "true",
           acceptedterms_verification: "true",

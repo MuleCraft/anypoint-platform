@@ -99,7 +99,6 @@ const InviteForm = () => {
     setShowStatusColumn(!showStatusColumn);
   };
 
-  // Function to count the number of checked columns
   const countCheckedColumns = () => {
     let count = 0;
     if (showNameColumn) count++;
@@ -126,7 +125,6 @@ const InviteForm = () => {
     setEmailError("");
   };
 
-  // Function to validate email format
   const validateEmail = (email) => {
     return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email);
   };
@@ -260,7 +258,6 @@ const InviteForm = () => {
               onChange={handleFilterChange}
               my={4}
               ml={4}
-
             />
           </InputGroup>
           <Menu>
@@ -281,7 +278,6 @@ const InviteForm = () => {
                   checked={showNameColumn}
                   onChange={toggleNameColumn}
                   readOnly
-
                 />
                 <Text>Name</Text>
               </Flex>
@@ -293,7 +289,6 @@ const InviteForm = () => {
                   checked={showEmailColumn}
                   onChange={toggleEmailColumn}
                   readOnly
-
                 />
                 <Text>Email</Text>
               </Flex>
