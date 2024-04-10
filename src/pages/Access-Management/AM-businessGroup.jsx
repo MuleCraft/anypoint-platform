@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useContext } from "react";
 import {
   Stack,
   Flex,
@@ -16,40 +16,33 @@ import CreateBusinessGroup from "../../components/AM-Component/CreateBusinessGro
 import BusinessGroupTable from "../../components/AM-Component/BusinessGroupTable";
 import { FiSearch } from "react-icons/fi";
 import fetchBgTableRows from "../../Utils/BgTableRows";
-import fetchUserSessionData from "../../Utils/SessionUserData";
+// import fetchUserSessionData from "../../Utils/SessionUserData";
+// import supabase from "../../Utils/supabase";
+import { AuthContext } from "../../Utils/AuthProvider";
 
 export default function AMBusinessGroup({ name, pathValue }) {
+
+  const { userData } = useContext(AuthContext);
+
   const [activeItem, setActiveItem] = useState("BusinessGroups");
   const [tableData, setTableData] = useState([]);
   const [currentUserName, setCurrentUserName] = useState('');
   const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const [currentOrganization, setCurrentOrganization] = useState('');
 
-  useEffect(() => {
-    if (currentUserName) {
-      fetchRows();
-    }
-  }, [currentUserName])
-
-  const userTableData = fetchUserSessionData();
-  userTableData.then((response) => {
-    setCurrentUserEmail(response.email);
-    setCurrentUserName(response.display_name);
-    console.log('current user name: ', currentUserName);
-    console.log('current user mail: ', currentUserEmail);
-  })
-    .catch((error) => {
-      console.log(error.message);
-    });
+  if(userData && (currentUserName === '')){
+    setCurrentUserEmail(userData.email);
+    setCurrentUserName(userData.display_name);
+    setCurrentOrganization(userData.company);
+  }
 
   const fetchRows = async () => {
-    const tableRowData = fetchBgTableRows(currentUserName);
-    tableRowData.then((response) => {
-      setTableData(response);
-      console.log('Table rows: ', tableData);
-    })
-      .catch((error) => {
-        console.log(error.message);
-      });
+    const tableRowData = await fetchBgTableRows(currentUserName);
+    setTableData(tableRowData);
+  }
+
+  if(userData && (tableData.length === 0)){
+    fetchRows();
   }
 
   const handleItemSelect = (itemName) => {
@@ -70,7 +63,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
             </Box>
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
               <Stack mt={"-60px"} direction={"row"} spacing={6}>
-                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName} />
+                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName} currentOrganization={currentOrganization}/>
                 <Text fontSize={14} color={"#747474"} fontWeight={500}>
                   Business groups are isolated scopes for managing access. Users
                   and teams may access resources in a business group through
