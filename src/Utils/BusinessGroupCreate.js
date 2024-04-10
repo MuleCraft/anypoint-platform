@@ -1,13 +1,23 @@
 import supabase from "./supabase";
+import { v4 as uuidv4 } from 'uuid';
 
 export default async function createNewBusinessGroup(groupCreateParams) {
     console.log('Group create fn invoked!');
+
+    const clientId = uuidv4().replace(/-/g, '');
+    // console.log(clientId);
+
+    const clientSecret = uuidv4().replace(/-/g, '');
+    // console.log(clientSecret);
+
     const { data, error } = await supabase
         .schema('mc_cap_develop')
         .from('businessGroup')
         .insert([
             {
                 businessGroupName: groupCreateParams.groupName,
+                clientId: clientId,
+                clientSecret: clientSecret,
                 groupOwner: groupCreateParams.ownerName,
                 userName: groupCreateParams.currentUserName,
                 userEmail: groupCreateParams.currentUserEmail,
