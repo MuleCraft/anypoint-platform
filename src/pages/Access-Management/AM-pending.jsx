@@ -9,11 +9,17 @@ import PendingInvitation from "../../components/AM-Component/pendingInvitation";
 
 
 export default function AMPending({ name, pathValue }) {
-    const [activeItem, setActiveItem] = useState('users', 'pending');
+    const [activeItem, setActiveItem] = useState('users');
 
-
+    const [selectedItem, setselectedItem] = useState('pending');
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
+    };
+
+
+
+    const handleselectedItem = (itemName) => {
+        setselectedItem(itemName);
     };
     return (
         <>
@@ -31,8 +37,8 @@ export default function AMPending({ name, pathValue }) {
                         <Flex direction="column" w="full" ml="200" mt="200">
                             <HorizontalSidebar
                                 sections={userTab}
-                                activeItem={activeItem}
-                                onItemSelect={handleItemSelect}
+                                activeItem={selectedItem}
+                                onItemSelect={handleselectedItem}
                             />
                             <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px">
                                 <PendingInvitation />

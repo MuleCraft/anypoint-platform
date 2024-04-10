@@ -9,12 +9,19 @@ import UserInvite from "../../components/AM-Component/userInvite";
 
 
 export default function AMUserList({ name, pathValue }) {
-    const [activeItem, setActiveItem] = useState('users', 'pending');
+    const [activeItem, setActiveItem] = useState('users');
 
-
+    const [selectedItem, setselectedItem] = useState('users');
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
+
+
+
+    const handleselectedItem = (itemName) => {
+        setselectedItem(itemName);
+    };
+
     return (
         <>
             <div className="home">
@@ -31,8 +38,8 @@ export default function AMUserList({ name, pathValue }) {
                         <Flex direction="column" w="full" ml="200" mt="200">
                             <HorizontalSidebar
                                 sections={userTab}
-                                activeItem={activeItem}
-                                onItemSelect={handleItemSelect}
+                                selectedItem={selectedItem}
+                                onItemSelect={handleselectedItem}
                             />
 
                             <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px">
