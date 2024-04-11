@@ -365,7 +365,7 @@ const InviteForm = () => {
         </Flex>
       </Flex>
 
-      <Table variant="simple" size="md">
+      <Table variant="simple" size="md" >
         <Thead borderBottomWidth="3px">
           <Tr>
             <Th style={columnTitleStyle} hidden={!showNameColumn}> Full name</Th>

@@ -14,8 +14,7 @@ const FlexableTabs = ({ sections, activeItem, onItemSelect }) => {
             borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
             w="full"
             h="auto"
-            position="fixed"
-            top="15%"
+            top="30%"
             zIndex={0}
         >
 

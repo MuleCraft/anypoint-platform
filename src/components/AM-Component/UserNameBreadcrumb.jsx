@@ -1,22 +1,58 @@
 import { useEffect, useState } from 'react';
 import adminAuthClient from '../../Utils/api';
-import { Menu, MenuButton, MenuList, MenuItem, IconButton, Text, BreadcrumbItem, Heading, Checkbox, BreadcrumbLink, Flex, Box, Breadcrumb, Divider, Table, Thead, Tr, Th, Tbody, Td } from '@chakra-ui/react';
+import { Menu, MenuButton, MenuList, MenuItem, IconButton, Text, BreadcrumbItem, Heading, Checkbox, BreadcrumbLink, Flex, Box, Breadcrumb, Divider, Table, Thead, Tr, Th, Tbody, Td, Stack, Input, Button, HStack } from '@chakra-ui/react';
 import moment from 'moment';
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { useParams } from "react-router-dom";
 import userId from '../../pages/Access-Management/utils/AM-UserID';
 import FlexableTabs from '../FlexableTabs';
 import { PiPencilLight } from "react-icons/pi";
+import supabase from '../../Utils/supabase';
 
 const UserNameBreadcrumb = () => {
     const { id } = useParams();
     const [user, setUser] = useState(null);
     const [, setUserData] = useState(null);
     const [activeItem, setActiveItem] = useState('Settings');
+    const [isEditing, setIsEditing] = useState(false);
+    const [isEditingEmail, setIsEditingEmail] = useState(false);
+    const [editableName, setEditableName] = useState('');
+    const [editableEmail, setEditableEmail] = useState('');
+    const [iconButtonVisible, setIconButtonVisible] = useState(true);
+    const [emailButtonVisible, setEmailButtonVisible] = useState(true); // State to control the visibility of the email icon button
+
+    const handleEdit = () => {
+        setIsEditing(true);
+        setEditableName(user?.user_metadata?.full_name || '');
+        setIconButtonVisible(false);
+        setEmailButtonVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+        setEditableName(user?.user_metadata?.full_name || '');
+        setIconButtonVisible(true);
+        setEmailButtonVisible(true);
+    };
+
+    const handleEditEmail = () => {
+        setIsEditingEmail(true);
+        setEditableEmail(user?.email || '');
+        setIconButtonVisible(false);
+        setEmailButtonVisible(false);
+    };
+
+    const handleCancelEmail = () => {
+        setIsEditingEmail(false);
+        setEditableEmail(user?.email || '');
+        setIconButtonVisible(true);
+        setEmailButtonVisible(true);
+    }
+
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
-    console.log(user)
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -38,20 +74,54 @@ const UserNameBreadcrumb = () => {
         fetchUserData();
     }, []);
 
+    const handleNameSubmit = async (id) => {
+        const { data, error } = await supabase
+            .schema("mc_cap_develop")
+            .from("users")
+            .upsert([
+                {
+                    id: id,
+                    full_name: editableName,
+
+                },
+            ]);
+        if (error) {
+            console.error("Error inserting additional details:", error.message);
+        } else {
+            console.log("Additional details inserted:", data);
+        }
+    }
+
+    const handleEmailSubmit = async (id) => {
+        const { data, error } = await supabase
+            .schema("mc_cap_develop")
+            .from("users")
+            .upsert([
+                {
+                    id: id,
+                    email: editableEmail,
+
+                },
+            ]);
+        if (error) {
+            console.error("Error inserting additional details:", error.message);
+        } else {
+            console.log("Additional details inserted:", data);
+        }
+    }
 
 
-    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', };
-    const rowValueStyle = { fontSize: 14, };
+
+    const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize' };
+    const rowValueStyle = { fontSize: 14 };
 
     return (
         <Box mt="-60px" >
-
-            <Flex alignItems="center" justifyContent="space-between" >
+            <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>
                         <BreadcrumbLink fontSize="lg" href='/accounts/users/'>Users</BreadcrumbLink>
                     </BreadcrumbItem>
-
                     <BreadcrumbItem>
                         <BreadcrumbLink fontSize="lg" fontWeight="600" href={`/accounts/users/${user?.id}`}>
                             {user?.user_metadata.full_name}
@@ -83,38 +153,54 @@ const UserNameBreadcrumb = () => {
                     </MenuList>
                 </Menu>
             </Flex>
-            <Box >
+            <Box pt={7}>
                 <FlexableTabs
                     sections={userId}
                     activeItem={activeItem}
                     onItemSelect={handleItemSelect}
                 />
             </Box>
-            <Box mt="120">
-                <Flex direction="column" gap={5} mb={10} >
-                    <Flex direction="row" maxW="500px" justifyContent="space-between" textAlign="left">
+            <Stack spacing={3} mt={7} mb={7}>
+                <HStack justify="space-between">
+                    <Box w='full' h='40px' >
                         <Text fontSize="xs">Username</Text>
+                    </Box>
+                    <Box w='full' h='40px'>
                         <Text fontSize="xs">{user?.user_metadata.full_name}</Text>
-                    </Flex>
-                    <Flex direction="row" maxW="500px" justifyContent="space-between">
+                    </Box>
+                    <Box w='full' h='40px'>
+                    </Box>
+                </HStack>
+                <HStack justify="space-between">
+                    <Box w='full' h='40px' >
                         <Text fontSize="xs">Created</Text>
+                    </Box>
+                    <Box w='full' h='40px'>
                         <Text fontSize="xs">{moment(user?.created_at).format('  YYYY/MM/DD')}</Text>
-                    </Flex>
-                    <Flex direction="row" maxW="500px" justifyContent="space-between">
+                    </Box>
+                    <Box w='full' h='40px'>
+                    </Box>
+                </HStack>
+                <HStack justify="space-between">
+                    <Box w='full' h='40px' >
                         <Text fontSize="xs">Multi-factor auth</Text>
-                        <Text fontSize="xs"> Not Enabled</Text>
-                    </Flex>
-
-                </Flex>
-                <Divider />
+                    </Box>
+                    <Box w='full' h='40px'>
+                        <Text fontSize="xs">Not Enabled</Text>
+                    </Box>
+                    <Box w='full' h='40px'>
+                    </Box>
+                </HStack>
+                <Divider mt={5} />
+            </Stack>
+            <Box mt="10">
                 <Box mt={5} mb={10} >
                     <Heading fontSize="sm" mb={7}>Identity Provider Profiles</Heading>
                     <Table variant="simple" size="md">
                         <Thead borderBottomWidth="3px">
                             <Tr>
-                                <Th style={columnTitleStyle} >Identity Provider</Th>
-
-                                <Th style={columnTitleStyle}>	Username</Th>
+                                <Th style={columnTitleStyle}>Identity Provider</Th>
+                                <Th style={columnTitleStyle}>Username</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
@@ -126,38 +212,95 @@ const UserNameBreadcrumb = () => {
                     </Table>
                 </Box>
                 <Divider />
-                <Flex direction="column" gap={5} m={10} >
-                    <Flex direction="row" maxW="800px" justifyContent="space-between">
-                        <Text fontSize="xs">Username</Text>
-                        <Text fontSize="xs">{user?.user_metadata.full_name}</Text>
-                        <PiPencilLight />
-                    </Flex>
-
-                    <Flex direction="row" maxW="415px" justifyContent="space-between">
-                        <Text fontSize="xs">Exempt from MFA requirement</Text>
-                        <Checkbox isDisabled />
-
-                    </Flex>
-
-                </Flex>
-                <Divider />
-                <Flex direction="column" gap={5} m={10}>
-                    <Flex direction="row" maxW="930px" justifyContent="space-between">
-                        <Text fontSize="xs">Email</Text>
-                        <Text fontSize="xs">{user?.email}</Text>
-                        <Box>
-                            <PiPencilLight />
+                <Stack spacing={3} mt={7} mb={7}>
+                    <HStack justify="space-between">
+                        <Box w='full' h='40px'>
+                            <Text fontSize="xs">Username</Text>
                         </Box>
-                    </Flex>
+                        <Box w='full' h='40px'>
+                            {isEditing ? (
+                                <Input
+                                    fontSize="xs"
+                                    value={editableName}
+                                    onChange={(e) => setEditableName(e.target.value)}
+                                    size="sm"
+                                    width={500}
+                                    height={10}
+                                />
+                            ) : (
+                                <Text fontSize="xs" textAlign="left">{user?.user_metadata.full_name}</Text>
+                            )}
+                        </Box>
+                        <Box w='full' h='40px'>
+                            {iconButtonVisible ? (
+                                <IconButton
+                                    icon={<PiPencilLight />}
+                                    onClick={handleEdit}
+                                    variant="ghost"
+                                    size="sm"
 
-                    <Flex direction="row" maxW="455px" justifyContent="space-between">
-                        <Text></Text>
-                        <Text>Verified</Text>
-                    </Flex>
+                                />
+                            ) : (<Box />)}
+                        </Box>
+                    </HStack>
+                    <HStack justify="space-between">
+                        <Box w='full' h='40px' >
+                            <Text fontSize="xs">Exempt from MFA requirement</Text>
+                        </Box>
+                        <Box w='full' h='40px'>
+                            <Checkbox defaultChecked />
+                        </Box>
+                        <Box w='full' h='40px'>
+                        </Box>
+                    </HStack>
+                    <Divider mt={5} />
+                    <HStack justify="space-between" mt={5}>
+                        <Box w='full' h='40px' >
+                            <Text fontSize="xs">Email</Text>
+                        </Box>
+                        <Box w='full' h='40px'>
+                            {isEditingEmail ? (
+                                <Input
+                                    fontSize="xs"
+                                    value={editableEmail}
+                                    onChange={(e) => setEditableEmail(e.target.value)}
+                                    size="sm"
+                                    width={500}
+                                    height={10}
+                                />
+                            ) : (
+                                <Text fontSize="xs" textAlign="left">{user?.email}</Text>
+                            )}
+                        </Box>
+                        <Box w='full' h='40px'>
+                            {emailButtonVisible ? (
+                                <IconButton
+                                    icon={<PiPencilLight />}
+                                    onClick={handleEditEmail}
+                                    variant="ghost"
+                                    size="sm"
+                                />
+                            ) : (<Box />)}
+                        </Box>
+                    </HStack>
+                </Stack>
 
-                </Flex>
             </Box>
+            {(isEditing) && (
+                <Stack direction="row" spacing={5} mt={20} px={4} justifyContent="space-between">
+                    <Button size="md" variant="outline" onClick={handleCancel} colorScheme="blue">Discard Changes</Button>
+                    <Button size="md" onClick={handleNameSubmit} colorScheme="blue">Save Changes</Button>
+                </Stack>
+            )}
 
+            {
+                (isEditingEmail) && (
+                    <Stack direction="row" spacing={5} mt={20} px={4} justifyContent="space-between">
+                        <Button variant="outline" size="md" onClick={handleCancelEmail} colorScheme="blue">Discard Changes</Button>
+                        <Button size="md" onClick={handleEmailSubmit} colorScheme="blue">Save Changes</Button>
+                    </Stack>
+                )
+            }
         </Box>
     );
 };
