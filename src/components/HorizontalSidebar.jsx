@@ -12,11 +12,11 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
             w="full"
             h="auto"
             position="fixed"
-            top="20"
-            zIndex={99}
+            top="65px"
+            zIndex={998}
         >
             {sections.map((section, sectionIndex) => (
-                <Box key={sectionIndex} mr={1}>
+                <Box key={sectionIndex} mr={2}>
                     <HStack spacing={2}>
                         {section.items.map((item) => (
                             <VStack
@@ -40,12 +40,14 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
                                         <>{item.label}</>
                                     }
                                 </Link>
+
                                 <Box
                                     h="3px"
                                     w="full"
                                     borderRadius="30px"
                                     bg={isActive(item.name) ? useColorModeValue('boxColor') : 'transparent'}
                                 />
+
                             </VStack>
                         ))}
                     </HStack>

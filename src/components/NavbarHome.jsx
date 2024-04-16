@@ -99,7 +99,7 @@ const Nav = ({ name, pathValue }) => {
       position={"fixed"}
       top={hasScrolled ? 0 : "auto"}
       width="100%"
-      zIndex={"1"}
+      zIndex={"999"}
     >
       <Flex h={16} alignItems="center" justifyContent="space-between">
         <Flex align="center" gap="3">

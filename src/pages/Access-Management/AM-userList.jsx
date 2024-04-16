@@ -40,7 +40,7 @@ export default function AMUserList({ name, pathValue }) {
                                 onItemSelect={handleselectedItem}
                             />
 
-                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px">
+                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-80px">
                                 <UserInvite />
                             </Box>
                         </Flex>

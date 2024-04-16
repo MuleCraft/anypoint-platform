@@ -204,8 +204,8 @@ const InviteForm = () => {
   };
   return (
     <div>
-      <Flex alignItems="center" justifyContent="space-between">
-        <Button colorScheme="blue" onClick={onOpen} zIndex={0}>Invite Users</Button>
+      <Flex alignItems="center" justifyContent="space-between" zIndex={0}>
+        <Button colorScheme="blue" onClick={onOpen} >Invite Users</Button>
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
           <ModalOverlay />
           <ModalContent>
