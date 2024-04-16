@@ -45,7 +45,7 @@ import supabase from "../../Utils/supabase";
 const UserNameBreadcrumb = () => {
     const { id } = useParams();
     const [user, setUser] = useState(null);
-    const [, setUserData] = useState(null);
+    const [userTable, setUserData] = useState(null);
     const [activeItem, setActiveItem] = useState("Settings");
     const [isEditing, setIsEditing] = useState(false);
     const [isEditingEmail, setIsEditingEmail] = useState(false);
@@ -54,8 +54,9 @@ const UserNameBreadcrumb = () => {
     const [iconButtonVisible, setIconButtonVisible] = useState(true);
     const [emailButtonVisible, setEmailButtonVisible] = useState(true); // State to control the visibility of the email icon button
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [emailError, setEmailError] = useState("");
 
+    const [nameError, setNameError] = useState("");
+    const [emailError, setEmailError] = useState("");
     const toast = useToast();
     const handleEdit = () => {
         setIsEditing(true);
@@ -74,8 +75,8 @@ const UserNameBreadcrumb = () => {
     const handleEditEmail = () => {
         setIsEditingEmail(true);
         setEditableEmail(user?.email || "");
-        setIconButtonVisible(true);
-        setEmailButtonVisible(true);
+        setIconButtonVisible(false);
+        setEmailButtonVisible(false);
 
 
     };
@@ -99,9 +100,10 @@ const UserNameBreadcrumb = () => {
                 if (error) {
                     console.error("Error fetching user data:", error.message);
                 } else {
-                    console.log("User data fetched successfully:", data);
+                    console.log("User data fetched successfully");
                     setUserData(data.users);
                     setUser(user);
+
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -109,12 +111,28 @@ const UserNameBreadcrumb = () => {
         };
 
         fetchUserData();
-    });
+    }, []);
+    const validateEmailFormat = (email) => {
+        const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+        return regex.test(email);
+    };
 
+    const checkForDuplicateEmail = (email) => {
+        return userTable.some(user => user.email.toLowerCase() === email.toLowerCase());
+    };
+
+    const checkForDuplicateName = (name) => {
+        return userTable.some(user => user.user_metadata.full_name.toLowerCase() === name.toLowerCase());
+    };
     const handleNameSubmit = async () => {
         if (!editableName.trim()) {
-            console.error("Username cannot be empty");
+            setNameError("Name cannot be empty");
             return;
+        } else if (checkForDuplicateName(editableName.trim())) {
+            setNameError("This name is already in use");
+            return;
+        } else {
+            setNameError("");
         }
 
         try {
@@ -158,9 +176,18 @@ const UserNameBreadcrumb = () => {
     };
     const handleEmailSubmit = async () => {
         if (!editableEmail.trim()) {
-            console.error("Email cannot be empty");
+            setEmailError("Email cannot be empty");
             return;
+        } else if (!validateEmailFormat(editableEmail)) {
+            setEmailError("Invalid email format");
+            return;
+        } else if (checkForDuplicateEmail(editableEmail)) {
+            setEmailError("This email is already in use");
+            return;
+        } else {
+            setEmailError("");
         }
+
         try {
             const { data: supabaseData, error: supabaseError } = await supabase
                 .schema("mc_cap_develop")
@@ -324,21 +351,20 @@ const UserNameBreadcrumb = () => {
                     </Table>
                 </Box>
                 <Divider />
-                <Stack spacing={3} mt={7} mb={7}>
+                <Stack spacing={6} mt={7} mb={7}>
                     <HStack justify="space-between">
                         <Box w="full" h="40px">
                             <Text fontSize="xs">Full name</Text>
                         </Box>
                         <Box w="full" h="40px">
                             {isEditing ? (
-                                <Input
+                                <><Input
                                     fontSize="xs"
                                     value={editableName}
                                     onChange={(e) => setEditableName(e.target.value)}
                                     size="sm"
                                     width={500}
-                                    height={10}
-                                />
+                                    height={10} /><Text fontSize="xs" color="red.500">{nameError}</Text></>
                             ) : (
                                 <Text fontSize="xs" textAlign="left">
                                     {user?.user_metadata.full_name}

@@ -66,6 +66,9 @@ const InviteForm = () => {
         } else {
           console.log("User data fetched successfully:");
           setUserData(data.users);
+
+
+
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -387,8 +390,11 @@ const InviteForm = () => {
         </Thead>
         <Tbody>
           {Array.isArray(userTable) && userTable
-            .filter(userTable => userData.id === userTable.id || userTable.invited_at)
-
+            .filter(userTable => userData?.id === userTable?.id || userTable.invited_at)
+            .filter(user =>
+              user.user_metadata.full_name.toLowerCase().includes(filter) ||
+              user.email.toLowerCase().includes(filter)
+            )
 
             .map((conversion, index) => (
               <Tr key={index}>
