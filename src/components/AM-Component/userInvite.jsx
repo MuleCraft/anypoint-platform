@@ -54,6 +54,7 @@ const InviteForm = () => {
   const [showLastModifiedDateColumn, setShowLastModifiedDateColumn] = useState(true);
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null); // This will hold the filtered user
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -73,6 +74,10 @@ const InviteForm = () => {
 
     fetchUserData();
   }, []);
+
+  console.log(userTable)
+  // const filteredUser = userTable.find(userTable => userData.id == userTable.id);
+  // setSelectedUser(filteredUser);
 
   const toggleNameColumn = () => {
     setShowNameColumn(!showNameColumn);
@@ -382,9 +387,9 @@ const InviteForm = () => {
         </Thead>
         <Tbody>
           {Array.isArray(userTable) && userTable
-            .filter(user =>
-              user.email.toLowerCase().includes(filter.toLowerCase()) && !user.invited_at
-            )
+            .filter(userTable => userData.id === userTable.id || userTable.invited_at)
+
+
             .map((conversion, index) => (
               <Tr key={index}>
                 <Td style={rowValueStyle} hidden={!showNameColumn} _hover={{ color: "boxColor" }}> <RouterLink to={`/accounts/users/${conversion.id}`}>{conversion.user_metadata.full_name}</RouterLink></Td>
