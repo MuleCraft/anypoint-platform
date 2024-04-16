@@ -54,8 +54,6 @@ const InviteForm = () => {
   const [showLastModifiedDateColumn, setShowLastModifiedDateColumn] = useState(true);
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
-  const [selectedUser, setSelectedUser] = useState(null); // This will hold the filtered user
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -77,10 +75,6 @@ const InviteForm = () => {
 
     fetchUserData();
   }, []);
-
-  console.log(userTable)
-  // const filteredUser = userTable.find(userTable => userData.id == userTable.id);
-  // setSelectedUser(filteredUser);
 
   const toggleNameColumn = () => {
     setShowNameColumn(!showNameColumn);
