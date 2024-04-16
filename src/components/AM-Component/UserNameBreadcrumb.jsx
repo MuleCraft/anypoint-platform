@@ -54,9 +54,10 @@ const UserNameBreadcrumb = () => {
     const [iconButtonVisible, setIconButtonVisible] = useState(true);
     const [emailButtonVisible, setEmailButtonVisible] = useState(true); // State to control the visibility of the email icon button
     const { isOpen, onOpen, onClose } = useDisclosure();
-
+    const [submissionStatus, setSubmissionStatus] = useState(null);
     const [nameError, setNameError] = useState("");
     const [emailError, setEmailError] = useState("");
+    const [email, setUserEmail] = useState(null)
     const toast = useToast();
     const handleEdit = () => {
         setIsEditing(true);
@@ -103,7 +104,7 @@ const UserNameBreadcrumb = () => {
                     console.log("User data fetched successfully");
                     setUserData(data.users);
                     setUser(user);
-
+                    setUserEmail(user.email)
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -239,6 +240,85 @@ const UserNameBreadcrumb = () => {
         onClose()
     };
 
+    const deleteInvitation = async () => {
+        try {
+
+            const { error: deleteError } = await supabase
+                .schema('mc_cap_develop')
+                .from('users')
+                .delete()
+                .eq('id', id);
+
+            if (deleteError) {
+                console.error(`Error deleting user ${id}:`, deleteError.message);
+                throw deleteError;
+            } else {
+                console.log(`User with ID ${id} deleted successfully`);
+                toast({
+                    title: "canceled invitation",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+
+                await insertAdditional(id);
+            }
+        } catch (error) {
+            console.error("Error canceling invitation:", error.message);
+            toast({
+                title: "Error canceling invitation",
+                description: error.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right"
+            });
+        }
+    };
+    const insertAdditional = async (id) => {
+        try {
+            const { error } = await adminAuthClient.deleteUser(id);
+
+            if (error) {
+                console.error(`Error canceling invitation for user ${id}:`, error.message);
+                throw error;
+            } else {
+                console.log(`Invitation canceled for user with ID: ${id}`);
+            }
+        } catch (error) {
+            console.error("Error delete user:", error.message);
+            toast({
+                title: "Error inserting additional details",
+                description: error.message,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            });
+        }
+    };
+
+    const handleRequestCredentials = async () => {
+
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email);
+            if (error) {
+                throw new Error(error.message);
+            }
+            setSubmissionStatus("success");
+            toast({
+                title: 'Send reset Password link',
+                description: 'check your email ',
+                status: 'success',
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right',
+            });
+        } catch (error) {
+            setSubmissionStatus("failed");
+        }
+    };
 
     const columnTitleStyle = {
         fontSize: 14,
@@ -278,14 +358,14 @@ const UserNameBreadcrumb = () => {
                         border={"1px solid #5c5c5c"}
                     />
                     <MenuList borderRadius={0}>
-                        <MenuItem fontSize="sm">Reset Password...</MenuItem>
+                        <MenuItem fontSize="sm" onClick={handleRequestCredentials}>Reset Password...</MenuItem>
                         <MenuItem fontSize="sm" isDisabled>
                             Reset Multi-factor auth...
                         </MenuItem>
                         <MenuItem fontSize="sm" color="red">
                             Disable user...
                         </MenuItem>
-                        <MenuItem fontSize="sm" color="red">
+                        <MenuItem fontSize="sm" color="red" onClick={deleteInvitation}>
                             Delete user...
                         </MenuItem>
                     </MenuList>
