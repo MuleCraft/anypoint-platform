@@ -204,6 +204,7 @@ const InviteForm = () => {
       );
 
     }
+    window.location.reload();
   };
   return (
     <div>

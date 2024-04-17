@@ -152,6 +152,7 @@ const UserTable = () => {
       );
 
     }
+    window.location.reload();
   };
 
   const cancelInvitation = async (id) => {
