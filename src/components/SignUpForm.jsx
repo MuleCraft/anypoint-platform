@@ -232,6 +232,7 @@ export default function SimpleCard() {
             data: {
               full_name: fullName,
               phone: phoneNumber,
+              company: company,
             },
           },
         });
@@ -247,7 +248,7 @@ export default function SimpleCard() {
           currentUserName: username,
           currentUserEmail: email,
           currentOrganization: company
-      };
+        };
 
         if (error) {
           console.error("Error creating user:", error.message);

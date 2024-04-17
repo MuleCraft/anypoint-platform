@@ -11,7 +11,7 @@ const UserTable = () => {
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [emails, setEmails] = useState("");
+  const [email, setEmails] = useState("");
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
@@ -80,7 +80,7 @@ const UserTable = () => {
   };
 
   const handleSubmit = async () => {
-    const emailList = emails.split(",").map((email) => email.trim());
+    const emailList = email.split(",").map((email) => email.trim());
 
 
     const invalidEmails = emailList.filter((email) => !validateEmail(email));
@@ -138,13 +138,19 @@ const UserTable = () => {
       .upsert([
         {
           id: id,
+          email: email,
           company: userData?.company,
         },
       ]);
     if (error) {
-      console.error("Error invitation canceled:", error.message);
+      console.error("Error invitation:", error.message);
     } else {
-      console.log("invitation canceled");
+      console.log("invitation sended");
+      await adminAuthClient.updateUserById(
+        id,
+        { user_metadata: { company: userData?.company, } }
+      );
+
     }
   };
 
@@ -259,7 +265,7 @@ const UserTable = () => {
                 </Text>
                 <Input
                   type="text"
-                  value={emails}
+                  value={email}
                   onChange={handleEmailChange}
                   placeholder="max@community.com"
                   isInvalid={emailError !== ""}

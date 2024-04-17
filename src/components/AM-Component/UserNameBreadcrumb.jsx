@@ -41,6 +41,7 @@ import userId from "../../pages/Access-Management/utils/AM-UserID";
 import FlexableTabs from "../FlexableTabs";
 import { PiPencilLight } from "react-icons/pi";
 import supabase from "../../Utils/supabase";
+import { filterFns } from "@tanstack/react-table";
 
 const UserNameBreadcrumb = () => {
     const { id } = useParams();
@@ -123,17 +124,46 @@ const UserNameBreadcrumb = () => {
     };
 
     const checkForDuplicateName = (name) => {
-        return userTable.some(user => user.user_metadata.full_name.toLowerCase() === name.toLowerCase());
+        return userTable && typeof filter === "string" && userTable.some(user => user.user_metadata.full_name.toLowerCase() === name.toLowerCase());
     };
-    const handleNameSubmit = async () => {
-        if (!editableName.trim()) {
-            setNameError("Name cannot be empty");
-            return;
-        } else if (checkForDuplicateName(editableName.trim())) {
-            setNameError("This name is already in use");
-            return;
+
+    const handleFullNameChange = (event) => {
+        const value = event.target.value;
+        setEditableName(value);
+
+        if (!value.trim() || value.trim().split(" ").length < 2) {
+            setNameError("Enter your first name and last name");
         } else {
             setNameError("");
+        }
+    };
+    const handleEmailChange = (event) => {
+        const value = event.target.value;
+        setEditableEmail(value);
+
+        if (!value.trim()) {
+            setEmailError("");
+        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
+            setEmailError("Please enter a valid email address");
+        } else {
+            setEmailError("");
+        }
+    };
+
+    const handleNameSubmit = async () => {
+        let isFormValid = true;
+        if (!editableName.trim() || editableName.trim().split(" ").length < 2) {
+            setNameError("Name cannot be empty");
+            isFormValid = false;
+        } else if (checkForDuplicateName(editableName.trim())) {
+            setNameError("This name is already in use");
+            isFormValid = false;
+        } else {
+            setNameError("");
+            isFormValid = true; // Set isFormValid to true when name validation passes
+        }
+        if (!isFormValid) {
+            return; // Exit function if form is not valid
         }
 
         try {
@@ -155,41 +185,50 @@ const UserNameBreadcrumb = () => {
                     id,
                     { user_metadata: { full_name: editableName } }
                 );
-                setIsEditing(false);
                 setUser((prevUser) => ({
                     ...prevUser,
                     user_metadata: { ...prevUser.user_metadata, full_name: editableName },
                 }));
                 toast({
-                    title: 'Username updated successfully',
-                    description: 'Your email has been successfully updated.',
+                    title: 'Full name updated successfully',
+                    description: 'Your full name has been successfully updated.',
                     status: 'success',
                     duration: 5000,
                     isClosable: true,
                     position: 'top-right',
                 });
-                setEmailButtonVisible(true);
-                setIconButtonVisible(true);
             }
         } catch (error) {
             console.error("Error updating username:", error);
+        } finally {
+            setIsEditing(false);
+            setEmailButtonVisible(true);
+            setIconButtonVisible(true);
         }
     };
+
+
     const handleEmailSubmit = async () => {
+        let isFormValid = true;
+
         if (!editableEmail.trim()) {
             setEmailError("Email cannot be empty");
-            return;
+            isFormValid = false;
         } else if (!validateEmailFormat(editableEmail)) {
             setEmailError("Invalid email format");
-            return;
+            isFormValid = false;
         } else if (checkForDuplicateEmail(editableEmail)) {
             setEmailError("This email is already in use");
-            return;
+            isFormValid = false;
         } else {
             setEmailError("");
         }
 
         try {
+            if (!isFormValid) {
+                return isFormValid;
+            }
+
             const { data: supabaseData, error: supabaseError } = await supabase
                 .schema("mc_cap_develop")
                 .from("users")
@@ -237,8 +276,13 @@ const UserNameBreadcrumb = () => {
         } catch (error) {
             console.error("Error updating email:", error);
         }
-        onClose()
+
+        onClose();
+
+        return isFormValid;
     };
+
+
 
     const deleteInvitation = async () => {
         try {
@@ -255,7 +299,7 @@ const UserNameBreadcrumb = () => {
             } else {
                 console.log(`User with ID ${id} deleted successfully`);
                 toast({
-                    title: "canceled invitation",
+                    title: "User deleted successfully",
                     status: "success",
                     duration: 5000,
                     isClosable: true,
@@ -265,9 +309,9 @@ const UserNameBreadcrumb = () => {
                 await insertAdditional(id);
             }
         } catch (error) {
-            console.error("Error canceling invitation:", error.message);
+            console.error("Error User deleting:", error.message);
             toast({
-                title: "Error canceling invitation",
+                title: "Error User deleting",
                 description: error.message,
                 status: "error",
                 duration: 5000,
@@ -441,7 +485,7 @@ const UserNameBreadcrumb = () => {
                                 <><Input
                                     fontSize="xs"
                                     value={editableName}
-                                    onChange={(e) => setEditableName(e.target.value)}
+                                    onChange={handleFullNameChange}
                                     size="sm"
                                     width={500}
                                     height={10} /><Text fontSize="xs" color="red.500">{nameError}</Text></>
@@ -484,7 +528,7 @@ const UserNameBreadcrumb = () => {
                                     <Input
                                         fontSize="xs"
                                         value={editableEmail}
-                                        onChange={(e) => setEditableEmail(e.target.value)}
+                                        onChange={handleEmailChange}
                                         isInvalid={emailError !== ""}
                                         errorBorderColor="red.300"
                                         size="sm"

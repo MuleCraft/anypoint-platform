@@ -134,6 +134,7 @@ const InviteForm = () => {
   const handleSubmit = async () => {
     const emailList = email.split(",").map((email) => email.trim());
 
+
     const invalidEmails = emailList.filter((email) => !validateEmail(email));
 
     if (invalidEmails.length > 0) {
@@ -146,19 +147,12 @@ const InviteForm = () => {
 
       await Promise.all(
         emailList.map(async (email) => {
-          const { data, error } = await adminAuthClient.inviteUserByEmail(
-            email,
-            {
-              redirectTo,
-              data: {
-                company: userData?.company,
-              },
-            }
-          );
+          const { data, error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
           if (error) {
             console.error(`Error inviting user ${email}:`, error.message);
             throw error;
           }
+
           if (data && data.user && data.user.id) {
             invitedUserIds.push(data.user.id);
             await insertAdditionalDetails(data.user.id);
@@ -173,7 +167,9 @@ const InviteForm = () => {
         duration: 5000,
         isClosable: true,
         position: "top-right"
-      });
+
+      }
+      );
     } catch (error) {
       console.error("Error inviting users:", error.message);
       toast({
@@ -186,9 +182,9 @@ const InviteForm = () => {
       });
     }
   };
-
+  console.log(submissionStatus)
   const insertAdditionalDetails = async (id) => {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .schema("mc_cap_develop")
       .from("users")
       .upsert([
@@ -199,9 +195,14 @@ const InviteForm = () => {
         },
       ]);
     if (error) {
-      console.error("Error inserting additional details:", error.message);
+      console.error("Error invitation:", error.message);
     } else {
-      console.log("Additional details inserted:", data);
+      console.log("invitation sended");
+      await adminAuthClient.updateUserById(
+        id,
+        { user_metadata: { company: userData?.company, } }
+      );
+
     }
   };
   return (
@@ -383,11 +384,22 @@ const InviteForm = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {Array.isArray(userTable) && userTable
-            .filter(userTable => userData?.id === userTable?.id || userTable.invited_at)
-            .filter(user =>
-              user.user_metadata.full_name.toLowerCase().includes(filter) ||
-              user.email.toLowerCase().includes(filter)
+
+          {Array.isArray(userTable) && userTable.filter(userTable => userData?.id === userTable?.id || userTable.invited_at &&
+            userData?.company === userTable?.user_metadata?.company
+          )
+
+            .filter(
+              (user) =>
+                user &&
+                user.user_metadata &&
+                user.user_metadata.full_name &&
+                typeof filter === "string" &&
+                (user.user_metadata.full_name
+                  .toLowerCase()
+                  .includes(filter.toLowerCase()) ||
+                  (user.email &&
+                    user.email.toLowerCase().includes(filter.toLowerCase())))
             )
 
             .map((conversion, index) => (
