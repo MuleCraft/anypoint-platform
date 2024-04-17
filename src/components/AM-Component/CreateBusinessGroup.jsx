@@ -4,11 +4,11 @@ import {
     SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
 import fetchBusinessGroupNames from "../../Utils/BusinessGroupData";
 
-function CreateBusinessGroup({ currentUserEmail, currentUserName }) {
+function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
@@ -28,25 +28,22 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName }) {
     const [businessGroupNames, setBusinessGroupNames] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    useEffect(() => {
-        if (!dataLoaded) {
-            fetchGroupNames();
-        }
-    })
+    // useEffect(() => {
+    // if (currentUserName && (!dataLoaded)) {
+    //     fetchGroupNames();
+    // }
+    // },[currentUserName])
 
     const fetchGroupNames = async () => {
-        const bgNamesData = fetchBusinessGroupNames(currentUserName);
-
-        bgNamesData.then((response) => {
-            setBusinessGroupNames(response);
-            if (businessGroupNames.length > 0) {
-                setDataLoaded(true);
-            }
-            console.log('group name: ', businessGroupNames);
-        })
-            .catch((error) => {
-                console.log(error.message);
-            });
+        const bgNamesData = await fetchBusinessGroupNames(currentUserName);
+        setBusinessGroupNames(bgNamesData);
+        if (businessGroupNames.length > 0) {
+            setDataLoaded(true);
+        }
+        // console.log('group name: ', businessGroupNames);
+    }
+    if (currentUserName && (!dataLoaded)) {
+        fetchGroupNames();
     }
 
     const handleSelectChange = (event) => {
@@ -88,9 +85,21 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName }) {
     const handleEnvCheckboxChange = () => {
         setIsEnvCheckboxSelected(!isEnvCheckboxSelected);
     }
+    const groupCreateParams = {
+        groupName: groupName,
+        selectedGroupValue: selectedGroupValue,
+        ownerName: ownerName,
+        isGroupCheckboxSelected: isGroupCheckboxSelected,
+        isEnvCheckboxSelected: isEnvCheckboxSelected,
+        sandboxSliderValue: sandboxSliderValue,
+        designSliderValue: designSliderValue,
+        currentUserName: currentUserName,
+        currentUserEmail: currentUserEmail,
+        currentOrganization: currentOrganization
+    };
 
     const invokeGroupCreateFunction = () => {
-        createNewBusinessGroup(groupName, selectedGroupValue, ownerName, isGroupCheckboxSelected, isEnvCheckboxSelected, sandboxSliderValue, designSliderValue, userName, userEmail);
+        createNewBusinessGroup(groupCreateParams);
     }
 
     return (

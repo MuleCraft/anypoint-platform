@@ -3,23 +3,19 @@ import Nav from "../../components/NavbarHome";
 import Sidebar from "../../components/sidebar";
 import sections from "./utils/AM-sidebar";
 import { Box, Flex } from "@chakra-ui/react";
-import HorizontalSidebar from "../../components/HorizontalSidebar";
-import userTab from "./utils/AM-userTab";
-import UserInvite from "../../components/AM-Component/userInvite";
 
 
-export default function AMUserList({ name, pathValue }) {
+import UserNameBreadcrumb from "../../components/AM-Component/UserNameBreadcrumb";
+
+
+
+export default function AMUserBreadcrumb({ name, pathValue }) {
     const [activeItem, setActiveItem] = useState('users');
 
-    const [selectedItem, setselectedItem] = useState('users');
+
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
-
-    const handleselectedItem = (itemName) => {
-        setselectedItem(itemName);
-    };
-
     return (
         <>
             <div className="home">
@@ -34,14 +30,10 @@ export default function AMUserList({ name, pathValue }) {
                             />
                         </Box>
                         <Flex direction="column" w="full" ml="200" mt="200">
-                            <HorizontalSidebar
-                                sections={userTab}
-                                activeItem={selectedItem}
-                                onItemSelect={handleselectedItem}
-                            />
 
-                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-80px">
-                                <UserInvite />
+
+                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px">
+                                <UserNameBreadcrumb />
                             </Box>
                         </Flex>
                     </Flex>

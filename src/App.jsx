@@ -11,11 +11,9 @@ import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
 import AMBusinessGroupDetails from "./pages/Access-Management/AM-businessGroupDetails";
 import AMUserList from "./pages/Access-Management/AM-userList";
 import AMPending from "./pages/Access-Management/AM-pending";
-import APIMain from "./pages/Api-Manager/Api-main";
-import Sidebar from "./components/sidebar";
-
 import InviteUserPasswordPage from "./pages/InvitedUserPassword";
 import InviteUserDatailPage from "./pages/InviteUserDetailsForm";
+import AMUserBreadcrumb from "./pages/Access-Management/AM-UserNameBreadcrumb";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -48,6 +46,7 @@ export default function App() {
                 />
               }
             />
+            <Route path="accounts/users/:id" element={<AMUserBreadcrumb name={AccessManagement} pathValue={AccessManagentPath} />} />
             <Route
               path="accounts/businessGroups"
               element={
