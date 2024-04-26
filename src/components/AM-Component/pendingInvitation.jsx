@@ -14,7 +14,7 @@ const UserTable = () => {
   const [email, setEmails] = useState("");
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
-  const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
+  const redirectTo = "Vite_REDIRECT_URL";
   const toast = useToast();
   useEffect(() => {
     const fetchUserData = async () => {
