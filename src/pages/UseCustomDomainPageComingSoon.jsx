@@ -5,7 +5,7 @@ import "../App.css";
 import Footer from "../components/Footer";
 import { Flex } from "@chakra-ui/react";
 
-export default function UseCustomDomainPage() {
+export default function UseCustomDomainPageComingSoon() {
   return (
     <div className="Credentials-page">
       <Flex justify="center" flex="1" flexDirection="column" align="center">

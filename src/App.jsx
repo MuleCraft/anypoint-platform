@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-import UseCustomDomainPage from "./pages/UseCustomDomainPage";
+import UseCustomDomainPageComingSoon from "./pages/UseCustomDomainPageComingSoon";
 import Home from "./pages/Home";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPassword from "./pages/ResetPasswordPage";
@@ -26,9 +26,15 @@ export default function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignUpPage />} />
-          <Route path="use-custom-domain" element={<UseCustomDomainPage />} />
+          <Route
+            path="use-custom-domain"
+            element={<UseCustomDomainPageComingSoon />}
+          />
           <Route path="inviteduser" element={<InviteUserPasswordPage />} />
-          <Route path="inviteduserdetails/:id" element={<InviteUserDatailPage />} />
+          <Route
+            path="inviteduserdetails/:id"
+            element={<InviteUserDatailPage />}
+          />
           <Route element={<PrivateRoutes />}>
             {" "}
             <Route
@@ -46,7 +52,15 @@ export default function App() {
                 />
               }
             />
-            <Route path="accounts/users/:id" element={<AMUserBreadcrumb name={AccessManagement} pathValue={AccessManagentPath} />} />
+            <Route
+              path="accounts/users/:id"
+              element={
+                <AMUserBreadcrumb
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
             <Route
               path="accounts/businessGroups"
               element={
@@ -58,7 +72,13 @@ export default function App() {
             />
             <Route
               path="accounts/businessGroups/:groupCode"
-              element={<AMBusinessGroupDetails name={AccessManagement} pathValue={AccessManagentPath} />} />
+              element={
+                <AMBusinessGroupDetails
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
             <Route
               path="/accounts/users/list"
               element={
