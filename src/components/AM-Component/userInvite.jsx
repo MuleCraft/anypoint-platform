@@ -213,7 +213,7 @@ const InviteForm = () => {
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between" zIndex={0}>
-        <Button colorScheme="blue" onClick={onOpen}>
+        <Button colorScheme="blue" onClick={onOpen} isDisabled>
           Invite Users
         </Button>
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
@@ -445,7 +445,7 @@ const InviteForm = () => {
                     _hover={{ color: "boxColor" }}
                   >
                     {" "}
-                    <RouterLink to={`/accounts/users/${conversion.id}`}>
+                    <RouterLink to="#">
                       {conversion.user_metadata.full_name}
                     </RouterLink>
                   </Td>

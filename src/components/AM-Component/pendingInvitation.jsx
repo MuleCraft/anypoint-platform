@@ -251,7 +251,7 @@ const UserTable = () => {
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between" >
-        <Button colorScheme="blue" onClick={onOpen} zIndex={0}>Invite Users</Button>
+        <Button colorScheme="blue" onClick={onOpen} zIndex={0} isDisabled >Invite Users</Button>
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
           <ModalOverlay />
           <ModalContent>
