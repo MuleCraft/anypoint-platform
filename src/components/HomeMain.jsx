@@ -195,10 +195,18 @@ export default function HomeMain() {
             <Flex alignItems="center" gap={2}>
               <Image src={runtime} />
               <Box flex="1">
-                <Heading fontSize="sm">Runtime Manager</Heading>
+                <ChakraLink
+                  as={ReactRouterLink}
+                  to="/cloudhub/design/home/applications"
+                  className="home-main__index"
+                >
+                  <Heading fontSize="sm">Runtime Manager</Heading>
+                </ChakraLink>
                 <Text>Deploy, manage, and monitor deployed applications.</Text>
+
               </Box>
               <ArrowForwardIcon />
+
             </Flex>
             <Flex alignItems="center" gap={2}>
               <Image src={visualizer} />

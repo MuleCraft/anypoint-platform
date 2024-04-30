@@ -5,6 +5,7 @@ import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { AuthContext } from '../../Utils/AuthProvider';
 import { FiSearch } from "react-icons/fi";
 import supabase from '../../Utils/supabase';
+import axios from 'axios';
 
 const UserTable = () => {
   const [userTable, setUserData] = useState(null);
@@ -17,22 +18,23 @@ const UserTable = () => {
   const redirectTo = "Vite_REDIRECT_URL";
   const toast = useToast();
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await adminAuthClient.listUsers();
+        const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+        const response = await axios.get(import.meta.env.VITE_API_URL, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': `application/json`,
 
-        if (error) {
-          console.error("Error fetching user data:", error.message);
-        } else {
-          console.log("User data fetched successfully:");
-          setUserData(data.users);
-        }
+          }
+        });
+        setUserData(response.data.users.users);
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchUserData();
+    fetchData();
   }, []);
 
   const calculateExpirationStatus = (invited_at) => {

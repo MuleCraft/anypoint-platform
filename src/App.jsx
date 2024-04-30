@@ -14,11 +14,16 @@ import AMPending from "./pages/Access-Management/AM-pending";
 import InviteUserPasswordPage from "./pages/InvitedUserPassword";
 import InviteUserDatailPage from "./pages/InviteUserDetailsForm";
 import AMUserBreadcrumb from "./pages/Access-Management/AM-UserNameBreadcrumb";
+import RunTimeManager from "./pages/Runtime-Manager/Application-main";
+import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/ApplicationSandbox";
+import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
 
 export default function App() {
   const AccessManagement = "Access Management";
   const AnypointPlatform = "Anypoint Platform";
+  const RuntimeManager = "Runtime Manager";
   const AccessManagentPath = "/accounts/users";
+  const RuntimeManagerPath = "/cloudhub/design/home/applications";
   return (
     <Router>
       <AuthProvider>
@@ -97,9 +102,38 @@ export default function App() {
                 />
               }
             />
+            <Route
+              path="/cloudhub/design/home/applications"
+              element={
+                <RunTimeManager
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications"
+              element={
+                <ApplicationSandbox
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications/addapplication"
+              element={
+                <DeployApplicationSandbox
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
           </Route>
+
+
           <Route
-            path="login/retrieve-username"
+            path="login /retrieve-username"
             element={<ForgotPasswordPage />}
           />
           <Route path="login/new-password" element={<ResetPassword />} />

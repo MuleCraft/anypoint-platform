@@ -81,6 +81,40 @@ const ContentMapping = {
     "Api Manager": [
         {
             icon: <PiBookOpenText size="25" />,
+            text: "Anypoint Runtime Manager"
+        },
+        {
+            icon: <PiBookOpenText size="33" />,
+            text: "Runtime Manager Agent"
+        },
+        {
+            icon: <PiBookOpenText size="25" />,
+            text: "Runtime Manager Agent Api"
+        },
+        {
+            icon: <PiBookOpenText size="25" />,
+            text: "Documentation"
+        },
+        {
+            icon: <PiChatsFill size={25} />,
+            text: "Forums"
+        },
+        {
+            icon: <BiSupport size={25} />,
+            text: "Help Center"
+        },
+        {
+            icon: <LiaUserGraduateSolid size={25} />,
+            text: "Training"
+        },
+        {
+            icon: <ImCompass2 size={25} />,
+            text: "Tutorials"
+        }
+    ],
+    "Runtime Manager": [
+        {
+            icon: <PiBookOpenText size="25" />,
             text: "Anypoint Api Manager"
         },
         {
@@ -170,6 +204,14 @@ export default function DynamicContent({ name }) {
                 <Text fontSize="xs" fontWeight="medium" py={1} mt="5px" mb="10px">
 
                     API MANAGER HELP
+                </Text>
+
+            )}
+
+            {(name === "Runtime Manager") && (
+                <Text fontSize="xs" fontWeight="medium" py={1} mt="5px" mb="10px">
+
+                    RUNTIME MANAGER HELP
                 </Text>
 
             )}

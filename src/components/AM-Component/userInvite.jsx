@@ -35,6 +35,7 @@ import supabase from "../../Utils/supabase";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import { Link as RouterLink } from "react-router-dom";
+import axios from "axios";
 
 const InviteForm = () => {
   const [userTable, setUserData] = useState(null);
@@ -57,22 +58,23 @@ const InviteForm = () => {
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await adminAuthClient.listUsers();
+        const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+        const response = await axios.get(import.meta.env.VITE_API_URL, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': `application/json`,
 
-        if (error) {
-          console.error("Error fetching user data:", error.message);
-        } else {
-          console.log("User data fetched successfully:");
-          setUserData(data.users);
-        }
+          }
+        });
+        setUserData(response.data.users.users);
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching data:', error);
       }
     };
 
-    fetchUserData();
+    fetchData();
   }, []);
 
   const toggleNameColumn = () => {

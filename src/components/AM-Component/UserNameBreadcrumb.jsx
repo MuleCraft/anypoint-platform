@@ -247,13 +247,14 @@ const UserNameBreadcrumb = () => {
                 console.log("Email updated successfully in Supabase:", supabaseData);
                 setUser((prevUser) => ({ ...prevUser, email: editableEmail }));
             }
-            const { error: authError } = await supabase.auth.updateUser({
-                id: id,
-                email: editableEmail.trim(),
-                data: {
-                    id: id,
-                }
-            });
+            const { error: authError } = await adminAuthClient.updateUserById(
+                id,
+                {
+                    email_confirm: true,
+                    email: editableEmail.trim(),
+                    user_metadata: { id: id }
+                });
+
             if (authError) {
                 console.error(
                     "Error updating email in authentication provider:",
