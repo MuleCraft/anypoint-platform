@@ -63,14 +63,13 @@ const InviteForm = () => {
         const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
         const response = await axios.get(import.meta.env.VITE_API_URL, {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': `application/json`,
-
-          }
+            Authorization: `Bearer ${token}`,
+            "Content-Type": `application/json`,
+          },
         });
-        setUserData(response.data.users.users);
+        setUserData(response.data.users);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
@@ -445,7 +444,7 @@ const InviteForm = () => {
                     _hover={{ color: "boxColor" }}
                   >
                     {" "}
-                    <RouterLink to="#">
+                    <RouterLink to={`/accounts/users/${conversion.id}`}>
                       {conversion.user_metadata.full_name}
                     </RouterLink>
                   </Td>
