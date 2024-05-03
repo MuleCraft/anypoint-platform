@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+// import adminAuthClient from "../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -62,7 +63,7 @@ const InviteForm = () => {
       setOrgId(userData.organizationId);
     }
   }, [userData]);
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -75,15 +76,16 @@ const InviteForm = () => {
         }, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": `application/json`,
-          },
+            "Content-Type": "application/json"
+          }
         });
-        setUserData(response.data.users);
+        setUserData(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
   }, [orgId]);
 
@@ -407,10 +409,9 @@ const InviteForm = () => {
             userTable
               .filter(
                 (userTable) =>
-                  userData?.id === userTable?.id
-                // ||
-                // (userTable.invited_at &&
-                //   userData?.company === userTable?.user_metadata?.company)
+                  userData?.id === userTable?.id ||
+                (userTable.invited_at &&
+                  userData?.company === userTable?.user_metadata?.company)
               )
 
               .filter(
@@ -435,7 +436,7 @@ const InviteForm = () => {
                   >
                     {" "}
                     <RouterLink to={`/accounts/users/${conversion.id}`}>
-                      {conversion.user_metadata.full_name}
+                      {conversion.full_name}
                     </RouterLink>
                   </Td>
                   <Td style={rowValueStyle} hidden={!showEmailColumn}>
