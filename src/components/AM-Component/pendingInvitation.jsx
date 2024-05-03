@@ -16,6 +16,7 @@ const UserTable = () => {
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const toast = useToast();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -69,6 +70,11 @@ const UserTable = () => {
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
+
+
+  const company = userData?.company
+  const organizationId = userData?.organizationId
+
   const handleEmailChange = (event) => {
     const value = event.target.value;
     setEmails(value);
@@ -89,12 +95,11 @@ const UserTable = () => {
       setEmailError("Please enter valid email addresses.");
       return;
     }
-    const company = userData?.company
     try {
       await Promise.all(
         emailList.map(async (email) => {
           const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company }, {
+          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company, organizationId }, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -194,19 +199,19 @@ const UserTable = () => {
 
 
 
-
   const ResendInvitation = async (email) => {
-    const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
-    if (error) {
-      console.error(`Error inviting user ${email}:`, error.message);
-      toast({
-        title: "Invitations sent not send",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right"
+    const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+    const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company, organizationId }, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
 
-      })
+    });
+    console.log(response)
+    if (response) {
+      console.error(`Error inviting user ${email}:`, response.message);
+
     }
 
     setSubmissionStatus("success");

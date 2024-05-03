@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-// import adminAuthClient from "../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -38,6 +37,7 @@ import axios from "axios";
 
 const InviteForm = () => {
   const [userTable, setUserData] = useState(null);
+
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -62,7 +62,7 @@ const InviteForm = () => {
       setOrgId(userData.organizationId);
     }
   }, [userData]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -75,16 +75,15 @@ const InviteForm = () => {
         }, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": `application/json`,
+          },
         });
-        setUserData(response.data);
-        console.log(response.data);
+        setUserData(response.data.users);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
   }, [orgId]);
 
@@ -158,12 +157,14 @@ const InviteForm = () => {
       return;
     }
     const company = userData?.company
+    const organizationId = userData?.organizationId
+
     try {
 
       await Promise.all(
         emailList.map(async (email) => {
           const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company }, {
+          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company, organizationId }, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -406,10 +407,10 @@ const InviteForm = () => {
             userTable
               .filter(
                 (userTable) =>
-                  userData?.id === userTable?.id 
-                  // ||
-                  // (userTable.invited_at &&
-                  //   userData?.company === userTable?.user_metadata?.company)
+                  userData?.id === userTable?.id
+                // ||
+                // (userTable.invited_at &&
+                //   userData?.company === userTable?.user_metadata?.company)
               )
 
               .filter(
@@ -434,7 +435,7 @@ const InviteForm = () => {
                   >
                     {" "}
                     <RouterLink to={`/accounts/users/${conversion.id}`}>
-                      {conversion.full_name}
+                      {conversion.user_metadata.full_name}
                     </RouterLink>
                   </Td>
                   <Td style={rowValueStyle} hidden={!showEmailColumn}>
