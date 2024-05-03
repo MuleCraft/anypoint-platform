@@ -15,7 +15,7 @@ const AuthProvider = ({ children }) => {
         const { data, error } = await supabase
           .schema("mc_cap_develop")
           .from("users")
-          .select("full_name, display_name, company,email, id")
+          .select("full_name, display_name, company,email, id,organizationId")
           .eq("id", session.user.id)
           .single();
 
