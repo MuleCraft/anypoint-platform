@@ -31,7 +31,6 @@ import {
 } from "@chakra-ui/react";
 import { AuthContext } from "../../Utils/AuthProvider";
 import { FiSearch } from "react-icons/fi";
-import supabase from "../../Utils/supabase";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import { Link as RouterLink } from "react-router-dom";
@@ -45,7 +44,6 @@ const InviteForm = () => {
   const [email, setEmails] = useState("");
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
-  const redirectTo = "Vite_REDIRECT_URL";
   const toast = useToast();
   const [showNameColumn, setShowNameColumn] = useState(true);
   const [showEmailColumn, setShowEmailColumn] = useState(true);
@@ -145,28 +143,24 @@ const InviteForm = () => {
       setEmailError("Please enter valid email addresses.");
       return;
     }
-
+    const company = userData?.company
     try {
-      const invitedUserIds = [];
 
       await Promise.all(
         emailList.map(async (email) => {
-          const { data, error } = await adminAuthClient.inviteUserByEmail(
-            email,
-            { redirectTo }
-          );
-          if (error) {
-            console.error(`Error inviting user ${email}:`, error.message);
-            throw error;
-          }
+          const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company }, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
 
-          if (data && data.user && data.user.id) {
-            invitedUserIds.push(data.user.id);
-            await insertAdditionalDetails(data.user.id);
-          }
+          });
+          console.log(response)
         })
       );
       setSubmissionStatus("success");
+      window.location.reload();
       onClose();
       toast({
         title: "Invitations sent successfully!",
@@ -188,31 +182,11 @@ const InviteForm = () => {
     }
   };
   console.log(submissionStatus);
-  const insertAdditionalDetails = async (id) => {
-    const { error } = await supabase
-      .schema("mc_cap_develop")
-      .from("users")
-      .upsert([
-        {
-          id: id,
-          email: email,
-          company: userData?.company,
-        },
-      ]);
-    if (error) {
-      console.error("Error invitation:", error.message);
-    } else {
-      console.log("invitation sended");
-      await adminAuthClient.updateUserById(id, {
-        user_metadata: { company: userData?.company },
-      });
-    }
-    window.location.reload();
-  };
+
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between" zIndex={0}>
-        <Button colorScheme="blue" onClick={onOpen} isDisabled>
+        <Button colorScheme="blue" onClick={onOpen}>
           Invite Users
         </Button>
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
