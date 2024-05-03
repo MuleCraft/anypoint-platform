@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import adminAuthClient from "../../Utils/api";
+// import adminAuthClient from "../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -55,24 +55,38 @@ const InviteForm = () => {
     useState(true);
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
+  const [orgId, setOrgId] = useState('');
+
+  useEffect(() => {
+    if (userData) {
+      setOrgId(userData.organizationId);
+    }
+  }, [userData]);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!orgId) {
+          return;
+        }
         const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-        const response = await axios.get(import.meta.env.VITE_API_URL, {
+        const response = await axios.post(import.meta.env.VITE_FETCH_ORG_USERS, {
+          "organizationId": orgId
+        }, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": `application/json`,
-          },
+            "Content-Type": "application/json"
+          }
         });
-        setUserData(response.data.users);
+        setUserData(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
-  }, []);
+  }, [orgId]);
 
   const toggleNameColumn = () => {
     setShowNameColumn(!showNameColumn);
@@ -392,22 +406,23 @@ const InviteForm = () => {
             userTable
               .filter(
                 (userTable) =>
-                  userData?.id === userTable?.id ||
-                  (userTable.invited_at &&
-                    userData?.company === userTable?.user_metadata?.company)
+                  userData?.id === userTable?.id 
+                  // ||
+                  // (userTable.invited_at &&
+                  //   userData?.company === userTable?.user_metadata?.company)
               )
 
               .filter(
-                (user) =>
-                  user &&
-                  user.user_metadata &&
-                  user.user_metadata.full_name &&
+                (userTable) =>
+                  // user &&
+                  // user.user_metadata &&
+                  // user.user_metadata.full_name &&
                   typeof filter === "string" &&
-                  (user.user_metadata.full_name
+                  (userTable.full_name
                     .toLowerCase()
                     .includes(filter.toLowerCase()) ||
-                    (user.email &&
-                      user.email.toLowerCase().includes(filter.toLowerCase())))
+                    (userTable.email &&
+                      userTable.email.toLowerCase().includes(filter.toLowerCase())))
               )
 
               .map((conversion, index) => (
@@ -419,7 +434,7 @@ const InviteForm = () => {
                   >
                     {" "}
                     <RouterLink to={`/accounts/users/${conversion.id}`}>
-                      {conversion.user_metadata.full_name}
+                      {conversion.full_name}
                     </RouterLink>
                   </Td>
                   <Td style={rowValueStyle} hidden={!showEmailColumn}>
