@@ -60,7 +60,7 @@ export default function HeroSectionHome({ greeting }) {
             textTransform="capitalize"
             textAlign="center"
           >
-            {userData ? `${greeting}, ${userData.display_name}!` : greeting}
+            {userData ? `${greeting}, ${userData.full_name}!` : greeting}
           </Heading>
           <Text textAlign={"center"}>
             Welcome to the #1 platform for APIs and integrations
