@@ -16,6 +16,8 @@ const UserTable = () => {
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const toast = useToast();
+  const [userId, setUserId] = useState('');
+  const [authUserId, setAuthUserId] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -139,33 +141,27 @@ const UserTable = () => {
 
   const cancelInvitation = async (id) => {
     try {
+          const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+          const response = await axios.post(import.meta.env.VITE_CANCEL_INVITE, { userId:id }, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
 
-      const { error: deleteError } = await supabase
-        .schema('mc_cap_develop')
-        .from('users')
-        .delete()
-        .eq('id', id);
-
-      if (deleteError) {
-        console.error(`Error deleting user ${id}:`, deleteError.message);
-        throw deleteError;
-      } else {
-        console.log(`User with ID ${id} deleted successfully`);
+          });
+          console.log(response);
         toast({
-          title: "canceled invitation",
+          title: "Invitation cancelled.",
           status: "success",
           duration: 5000,
           isClosable: true,
           position: "top-right"
         });
-
-        await insertAdditional(id);
-      }
     } catch (error) {
-      console.error("Error canceling invitation:", error.message);
+      console.error("Error canceling invitation:", error);
       toast({
         title: "Error canceling invitation",
-        description: error.message,
+        description: error,
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -174,28 +170,28 @@ const UserTable = () => {
     }
   };
 
-  const insertAdditional = async (id) => {
-    try {
-      const { error } = await adminAuthClient.deleteUser(id);
+  // const insertAdditional = async (id) => {
+  //   try {
+  //     const { error } = await adminAuthClient.deleteUser(id);
 
-      if (error) {
-        console.error(`Error canceling invitation for user ${id}:`, error.message);
-        throw error;
-      } else {
-        console.log(`Invitation canceled for user with ID: ${id}`);
-      }
-    } catch (error) {
-      console.error("Error delete user:", error.message);
-      toast({
-        title: "Error inserting additional details",
-        description: error.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right"
-      });
-    }
-  };
+  //     if (error) {
+  //       console.error(`Error canceling invitation for user ${id}:`, error.message);
+  //       throw error;
+  //     } else {
+  //       console.log(`Invitation canceled for user with ID: ${id}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error delete user:", error.message);
+  //     toast({
+  //       title: "Error inserting additional details",
+  //       description: error.message,
+  //       status: "error",
+  //       duration: 3000,
+  //       isClosable: true,
+  //       position: "top-right"
+  //     });
+  //   }
+  // };
 
 
 
