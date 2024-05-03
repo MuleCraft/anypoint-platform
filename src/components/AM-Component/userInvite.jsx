@@ -38,6 +38,7 @@ import axios from "axios";
 
 const InviteForm = () => {
   const [userTable, setUserData] = useState(null);
+
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -158,12 +159,14 @@ const InviteForm = () => {
       return;
     }
     const company = userData?.company
+    const organizationId = userData?.organizationId
+
     try {
 
       await Promise.all(
         emailList.map(async (email) => {
           const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company }, {
+          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company, organizationId }, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -406,10 +409,9 @@ const InviteForm = () => {
             userTable
               .filter(
                 (userTable) =>
-                  userData?.id === userTable?.id 
-                  // ||
-                  // (userTable.invited_at &&
-                  //   userData?.company === userTable?.user_metadata?.company)
+                  userData?.id === userTable?.id ||
+                (userTable.invited_at &&
+                  userData?.company === userTable?.user_metadata?.company)
               )
 
               .filter(
