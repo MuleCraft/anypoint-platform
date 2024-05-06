@@ -20,10 +20,9 @@ const SelectedComponent = ({ options, selectedRow }) => {
             fontWeight: "400",
             fontSize: "14px",
             borderBottom: "none",
-
+            backgroundColor: "transparent",
             boxShadow: state.isFocused ? "none" : "none",
             borderRadius: 0,
-
             padding: "2px",
 
         }),
@@ -93,8 +92,8 @@ const SelectedComponent = ({ options, selectedRow }) => {
         }),
     };
 
-    const handleOptionSelect = (selected) => {
-        setSelectedOption(selected);
+    const handleOptionSelect = () => {
+        setSelectedOption();
     };
 
     const toggleMenu = () => {

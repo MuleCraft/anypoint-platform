@@ -171,7 +171,7 @@ const DrawerComponent = ({ isOpen, onClose }) => {
                   >
                     <ChakraLink
                       as={ReactRouterLink}
-                      to="/cloudhub/design/home/applications"
+                      to="/cloudhub/design/home/chooseEnvironment"
                       variant="useCustomForgotLink"
                     >
                       <HStack>

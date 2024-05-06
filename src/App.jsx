@@ -17,6 +17,7 @@ import AMUserBreadcrumb from "./pages/Access-Management/AM-UserNameBreadcrumb";
 import RunTimeManager from "./pages/Runtime-Manager/Application-main";
 import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/ApplicationSandbox";
 import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
+import ChooseEnv from "./pages/Runtime-Manager/ChooseEnvironment";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -99,6 +100,15 @@ export default function App() {
                 <AMPending
                   name={AccessManagement}
                   pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/design/home/chooseEnvironment"
+              element={
+                <ChooseEnv
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
                 />
               }
             />

@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/react";
+import { Drawer, extendTheme } from "@chakra-ui/react";
 
 const theme = extendTheme({
   components: {
@@ -107,7 +107,9 @@ const theme = extendTheme({
     boxColor: "#0376d3",
     modelColor: "#f3f3f3",
     textColor: "#9e9e9e",
-    activeColor: "#6b8a99"
+    activeColor: "#6b8a99",
+    Drawerbg: "#f4f5f6",
+    Drawerheadbg: "#e8e9ea"
   },
   fontSizes: {
     lg: "20px",

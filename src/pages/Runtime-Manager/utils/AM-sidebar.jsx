@@ -2,7 +2,7 @@
 const RuntimeSection = [
     {
         items: [
-            { name: 'Application', label: 'Application', path: '/cloudhub/design/home/applications' },
+            { name: 'Application', label: 'Application', path: '/cloudhub/sandbox/home/applications?option=Sandbox' },
             { name: 'Servers', label: 'Servers', path: '/organizations/environments/api-groups' },
         ],
     },

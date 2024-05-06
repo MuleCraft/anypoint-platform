@@ -197,7 +197,7 @@ export default function HomeMain() {
               <Box flex="1">
                 <ChakraLink
                   as={ReactRouterLink}
-                  to="/cloudhub/design/home/applications"
+                  to="/cloudhub/design/home/chooseEnvironment"
                   className="home-main__index"
                 >
                   <Heading fontSize="sm">Runtime Manager</Heading>

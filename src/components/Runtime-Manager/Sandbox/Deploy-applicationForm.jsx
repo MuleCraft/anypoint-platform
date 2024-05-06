@@ -154,7 +154,6 @@ export const DeployApplicationForm = () => {
             });
     };
 
-
     return (
         <Box>
             <Flex justifyContent="space-between" alignItems="center">
@@ -187,7 +186,7 @@ export const DeployApplicationForm = () => {
                     {
                         showErrorContainer && (
 
-                            <Box position="absolute" flexDirection="column" maxH="30%" zIndex={99} ml="45%" borderWidth="1px" p={4} borderRightWidth={3} borderLeftWidth={3} bgColor="#fff" top="-50">
+                            <Box position="absolute" flexDirection="column" maxH="40%" zIndex={99} ml="45%" borderWidth="1px" p={4} borderRightWidth={3} borderLeftWidth={3} bgColor="#fff" top="-50">
                                 <Box display="flex" alignItems="center" gap={2}>
                                     {validationStatus.maxLength ? (
                                         <FaCheck color="green" />

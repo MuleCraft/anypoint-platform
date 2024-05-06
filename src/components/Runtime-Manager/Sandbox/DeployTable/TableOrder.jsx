@@ -59,61 +59,54 @@ const TableOrder = ({ data }) => {
     };
 
     return (
-        <Box>
-            <Box style={{ marginRight: isDrawerOpen ? '400px' : 0 }}>
-                <Table>
-                    <Thead>
-                        <Tr>
-                            {headers.map(header => (
-                                <Th
-                                    key={header}
-                                    onClick={() => handleSort(header)}
-                                    borderBottomWidth={selectedHeader === header ? defaultHeaderBorderWidth : 1}
-                                    borderColor={selectedHeader === header ? defaultHeaderBorderColor : 'inherit'}
-                                    style={{ ...columnTitleStyle, borderBottomWidth: 3 }}
-                                >
-                                    <Flex alignItems="center" gap={3}>
-                                        {header}{' '}
-                                        {sortField === header && (
-                                            <>
-                                                {sortOrder === 'asc' ? (
-                                                    <IoIosArrowUp />
-                                                ) : (
-                                                    <IoIosArrowDown />
-                                                )}
-                                            </>
-                                        )}
-                                    </Flex>
-                                </Th>
-                            ))}
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {sortedData.map((item) => (
-                            <Tr key={item.id} onClick={toggleDrawer}>
-                                <Td style={rowValueStyle} _hover={{ color: "boxColor" }}
-                                    onMouseEnter={() => setHoveredRow(item)}
-                                    onMouseLeave={() => setHoveredRow(null)}><NavLink to={`/accounts/users/`}>
-                                        <NavLink to={`/accounts/users/`}>
-                                            <Flex gap={2} align="center">
-                                                {item.Name}
-                                                {hoveredRow === item && <IoArrowRedo />}
-                                            </Flex>
-                                        </NavLink>
-                                    </NavLink></Td>
-                                <Td style={rowValueStyle}><Flex gap={2} align="center"><IoMdCloudOutline style={{ height: 25 }} />{item.TargetName}</Flex></Td>
-                                <Td style={rowValueStyle}>{item.TargetType}</Td>
-                                <Td style={rowValueStyle} textColor="#18bc65"><Flex gap={2} align="center"><FaCircle color='#18bc65' />{item.Status}</Flex></Td>
-                                <Td style={rowValueStyle}>{item.RuntimeVersion}</Td>
-                                <Td style={rowValueStyle}>{item.UpdateAvailable}</Td>
-                                <Td style={rowValueStyle}>{item.DateModified}</Td>
-                            </Tr>
+        <><Box style={{ marginRight: isDrawerOpen ? '400px' : 0 }}>
+            <Table>
+                <Thead>
+                    <Tr>
+                        {headers.map(header => (
+                            <Th
+                                key={header}
+                                onClick={() => handleSort(header)}
+                                borderBottomWidth={selectedHeader === header ? defaultHeaderBorderWidth : 1}
+                                borderColor={selectedHeader === header ? defaultHeaderBorderColor : 'inherit'}
+                                style={{ ...columnTitleStyle, borderBottomWidth: 3 }}
+                            >
+                                <Flex alignItems="center" gap={3}>
+                                    {header}{' '}
+                                    {sortField === header && (
+                                        <>
+                                            {sortOrder === 'asc' ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                                        </>
+                                    )}
+                                </Flex>
+                            </Th>
                         ))}
-                    </Tbody>
-                </Table>
-            </Box>
-            <Box>hello</Box>
+                    </Tr>
+                </Thead>
+                <Tbody>
+                    {sortedData.map((item) => (
+                        <Tr key={item.id} onClick={toggleDrawer}>
+                            <Td style={rowValueStyle} _hover={{ color: "boxColor" }}
+                                onMouseEnter={() => setHoveredRow(item)}
+                                onMouseLeave={() => setHoveredRow(null)}><NavLink to={`/accounts/users/`}>
+                                    <Flex gap={2} align="center">
+                                        {item.Name}
+                                        {hoveredRow === item && <IoArrowRedo />}
+                                    </Flex>
+                                </NavLink></Td>
+                            <Td style={rowValueStyle}><Flex gap={2} align="center"><IoMdCloudOutline style={{ height: 25 }} />{item.TargetName}</Flex></Td>
+                            <Td style={rowValueStyle}>{item.TargetType}</Td>
+                            <Td style={rowValueStyle} textColor="#18bc65"><Flex gap={2} align="center"><FaCircle color='#18bc65' />{item.Status}</Flex></Td>
+                            <Td style={rowValueStyle}>{item.RuntimeVersion}</Td>
+                            <Td style={rowValueStyle}>{item.UpdateAvailable}</Td>
+                            <Td style={rowValueStyle}>{item.DateModified}</Td>
+                        </Tr>
+                    ))}
+                </Tbody>
+            </Table>
         </Box>
+        </>
+
     );
 };
 

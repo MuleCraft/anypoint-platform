@@ -1,5 +1,5 @@
 import { Box, Flex, Stack, Text } from "@chakra-ui/react";
-import { BsCloudFog2 } from "react-icons/bs";
+// import { BsCloudFog2 } from "react-icons/bs";
 import { MdOutlineCloud } from "react-icons/md";
 
 const options = [
@@ -14,17 +14,17 @@ const options = [
             </Flex>
         ),
     },
-    {
-        value: "Hybrid",
-        label: (
-            <Flex gap={3}>
-                <span className="icon1 pr-2">
-                    <BsCloudFog2 size={20} />
-                </span>
-                Hybrid
-            </Flex>
-        ),
-    },
+    // {
+    //     value: "Hybrid",
+    //     label: (
+    //         <Flex gap={3}>
+    //             <span className="icon1 pr-2">
+    //                 <BsCloudFog2 size={20} />
+    //             </span>
+    //             Hybrid
+    //         </Flex>
+    //     ),
+    // },
 ];
 
 const versions = [
@@ -357,4 +357,41 @@ const RMChannel = [
 
 
 ];
-export { options, versions, Release, RuntimeVersion, WorkerCount, WorkerSize, Logger, env, RMModel, RMChannel };
+
+const AppStatus = [
+    {
+        value: "Started",
+        label: (
+            <Flex gap={3}>
+                Start
+            </Flex>
+        ),
+    },
+    {
+        value: "Started",
+        label: (
+            <Flex gap={3}>
+                Restart
+            </Flex>
+        ),
+    },
+    {
+        value: "Unemployed",
+        label: (
+            <Flex gap={3}>
+                Stop
+            </Flex>
+        ),
+    },
+    {
+        value: "Delete",
+        label: (
+            <Flex gap={3}>
+                Delete
+            </Flex>
+        ),
+    },
+
+];
+
+export { options, versions, Release, RuntimeVersion, WorkerCount, WorkerSize, Logger, env, RMModel, RMChannel, AppStatus };
