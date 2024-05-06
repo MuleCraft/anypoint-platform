@@ -224,7 +224,6 @@ export default function SimpleCard() {
           }
           return;
         }
-
         const { data, error } = await supabase.auth.signUp({
           email: email,
           password: password,
@@ -233,6 +232,7 @@ export default function SimpleCard() {
               full_name: fullName,
               phone: phoneNumber,
               company: company,
+              role: "admin",
             },
           },
         });
@@ -247,7 +247,7 @@ export default function SimpleCard() {
           designSliderValue: 1,
           currentUserName: username,
           currentUserEmail: email,
-          currentOrganization: company
+          currentOrganization: company,
         };
 
         if (error) {
@@ -281,6 +281,7 @@ export default function SimpleCard() {
           recaptcha_verification: "true",
           acceptedterms_verification: "true",
           company: company,
+          role: "Admin",
         },
       ]);
     if (error) {

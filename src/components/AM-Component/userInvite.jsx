@@ -56,14 +56,14 @@ const InviteForm = () => {
     useState(true);
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
-  const [orgId, setOrgId] = useState('');
+  const [orgId, setOrgId] = useState("");
 
   useEffect(() => {
     if (userData) {
       setOrgId(userData.organizationId);
     }
   }, [userData]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -71,21 +71,25 @@ const InviteForm = () => {
           return;
         }
         const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-        const response = await axios.post(import.meta.env.VITE_FETCH_ORG_USERS, {
-          "organizationId": orgId
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
+        const response = await axios.post(
+          import.meta.env.VITE_FETCH_ORG_USERS,
+          {
+            organizationId: orgId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
         setUserData(response.data);
         console.log(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
   }, [orgId]);
 
@@ -158,22 +162,54 @@ const InviteForm = () => {
       setEmailError("Please enter valid email addresses.");
       return;
     }
-    const company = userData?.company
-    const organizationId = userData?.organizationId
+
+    const existingEmails = userTable.map((user) => user.email.toLowerCase());
+    const duplicateEmails = emailList.filter((email) =>
+      existingEmails.includes(email.toLowerCase())
+    );
+
+    if (duplicateEmails.length > 0) {
+      toast({
+        title: "Error",
+        description: "One or more emails already exist in the table.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+      return;
+    }
+
+    const company = userData?.company;
+    const organizationId = userData?.organizationId;
+    const role = userData?.role;
+    if (role !== "Admin") {
+      toast({
+        title: "Error",
+        description: "You do not have permission to invite users.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+      return;
+    }
 
     try {
-
       await Promise.all(
         emailList.map(async (email) => {
           const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-          const response = await axios.post(import.meta.env.VITE_API_URL_INVITE, { email, company, organizationId }, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json',
+          const response = await axios.post(
+            import.meta.env.VITE_API_URL_INVITE,
+            { email, company, organizationId, role },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
             }
-
-          });
-          console.log(response)
+          );
+          console.log(response);
         })
       );
       setSubmissionStatus("success");
@@ -198,6 +234,7 @@ const InviteForm = () => {
       });
     }
   };
+
   console.log(submissionStatus);
 
   return (
@@ -410,8 +447,8 @@ const InviteForm = () => {
               .filter(
                 (userTable) =>
                   userData?.id === userTable?.id ||
-                (userTable.invited_at &&
-                  userData?.company === userTable?.user_metadata?.company)
+                  (userTable.invited_at &&
+                    userData?.company === userTable?.user_metadata?.company)
               )
 
               .filter(
@@ -424,7 +461,9 @@ const InviteForm = () => {
                     .toLowerCase()
                     .includes(filter.toLowerCase()) ||
                     (userTable.email &&
-                      userTable.email.toLowerCase().includes(filter.toLowerCase())))
+                      userTable.email
+                        .toLowerCase()
+                        .includes(filter.toLowerCase())))
               )
 
               .map((conversion, index) => (
