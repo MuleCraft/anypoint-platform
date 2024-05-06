@@ -148,6 +148,7 @@ export default function InviteUserDetailForm() {
           await supabase.auth.updateUser({
             data: {
               full_name: fullName,
+              role: "User",
             },
           });
         if (updateUserError) {
@@ -167,6 +168,7 @@ export default function InviteUserDetailForm() {
               display_name: username,
               recaptcha_verification: "true",
               acceptedterms_verification: "true",
+              role: "user",
             },
           ]);
         if (error) {
