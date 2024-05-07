@@ -183,7 +183,6 @@ const UserNameBreadcrumb = () => {
     };
 
     try {
-      // First attempt to update via axios
       const { data, error } = await axios.put(
         `${import.meta.env.VITE_UPDATE_FULL_NAME_URL}`,
         requestBody,
@@ -205,46 +204,14 @@ const UserNameBreadcrumb = () => {
       const { data: supabaseData, error: supabaseError } = await supabase
         .schema("mc_cap_develop")
         .from("users")
-        .upsert([
-          {
-            id: id,
-            full_name: editableName.trim(),
-          },
-        ]);
-      if (error) {
-        console.error("Error updating username:", error.message);
-      } else {
-        console.log("Username updated successfully:");
-        const requestBody = {
-          id: id,
-          full_name: editableName,
-        };
-        const { data, error } = await axios.put(
-          `${import.meta.env.VITE_UPDATE_FULL_NAME_URL}`,
-          requestBody,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${
-                import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-              }`,
-            },
-          }
-        );
-        setUser((prevUser) => ({
-          ...prevUser,
-          user_metadata: { ...prevUser.user_metadata, full_name: editableName },
-        }));
+        .upsert({ id: id, full_name: editableName.trim() });
 
-        toast({
-          title: "Full name updated successfully",
-          description: "Your full name has been successfully updated.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-        window.location.reload();
+      if (supabaseError) {
+        console.error(
+          "Error updating name in Supabase:",
+          supabaseError.message
+        );
+        throw new Error("Failed to update name in Supabase.");
       }
 
       console.log("Name updated successfully in Supabase:", supabaseData);
@@ -327,19 +294,8 @@ const UserNameBreadcrumb = () => {
       );
 
       if (error) {
-        console.error("Error updating email:", error.message);
-      } else {
-        console.log("Email updated successfully:", data);
-        setUser((prevUser) => ({ ...prevUser, email: editableEmail }));
-        toast({
-          title: "Email update!",
-          description: "Your Email has been updated successfully.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-        window.location.reload();
+        console.error("Error updating email via axios:", error.message);
+        throw new Error("Failed to update email via external service.");
       }
 
       console.log("Email updated successfully via axios:", data);
@@ -420,31 +376,6 @@ const UserNameBreadcrumb = () => {
       });
     }
   };
-  const insertAdditional = async (id) => {
-    try {
-      const { error } = await adminAuthClient.deleteUser(id);
-
-      if (error) {
-        console.error(
-          `Error canceling invitation for user ${id}:`,
-          error.message
-        );
-        throw error;
-      } else {
-        console.log(`Invitation canceled for user with ID: ${id}`);
-      }
-    } catch (error) {
-      console.error("Error delete user:", error.message);
-      toast({
-        title: "Error inserting additional details",
-        description: error.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right",
-      });
-    }
-  };
 
   const handleRequestCredentials = async () => {
     try {
@@ -461,7 +392,6 @@ const UserNameBreadcrumb = () => {
         isClosable: true,
         position: "top-right",
       });
-      window.location.reload();
     } catch (error) {
       setSubmissionStatus("failed");
     }

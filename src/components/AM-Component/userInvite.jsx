@@ -56,6 +56,10 @@ const InviteForm = () => {
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
   const [orgId, setOrgId] = useState("");
+  const handleReload = (event, path) => {
+    event.preventDefault();
+    window.location.href = path;
+  };
 
   useEffect(() => {
     if (userData) {
@@ -212,7 +216,7 @@ const InviteForm = () => {
         })
       );
       setSubmissionStatus("success");
-      window.location.reload();
+
       onClose();
       toast({
         title: "Invitations sent successfully!",
@@ -451,6 +455,7 @@ const InviteForm = () => {
                 if (!userTable.full_name) {
                   return false;
                 }
+
                 return (
                   typeof filter === "string" &&
                   (userTable.full_name
@@ -470,8 +475,12 @@ const InviteForm = () => {
                     hidden={!showNameColumn}
                     _hover={{ color: "boxColor" }}
                   >
-                    {" "}
-                    <RouterLink to={`/accounts/users/${conversion.id}`}>
+                    <RouterLink
+                      to={`/accounts/users/${conversion.id}`}
+                      onClick={(event) =>
+                        handleReload(event, `/accounts/users/${conversion.id}`)
+                      }
+                    >
                       {conversion.full_name}
                     </RouterLink>
                   </Td>

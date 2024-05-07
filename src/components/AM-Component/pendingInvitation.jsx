@@ -205,7 +205,6 @@ const UserTable = () => {
     }
   };
   console.log(submissionStatus);
-
   const cancelInvitation = async (id) => {
     const role = userData?.role;
 
@@ -222,7 +221,11 @@ const UserTable = () => {
         }
       );
       console.log(response);
-      window.location.reload();
+
+      // Remove the cancelled invitation from the userTable state
+      const updatedUserTable = userTable.filter((user) => user.id !== id);
+      setUserData(updatedUserTable);
+
       toast({
         title: "Invitation Cancelled",
         description: "The invitation has been successfully cancelled.",
@@ -243,6 +246,7 @@ const UserTable = () => {
       });
     }
   };
+
   // const insertAdditional = async (id) => {
   //   try {
   //     const { error } = await adminAuthClient.deleteUser(id);

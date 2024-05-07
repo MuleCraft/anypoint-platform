@@ -30,7 +30,6 @@ const AuthProvider = ({ children }) => {
         console.error("Error fetching user data:", error.message);
       }
     };
-
     fetchUserData();
 
     const handleAuthStateChange = (_event, session) => {
