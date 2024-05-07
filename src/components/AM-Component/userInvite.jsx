@@ -56,6 +56,10 @@ const InviteForm = () => {
   const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
   const [orgId, setOrgId] = useState("");
+  const handleReload = (event, path) => {
+    event.preventDefault();
+    window.location.href = path;
+  };
 
   useEffect(() => {
     if (userData) {
@@ -212,7 +216,7 @@ const InviteForm = () => {
         })
       );
       setSubmissionStatus("success");
-      window.location.reload();
+
       onClose();
       toast({
         title: "Invitations sent successfully!",
@@ -233,8 +237,6 @@ const InviteForm = () => {
       });
     }
   };
-
-
 
   return (
     <div>
@@ -449,12 +451,12 @@ const InviteForm = () => {
                   (userTable.invited_at &&
                     userData?.company === userTable?.user_metadata?.company)
               )
+              .filter((userTable) => {
+                if (!userTable.full_name) {
+                  return false;
+                }
 
-              .filter(
-                (userTable) =>
-                  // user &&
-                  // user.user_metadata &&
-                  // user.user_metadata.full_name &&
+                return (
                   typeof filter === "string" &&
                   (userTable.full_name
                     .toLowerCase()
@@ -463,7 +465,8 @@ const InviteForm = () => {
                       userTable.email
                         .toLowerCase()
                         .includes(filter.toLowerCase())))
-              )
+                );
+              })
 
               .map((conversion, index) => (
                 <Tr key={index}>
@@ -472,8 +475,12 @@ const InviteForm = () => {
                     hidden={!showNameColumn}
                     _hover={{ color: "boxColor" }}
                   >
-                    {" "}
-                    <RouterLink to={`/accounts/users/${conversion.id}`}>
+                    <RouterLink
+                      to={`/accounts/users/${conversion.id}`}
+                      onClick={(event) =>
+                        handleReload(event, `/accounts/users/${conversion.id}`)
+                      }
+                    >
                       {conversion.full_name}
                     </RouterLink>
                   </Td>

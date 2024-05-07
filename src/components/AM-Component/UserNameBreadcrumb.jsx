@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import adminAuthClient from "../../Utils/api";
 import {
   Menu,
@@ -43,10 +43,11 @@ import { PiPencilLight } from "react-icons/pi";
 import supabase from "../../Utils/supabase";
 import { filterFns } from "@tanstack/react-table";
 import axios from "axios";
-
+import { AuthContext } from "../../Utils/AuthProvider";
 const UserNameBreadcrumb = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);
+  const { userData } = useContext(AuthContext);
   const [userTable, setUserData] = useState(null);
   const [activeItem, setActiveItem] = useState("Settings");
   const [isEditing, setIsEditing] = useState(false);
@@ -54,7 +55,7 @@ const UserNameBreadcrumb = () => {
   const [editableName, setEditableName] = useState("");
   const [editableEmail, setEditableEmail] = useState("");
   const [iconButtonVisible, setIconButtonVisible] = useState(true);
-  const [emailButtonVisible, setEmailButtonVisible] = useState(true); // State to control the visibility of the email icon button
+  const [emailButtonVisible, setEmailButtonVisible] = useState(true);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [nameError, setNameError] = useState("");
@@ -97,7 +98,6 @@ const UserNameBreadcrumb = () => {
       try {
         const { data, error } = await adminAuthClient.listUsers();
         const user = data.users.find((user) => user.id === id);
-
         if (error) {
           console.error("Error fetching user data:", error.message);
         } else {
@@ -158,69 +158,86 @@ const UserNameBreadcrumb = () => {
   };
   const handleNameSubmit = async () => {
     let isFormValid = true;
+
     if (!editableName.trim() || editableName.trim().split(" ").length < 2) {
-      setNameError("Name cannot be empty");
+      setNameError("Name must include at least two words");
       isFormValid = false;
     } else if (checkForDuplicateName(editableName.trim())) {
       setNameError("This name is already in use");
       isFormValid = false;
     } else {
       setNameError("");
-      isFormValid = true;
     }
+
     if (!isFormValid) {
       return;
     }
+
+    const role = userData?.role;
+    const sessionUser = userData?.id;
+    const requestBody = {
+      sessionUser,
+      full_name: editableName.trim(),
+      role: role,
+      id: id,
+    };
+
     try {
-      const { error } = await supabase
+      const { data, error } = await axios.put(
+        `${import.meta.env.VITE_UPDATE_FULL_NAME_URL}`,
+        requestBody,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+            }`,
+          },
+        }
+      );
+
+      if (error) {
+        console.error("Error updating name via axios:", error.message);
+        throw new Error("Failed to update name via external service.");
+      }
+
+      const { data: supabaseData, error: supabaseError } = await supabase
         .schema("mc_cap_develop")
         .from("users")
-        .upsert([
-          {
-            id: id,
-            full_name: editableName.trim(),
-          },
-        ]);
-      if (error) {
-        console.error("Error updating username:", error.message);
-      } else {
-        console.log("Username updated successfully:");
-        const requestBody = {
-          id: id,
-          full_name: editableName,
-        };
-        const { data, error } = await axios.put(
-          `${import.meta.env.VITE_UPDATE_FULL_NAME_URL}`,
-          requestBody,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-                }`,
-            },
-          }
-        );
-        setUser((prevUser) => ({
-          ...prevUser,
-          user_metadata: { ...prevUser.user_metadata, full_name: editableName },
-        }));
+        .upsert({ id: id, full_name: editableName.trim() });
 
-        toast({
-          title: "Full name updated successfully",
-          description: "Your full name has been successfully updated.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-        window.location.reload();
+      if (supabaseError) {
+        console.error(
+          "Error updating name in Supabase:",
+          supabaseError.message
+        );
+        throw new Error("Failed to update name in Supabase.");
       }
-    } catch (error) {
-      console.error("Error updating username:", error);
+
+      console.log("Name updated successfully in Supabase:", supabaseData);
+
+      setUser((prevUser) => ({
+        ...prevUser,
+        user_metadata: {
+          ...prevUser.user_metadata,
+          full_name: editableName.trim(),
+        },
+      }));
+
       toast({
-        title: "Error",
+        title: "Name update successful",
+        description: "Your full name has been updated successfully.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } catch (error) {
+      console.error("Error during name update process:", error.message);
+      toast({
+        title: "Permission denied",
         description:
-          "There was an error updating your full name. Please try again later.",
+          "You do not have permission to update other user's fullname",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -235,6 +252,7 @@ const UserNameBreadcrumb = () => {
 
   const handleEmailSubmit = async () => {
     let isFormValid = true;
+
     if (!editableEmail.trim()) {
       setEmailError("Email cannot be empty");
       isFormValid = false;
@@ -248,132 +266,114 @@ const UserNameBreadcrumb = () => {
       setEmailError("");
     }
 
+    if (!isFormValid) {
+      return;
+    }
+
+    const role = userData?.role;
+    const sessionUser = userData?.id;
+    const requestBody = {
+      sessionUser,
+      email: editableEmail.trim(),
+      role: role,
+      id: id,
+    };
+
     try {
-      if (!isFormValid) {
-        return isFormValid;
-      }
-
-      const { data: supabaseData, error: supabaseError } = await supabase
-        .schema("mc_cap_develop")
-        .from("users")
-        .upsert([
-          {
-            id: id,
-            email: editableEmail.trim(),
-          },
-        ]);
-      if (supabaseError) {
-        console.error(
-          "Error updating email in Supabase:",
-          supabaseError.message
-        );
-      } else {
-        console.log("Email updated successfully in Supabase:", supabaseData);
-        setUser((prevUser) => ({ ...prevUser, email: editableEmail }));
-      }
-      const requestBody = {
-        id: id,
-        email: editableEmail.trim(),
-      };
-
       const { data, error } = await axios.put(
         `${import.meta.env.VITE_UPDATE_EMAIL_URL}`,
         requestBody,
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-              }`,
+            Authorization: `Bearer ${
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+            }`,
           },
         }
       );
 
       if (error) {
-        console.error("Error updating email:", error.message);
-      } else {
-        console.log("Email updated successfully:", data);
-        setUser((prevUser) => ({ ...prevUser, email: editableEmail }));
-        toast({
-          title: "Email update!",
-          description: "Your Email has been updated successfully.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-        window.location.reload();
+        console.error("Error updating email via axios:", error.message);
+        throw new Error("Failed to update email via external service.");
       }
-      setEmailButtonVisible(true);
-      setIconButtonVisible(true);
-      setIsEditingEmail(false);
-    } catch (error) {
-      console.error("Error updating email:", error);
-    }
 
-    onClose();
-
-    return isFormValid;
-  };
-
-  const deleteInvitation = async () => {
-    try {
-      const { error: deleteError } = await supabase
+      console.log("Email updated successfully via axios:", data);
+      setUser((prevUser) => ({ ...prevUser, email: editableEmail }));
+      const { data: supabaseData, error: supabaseError } = await supabase
         .schema("mc_cap_develop")
         .from("users")
-        .delete()
-        .eq("id", id);
+        .upsert({ id: id, email: editableEmail.trim() });
 
-      if (deleteError) {
-        console.error(`Error deleting user ${id}:`, deleteError.message);
-        throw deleteError;
-      } else {
-        console.log(`User with ID ${id} deleted successfully`);
-        toast({
-          title: "User deleted successfully",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-
-        await insertAdditional(id);
+      if (supabaseError) {
+        console.error(
+          "Error updating email in Supabase:",
+          supabaseError.message
+        );
+        throw new Error(supabaseError.message);
       }
-    } catch (error) {
-      console.error("Error User deleting:", error.message);
+
+      console.log("Email updated successfully in Supabase:", supabaseData);
       toast({
-        title: "Error User deleting",
-        description: error.message,
+        title: "Email update!",
+        description: "Your Email has been updated successfully.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } catch (error) {
+      console.error("Error during email update process:", error.message);
+      toast({
+        title: "Permission denied",
+        description:
+          "You do not have permission to update other's email address",
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "top-right",
       });
+    } finally {
+      setEmailButtonVisible(true);
+      setIconButtonVisible(true);
+      setIsEditingEmail(false);
+      onClose();
     }
   };
-  const insertAdditional = async (id) => {
-    try {
-      const { error } = await adminAuthClient.deleteUser(id);
+  const cancelInvitation = async (id) => {
+    const role = userData?.role;
 
-      if (error) {
-        console.error(
-          `Error canceling invitation for user ${id}:`,
-          error.message
-        );
-        throw error;
-      } else {
-        console.log(`Invitation canceled for user with ID: ${id}`);
-      }
-    } catch (error) {
-      console.error("Error delete user:", error.message);
+    try {
+      const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+      const response = await axios.post(
+        import.meta.env.VITE_CANCEL_INVITE,
+        { userId: id, role },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
       toast({
-        title: "Error inserting additional details",
-        description: error.message,
-        status: "error",
-        duration: 3000,
+        title: "Invitation Cancelled",
+        description: "The invitation has been successfully cancelled.",
+        status: "success",
+        duration: 5000,
         isClosable: true,
         position: "top-right",
       });
-
+    } catch (error) {
+      console.error("Error canceling invitation:", error.message);
+      toast({
+        title: "Error Canceling Invitation",
+        description: "You do not have permission to cancel invitation",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
     }
   };
 
@@ -445,7 +445,7 @@ const UserNameBreadcrumb = () => {
             <MenuItem fontSize="sm" color="red">
               Disable user...
             </MenuItem>
-            <MenuItem fontSize="sm" color="red" onClick={deleteInvitation}>
+            <MenuItem fontSize="sm" color="red" onClick={cancelInvitation}>
               Delete user...
             </MenuItem>
           </MenuList>

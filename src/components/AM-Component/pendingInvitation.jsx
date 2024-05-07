@@ -205,13 +205,14 @@ const UserTable = () => {
     }
   };
   console.log(submissionStatus);
-
   const cancelInvitation = async (id) => {
+    const role = userData?.role;
+
     try {
       const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
       const response = await axios.post(
         import.meta.env.VITE_CANCEL_INVITE,
-        { userId: id },
+        { userId: id, role },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -220,19 +221,22 @@ const UserTable = () => {
         }
       );
       console.log(response);
-      window.location.reload();
+      const updatedUserTable = userTable.filter((user) => user.id !== id);
+      setUserData(updatedUserTable);
+
       toast({
-        title: "Invitation cancelled.",
+        title: "Invitation Cancelled",
+        description: "The invitation has been successfully cancelled.",
         status: "success",
         duration: 5000,
         isClosable: true,
         position: "top-right",
       });
     } catch (error) {
-      console.error("Error canceling invitation:", error);
+      console.error("Error canceling invitation:", error.message);
       toast({
-        title: "Error canceling invitation",
-        description: error,
+        title: "Permission Denied",
+        description: "You do not have permission to cancel invitation",
         status: "error",
         duration: 5000,
         isClosable: true,

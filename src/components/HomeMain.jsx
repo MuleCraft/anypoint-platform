@@ -32,6 +32,11 @@ import { BiSupport } from "react-icons/bi";
 import "../assets/Common.css";
 
 export default function HomeMain() {
+  const handleReload = (event, path) => {
+    event.preventDefault();
+    window.location.href = path;
+  };
+
   const slides = [
     {
       title: "Tutorials",
@@ -203,10 +208,8 @@ export default function HomeMain() {
                   <Heading fontSize="sm">Runtime Manager</Heading>
                 </ChakraLink>
                 <Text>Deploy, manage, and monitor deployed applications.</Text>
-
               </Box>
               <ArrowForwardIcon />
-
             </Flex>
             <Flex alignItems="center" gap={2}>
               <Image src={visualizer} />
@@ -231,6 +234,7 @@ export default function HomeMain() {
                   as={ReactRouterLink}
                   to="/accounts/users"
                   className="home-main__index"
+                  onClick={(event) => handleReload(event, "/accounts/users")}
                 >
                   <Heading fontSize="sm">Access Management</Heading>
                 </ChakraLink>
