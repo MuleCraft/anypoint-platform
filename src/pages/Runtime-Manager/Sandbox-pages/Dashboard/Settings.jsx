@@ -1,12 +1,14 @@
 import { Box, Flex } from "@chakra-ui/react";
-import Nav from "../../components/NavbarHome";
-import Sidebar from "../../components/sidebar";
-import { useState } from "react";
-import RuntimeSection from "./utils/RM-sidebar";
-import { RuntimeApplication } from "../../components/Runtime-Manager/Appication";
 
-export default function RunTimeManager({ name, pathValue }) {
-    const [activeItem, setActiveItem] = useState('Application');
+import { useState } from "react";
+import Nav from "../../../../components/NavbarHome";
+import Sidebar from "../../../../components/sidebar";
+import RuntimeDashboardSection from "../../utils/RMDashboard";
+import { SandboxSetting } from "../../../../components/Runtime-Manager/Sandbox/Dashboard/SandboxSettings";
+
+
+export default function SandboxSettingmain({ name, pathValue }) {
+    const [activeItem, setActiveItem] = useState('Setting');
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
@@ -18,15 +20,14 @@ export default function RunTimeManager({ name, pathValue }) {
                     <Box>
                         <Sidebar
                             name={name}
-                            sections={RuntimeSection}
+                            sections={RuntimeDashboardSection}
                             activeItem={activeItem}
                             onItemSelect={handleItemSelect}
                         />
+
                     </Box>
-                    <Flex direction="column" w="full" ml="200" mt="200">
-                        <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-100px">
-                            <RuntimeApplication />
-                        </Box>
+                    <Flex direction="column" w="full" ml="200" mt="75">
+                        <SandboxSetting />
                     </Flex>
                 </Flex>
             </div>

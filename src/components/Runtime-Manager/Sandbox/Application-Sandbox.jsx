@@ -1,19 +1,18 @@
-import { Box, Button, Text, VStack, Image, Flex, InputGroup, Input, InputRightElement, InputLeftElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Stack, Table, Thead, Tr, Th, Tbody, Td, Heading, MenuDivider, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, Divider, ModalBody, FormControl, RadioGroup, Radio, TableContainer, ModalFooter, Link } from "@chakra-ui/react"
+import { Box, Button, Text, VStack, Image, Flex, InputGroup, Input, InputRightElement, InputLeftElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Stack, Table, Thead, Tr, Th, Tbody, Td, Heading, MenuDivider, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, Divider, ModalBody, FormControl, RadioGroup, Radio, TableContainer, ModalFooter, Link, Spinner } from "@chakra-ui/react"
 import muleAvator from "/Images/Logo.svg"
 import Notify from "/Images/RTpreload.webp"
-
 import { BsSearch } from "react-icons/bs";
 import { CloseIcon, TriangleDownIcon } from "@chakra-ui/icons"
 import { IoNotificationsOutline } from "react-icons/io5";
 import SelectComponent from "../../SelectedComponent";
-import { AppStatus, RMChannel, RMModel } from "./SelectMenuDatas/DeploymentTarget";
-import { useRef, useState } from "react";
+import { RMChannel, RMModel } from "./SelectMenuDatas/DeploymentTarget";
+import { useEffect, useRef, useState } from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { NavLink } from 'react-router-dom';
 import { FaCircle } from "react-icons/fa6";
 import { IoMdCloudOutline } from "react-icons/io";
 import { IoArrowRedo } from "react-icons/io5";
-import SelectedComponent from "../../SelectedComponent";
+import { FaRegCircle } from "react-icons/fa";
 import { AiOutlineCloudServer } from "react-icons/ai";
 export const RuntimeApplicationSandbox = () => {
     const Application = 1
@@ -119,6 +118,34 @@ export const RuntimeApplicationSandbox = () => {
     const isSelected = (index) => {
         return index === selectedRow;
     };
+
+    const [selectedOption, setSelectedOption] = useState('Deploying');
+
+    const handleOptionSelect = (option) => {
+        setSelectedOption(option);
+    };
+
+    const getMenuStyle = (option) => {
+        if (option === selectedOption) {
+            return {
+                borderRightWidth: 3,
+                borderRightColor: "boxColor",
+                borderLeftWidth: 3,
+                borderLeftColor: "boxColor",
+                backgroundColor: "gray.900",
+                textColor: "boxColor",
+                borderBottomWidth: 1,
+                borderTopWidth: 1,
+
+
+            };
+        } else {
+            return {};
+        }
+    };
+
+
+
     return (
         <>
             {Application === 0 && (
@@ -126,17 +153,17 @@ export const RuntimeApplicationSandbox = () => {
                     <VStack spacing={4} alignItems="center" justifyContent="center">
                         <Box as={Image} src={muleAvator} width={100} />
                         <Text fontSize="xl" fontWeight="500" color="gray.300">There are no applications to show</Text>\
-                        <Link to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
+                        <NavLink to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
                             <Button colorScheme="blue" size="md"><Text fontSize="xs">Deploy application</Text></Button>
-                        </Link>
+                        </NavLink>
                     </VStack>
                 </Box>
             )}
             {Application === 1 && (
                 <><Flex alignItems="center" gap={4} style={{ marginRight: isDrawerOpen ? '400px' : 0 }}>
-                    <Link to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
+                    <NavLink to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
                         <Button colorScheme="blue" size="md"><Text fontSize="xs">Deploy application</Text></Button>
-                    </Link>
+                    </NavLink>
                     <InputGroup size='md' flexDirection="column" py={3}>
                         <Input bgColor="#f4f5f6" variant='filled' borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Search Application' size=' base' height={10} borderRadius={8} />
                         <InputRightElement width='4.5rem' pt={6}>
@@ -214,7 +241,7 @@ export const RuntimeApplicationSandbox = () => {
                                     <Tr key={item.id} onClick={toggleDrawer}>
                                         <Td style={rowValueStyle} _hover={{ color: "boxColor" }}
                                             onMouseEnter={() => setHoveredRow(item)}
-                                            onMouseLeave={() => setHoveredRow(null)}><NavLink to={`/accounts/users/`}>
+                                            onMouseLeave={() => setHoveredRow(null)}><NavLink to={`/cloudhub/sandbox/home/applications/${item.Name}?option=Sandbox`}>
                                                 <Flex gap={2} align="center">
                                                     {item.Name}
                                                     {hoveredRow == !item.Name && <IoArrowRedo />}
@@ -252,9 +279,35 @@ export const RuntimeApplicationSandbox = () => {
                         </Flex>
                     </Flex>
                     <Stack direction="row" p={5} gap={20} alignItems="center">
-                        <Stack direction="row" alignItems="center" gap={4}>
-                            <FaCircle color='#18bc65' />
-                            <SelectedComponent options={AppStatus} />
+                        <Stack direction="row" alignItems="center" >
+                            {selectedOption === "Deploying" && (
+                                <FaCircle color='#18bc65' />
+                            )}
+                            {selectedOption === "Update" && (
+                                <Spinner h={3} w={3} color="gray.400" />
+                            )}
+                            {selectedOption === "Undeployed" && (
+                                <FaRegCircle color='gray' />
+                            )}
+
+                            <Menu value={selectedOption} as={Button}>
+                                <MenuButton
+                                    as={Button}
+                                    variant=""
+                                    borderRadius={0}
+                                    rightIcon={<TriangleDownIcon color="gray.400" height={3} />}
+                                    height="38px"
+
+                                >
+                                    {selectedOption}
+                                </MenuButton>
+                                <MenuList mt="-10" borderWidth={2} borderRadius={0} borderColor="#8a8a8a" borderTopWidth={0}>
+                                    <MenuItem textColor="gray.900" fontSize=" base" _hover={{ backgroundColor: "#fff", textColor: "boxColor", borderRightColor: "boxColor", borderLeftColor: "boxColor", }} style={getMenuStyle('Deploying')} onClick={() => handleOptionSelect('Deploying')}>Start</MenuItem>
+                                    <MenuItem textColor="gray.900" fontSize=" base" _hover={{ backgroundColor: "#fff", textColor: "boxColor", borderRightColor: "boxColor", borderLeftColor: "boxColor", }} style={getMenuStyle('Update')} onClick={() => handleOptionSelect('Update')}>Restart</MenuItem>
+                                    <MenuItem textColor="gray.900" fontSize=" base" _hover={{ backgroundColor: "#fff", textColor: "boxColor", borderRightColor: "boxColor", borderLeftColor: "boxColor", }} style={getMenuStyle('Undeployed')} onClick={() => handleOptionSelect('Undeployed')}>Stop</MenuItem>
+                                    <MenuItem textColor="gray.900" fontSize=" base" _hover={{ backgroundColor: "#fff", textColor: "boxColor", borderRightColor: "boxColor", borderLeftColor: "boxColor", }} style={getMenuStyle('Deleted')} onClick={() => handleOptionSelect('Deleted')}>Delete</MenuItem>
+                                </MenuList>
+                            </Menu>
                         </Stack>
                         <Stack direction="row" alignItems="center" gap={4}>
                             <AiOutlineCloudServer />
@@ -425,6 +478,7 @@ export const RuntimeApplicationSandbox = () => {
                             <Link>View Associated Alerts</Link>
                         </Text>
                     </Box>
+
                 </Box >
             )}
         </>

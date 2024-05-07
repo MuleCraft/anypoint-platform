@@ -18,6 +18,8 @@ import RunTimeManager from "./pages/Runtime-Manager/Application-main";
 import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/ApplicationSandbox";
 import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
 import ChooseEnv from "./pages/Runtime-Manager/ChooseEnvironment";
+import SandboxDashboard from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Dashboard-main";
+import SandboxSettingmain from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Settings";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -134,6 +136,24 @@ export default function App() {
               path="/cloudhub/sandbox/home/applications/addapplication"
               element={
                 <DeployApplicationSandbox
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications/:name"
+              element={
+                <SandboxDashboard
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications/:name/settings"
+              element={
+                <SandboxSettingmain
                   name={RuntimeManager}
                   pathValue={RuntimeManagerPath}
                 />
