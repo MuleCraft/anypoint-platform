@@ -220,6 +220,7 @@ const UserTable = () => {
         }
       );
       console.log(response);
+      window.location.reload();
       toast({
         title: "Invitation cancelled.",
         status: "success",
@@ -291,6 +292,7 @@ const UserTable = () => {
       console.error(`Error inviting user ${email}:`, response.message);
     }
     setSubmissionStatus("success");
+    window.location.reload();
     onClose();
     toast({
       title: "Invitations sent successfully!",

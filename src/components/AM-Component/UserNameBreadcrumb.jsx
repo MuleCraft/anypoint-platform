@@ -195,9 +195,8 @@ const UserNameBreadcrumb = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${
-                import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-              }`,
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+                }`,
             },
           }
         );
@@ -205,6 +204,7 @@ const UserNameBreadcrumb = () => {
           ...prevUser,
           user_metadata: { ...prevUser.user_metadata, full_name: editableName },
         }));
+
         toast({
           title: "Full name updated successfully",
           description: "Your full name has been successfully updated.",
@@ -213,6 +213,7 @@ const UserNameBreadcrumb = () => {
           isClosable: true,
           position: "top-right",
         });
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error updating username:", error);
@@ -281,9 +282,8 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-            }`,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+              }`,
           },
         }
       );
@@ -301,6 +301,7 @@ const UserNameBreadcrumb = () => {
           isClosable: true,
           position: "top-right",
         });
+        window.location.reload();
       }
       setEmailButtonVisible(true);
       setIconButtonVisible(true);
@@ -372,6 +373,7 @@ const UserNameBreadcrumb = () => {
         isClosable: true,
         position: "top-right",
       });
+
     }
   };
 
@@ -390,6 +392,7 @@ const UserNameBreadcrumb = () => {
         isClosable: true,
         position: "top-right",
       });
+      window.location.reload();
     } catch (error) {
       setSubmissionStatus("failed");
     }

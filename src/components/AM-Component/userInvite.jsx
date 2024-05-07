@@ -38,7 +38,6 @@ import axios from "axios";
 
 const InviteForm = () => {
   const [userTable, setUserData] = useState(null);
-
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -84,7 +83,7 @@ const InviteForm = () => {
           }
         );
         setUserData(response.data);
-        console.log("org users",response.data);
+        console.log("org users", response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -235,7 +234,7 @@ const InviteForm = () => {
     }
   };
 
-  console.log(submissionStatus);
+
 
   return (
     <div>
