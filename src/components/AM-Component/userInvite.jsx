@@ -234,8 +234,6 @@ const InviteForm = () => {
     }
   };
 
-
-
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between" zIndex={0}>
@@ -449,12 +447,11 @@ const InviteForm = () => {
                   (userTable.invited_at &&
                     userData?.company === userTable?.user_metadata?.company)
               )
-
-              .filter(
-                (userTable) =>
-                  // user &&
-                  // user.user_metadata &&
-                  // user.user_metadata.full_name &&
+              .filter((userTable) => {
+                if (!userTable.full_name) {
+                  return false;
+                }
+                return (
                   typeof filter === "string" &&
                   (userTable.full_name
                     .toLowerCase()
@@ -463,7 +460,8 @@ const InviteForm = () => {
                       userTable.email
                         .toLowerCase()
                         .includes(filter.toLowerCase())))
-              )
+                );
+              })
 
               .map((conversion, index) => (
                 <Tr key={index}>
