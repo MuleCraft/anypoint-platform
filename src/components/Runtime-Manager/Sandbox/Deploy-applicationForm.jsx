@@ -15,8 +15,8 @@ import { useNavigate } from "react-router-dom";
 export const DeployApplicationForm = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isOpenOne, onOpen: onOpenOne, onClose: onCloseOne } = useDisclosure();
-    const customWidth = "800px";
-    const customHeight = "650px";
+
+
     const [value, setValue] = useState('1')
     const columnTitleStyle = { fontSize: 14, color: '#686868', fontWeight: 800, textTransform: 'capitalize', padding: 15 };
     const rowValueStyle = { fontSize: 14, padding: 17, };
@@ -258,6 +258,7 @@ export const DeployApplicationForm = () => {
                         <Input variant='filled' value={selectedJar} borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='No file has been loaded' size='sm' height="40px" isDisabled bgColor="#f4f5f6" />
                     </Box>
                     <Box width="10%" pt={6}>
+
                         <Menu>
                             <MenuButton
                                 as={Button}
@@ -273,7 +274,7 @@ export const DeployApplicationForm = () => {
                             >
                                 <Text fontSize="xs">Choose file</Text>
                             </MenuButton>
-                            <MenuList borderRadius={0} borderWidth={1} borderColor="gray.400">
+                            <MenuList borderRadius={0} borderWidth={1} borderColor="gray.400" >
                                 <MenuItem
                                     borderBottomWidth={1}
                                     borderColor="gray.400"

@@ -1,20 +1,20 @@
-import { Box, Button, Text, VStack, Image, Flex, InputGroup, Input, InputRightElement, InputLeftElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Stack, Table, Thead, Tr, Th, Tbody, Td, Heading, MenuDivider } from "@chakra-ui/react"
+import { Box, Button, Text, VStack, Image, Flex, InputGroup, Input, InputRightElement, InputLeftElement, Menu, MenuButton, IconButton, MenuList, MenuItem, Stack, Table, Thead, Tr, Th, Tbody, Td, Heading, MenuDivider, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, Divider, ModalBody, FormControl, RadioGroup, Radio, TableContainer, ModalFooter, Link } from "@chakra-ui/react"
 import muleAvator from "/Images/Logo.svg"
 import Notify from "/Images/RTpreload.webp"
-import { Link } from "react-router-dom"
+
 import { BsSearch } from "react-icons/bs";
-import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons"
+import { CloseIcon, TriangleDownIcon } from "@chakra-ui/icons"
 import { IoNotificationsOutline } from "react-icons/io5";
 import SelectComponent from "../../SelectedComponent";
 import { AppStatus, RMChannel, RMModel } from "./SelectMenuDatas/DeploymentTarget";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { NavLink } from 'react-router-dom';
 import { FaCircle } from "react-icons/fa6";
 import { IoMdCloudOutline } from "react-icons/io";
 import { IoArrowRedo } from "react-icons/io5";
 import SelectedComponent from "../../SelectedComponent";
-
+import { AiOutlineCloudServer } from "react-icons/ai";
 export const RuntimeApplicationSandbox = () => {
     const Application = 1
     const data = [
@@ -42,7 +42,7 @@ export const RuntimeApplicationSandbox = () => {
     const defaultSortField = 'Name';
     const defaultHeaderBorderWidth = 5;
     const defaultHeaderBorderColor = '#6b8a99';
-
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [sortField, setSortField] = useState(defaultSortField);
     const [sortOrder, setSortOrder] = useState('asc');
     const [selectedHeader, setSelectedHeader] = useState(defaultSortField);
@@ -90,17 +90,35 @@ export const RuntimeApplicationSandbox = () => {
     const toggleDrawer = () => {
         setIsDrawerOpen(!isDrawerOpen);
     };
-
-    const [isOpen, setIsOpen] = useState(false);
-
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
-    const handleMenuItemClick = (menuItem) => {
-        console.log(`Clicked on ${menuItem}`);
-
+    const fileInputRef = useRef(null);
+    const [selectedJar, setSelectedJar] = useState("");
+    const handleChooseFile = () => {
+        fileInputRef.current.click();
     };
 
+    const handleFileChange = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            setSelectedJar(selectedFile.name);
+        }
+    };
+    const customWidth = "800px";
+    const customHeight = "650px";
+    const [value, setValue] = useState('1')
+    const tableData = [
+        { name: "Manufacturing SAP HANA Event Listener", organization: "Mulecraft" },
+        { name: "Another Row", organization: "Organization 2" },
+    ];
+
+    const [selectedRow, setSelectedRow] = useState(null);
+
+    const handleRowClick = (index) => {
+        setSelectedRow(index === selectedRow ? null : index);
+    };
+
+    const isSelected = (index) => {
+        return index === selectedRow;
+    };
     return (
         <>
             {Application === 0 && (
@@ -120,7 +138,7 @@ export const RuntimeApplicationSandbox = () => {
                         <Button colorScheme="blue" size="md"><Text fontSize="xs">Deploy application</Text></Button>
                     </Link>
                     <InputGroup size='md' flexDirection="column" py={3}>
-                        <Input bgColor="#f4f5f6" variant='filled' borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Search Application' size='sm' height={10} borderRadius={8} />
+                        <Input bgColor="#f4f5f6" variant='filled' borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Search Application' size=' base' height={10} borderRadius={8} />
                         <InputRightElement width='4.5rem' pt={6}>
                             <CloseIcon color="formLabelColor" />
                         </InputRightElement>
@@ -146,7 +164,7 @@ export const RuntimeApplicationSandbox = () => {
                         <MenuList width="500px">
                             <VStack spacing={1} alignItems="center" justifyContent="center">
                                 <Box as={Image} src={Notify} width={140} />
-                                <Text fontSize="sm" fontWeight="500" color="gray.300">No unread notifications to show</Text>
+                                <Text fontSize=" base" fontWeight="500" color="gray.300">No unread notifications to show</Text>
                                 <Text color="boxColor" fontSize="xs" ml={1} display="inline">
                                     <Link>Show all notifications</Link>
                                 </Text>
@@ -233,78 +251,180 @@ export const RuntimeApplicationSandbox = () => {
                             <CloseIcon onClick={toggleDrawer} />
                         </Flex>
                     </Flex>
-                    <Stack direction="row" p={5}>
-                        <div style={{ position: 'relative' }}>
-                            <button
-                                onClick={toggleMenu}
-                                style={{
-                                    padding: '8px',
-                                    backgroundColor: 'transparent',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                File
-                            </button>
-                            {isOpen && (
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: '40px', // Adjust the top position as needed
-                                        left: '0',
-                                        backgroundColor: '#ffffff',
-                                        border: '1px solid #cccccc',
-                                        borderRadius: '4px',
-                                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                                        zIndex: '999',
-                                        minWidth: '120px', // Adjust the width as needed
+                    <Stack direction="row" p={5} gap={20} alignItems="center">
+                        <Stack direction="row" alignItems="center" gap={4}>
+                            <FaCircle color='#18bc65' />
+                            <SelectedComponent options={AppStatus} />
+                        </Stack>
+                        <Stack direction="row" alignItems="center" gap={4}>
+                            <AiOutlineCloudServer />
+                            <Text>Cloudhub</Text>
+                        </Stack>
+                    </Stack>
+                    <Stack direction="row" p={5} alignItems="center" gap={3}>
+                        <Box width={220}>
+                            <Input bgColor="#ffff" variant='filled' borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Search Application' size=' base' height={10} borderRadius={8} value="mulecraft-demo-project-1.0.0-SNAPSHOT-mule-application.jar" />
+                        </Box>
+                        <Box width="10%">
+                            <Menu>
+                                <MenuButton
+                                    as={Button}
+                                    variant="outline"
+                                    borderRadius={0}
+                                    borderColor="gray.400"
+                                    rightIcon={<TriangleDownIcon color="gray.400" height={3} />}
+                                    height="38px"
+                                    backgroundColor="gray.100"
+                                    _hover={{
+                                        backgroundColor: "gray.100",
                                     }}
                                 >
-                                    <div
-                                        onClick={() => handleMenuItemClick('New File')}
-                                        style={{
-                                            padding: '8px',
-                                            cursor: 'pointer',
+                                    <Text fontSize="xs">Choose file</Text>
+                                </MenuButton>
+                                <MenuList borderRadius={0} borderWidth={1} borderColor="gray.400" >
+                                    <MenuItem
+                                        borderBottomWidth={1}
+                                        borderColor="gray.400"
+                                        textColor="gray.500"
+                                        fontSize=" base"
+                                        onClick={onOpen}
+                                        _hover={{
+                                            borderRightWidth: 1.5,
+                                            borderRightColor: "boxColor",
+                                            borderLeftWidth: 1.5,
+                                            borderLeftColor: "boxColor",
+                                            backgroundColor: "gray.200",
+                                            textColor: "boxColor"
+                                        }}
+                                    >
+                                        Import file from Exchange
+                                    </MenuItem>
+                                    <MenuItem
+                                        textColor="gray.500"
+                                        fontSize=" base"
+                                        onClick={handleChooseFile}
+                                        _hover={{
+                                            borderRightWidth: 1.5,
+                                            borderRightColor: "boxColor",
+                                            borderLeftWidth: 1.5,
+                                            borderLeftColor: "boxColor",
+                                            backgroundColor: "gray.200",
+                                            textColor: "boxColor"
+                                        }}
+                                    >
+                                        Upload file
+                                    </MenuItem>
+                                </MenuList>
+                            </Menu>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: "none" }}
+                                onChange={handleFileChange}
+                                accept=".jar"
+                            />
+                            <Modal isOpen={isOpen} onClose={onClose} isCentered size={"6xl"} >
+                                <ModalOverlay />
+                                <ModalContent borderRadius="0" width={customWidth} height={customHeight}>
+                                    <Box bg="#f9fafb " borderRadius="4px">
+                                        <ModalHeader fontSize="xl" fontWeight="200" textColor="gray.500">Get from Exchange</ModalHeader>
+                                    </Box>
+                                    <Divider />
+                                    <ModalBody>
+                                        <FormControl >
+                                            <Text fontSize=" base" textColor="gray.500">Type</Text>
+                                            <RadioGroup onChange={setValue} value={value} >
+                                                <Stack direction='row' gap="10" py={2}>
+                                                    <Radio value='1' Color="gray.500">Application</Radio>
+                                                    <Radio value='2' Color="gray.500">Example</Radio>
+                                                </Stack>
+                                            </RadioGroup>
+                                            <InputGroup size='md' flexDirection="column" py={3}>
+                                                <Input bgColor="#f4f5f6" variant='filled' borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Search asset by name' size=' base' height={10} />
+                                                <InputRightElement width='4.5rem' pt={6}>
+                                                    <BsSearch />
+                                                </InputRightElement>
+                                            </InputGroup>
+                                        </FormControl>
+                                        <Box height="200px" width="750px" borderWidth="1px" borderColor="gray.200">
+                                            <TableContainer p={2}>
+                                                <Table size=' base'>
+                                                    <Thead>
+                                                        <Tr>
+                                                            <Th style={columnTitleStyle}>Name</Th>
+                                                            <Th style={columnTitleStyle}>File</Th>
+                                                            <Th style={columnTitleStyle}></Th>
+                                                        </Tr>
+                                                    </Thead>
+                                                    <Tbody>
+                                                        {tableData.map((rowData, index) => (
+                                                            <Tr key={index} onClick={() => handleRowClick(index)} bg={isSelected(index) ? "gray.100" : ""}
+                                                                borderRightWidth={isSelected(index) ? "2px" : ""}
+                                                                borderLeftWidth={isSelected(index) ? "2px" : ""}
+                                                                borderColor={isSelected(index) ? "blue.500" : ""}>
+                                                                <Td style={rowValueStyle}>{rowData.name}</Td>
+                                                                <Td style={rowValueStyle}>{rowData.organization}</Td>
 
-                                        }}
-                                    >
-                                        New File
-                                    </div>
-                                    <div
-                                        onClick={() => handleMenuItemClick('New Window')}
-                                        style={{
-                                            padding: '8px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        New Window
-                                    </div>
-                                    <div style={{ borderTop: '1px solid #cccccc' }} />
-                                    <div
-                                        onClick={() => handleMenuItemClick('Open...')}
-                                        style={{
-                                            padding: '8px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        Open...
-                                    </div>
-                                    <div
-                                        onClick={() => handleMenuItemClick('Save File')}
-                                        style={{
-                                            padding: '8px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        Save File
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                                                            </Tr>
+                                                        ))}
+                                                    </Tbody>
+
+                                                </Table>
+                                            </TableContainer>
+
+                                        </Box>
+
+                                    </ModalBody>
+                                    <Divider />
+                                    <ModalFooter gap={5}>
+                                        <Button variant="outline" onClick={onClose} borderRadius={0}>Close</Button>
+                                        <Button variant="outline" borderRadius={0}>
+                                            Select
+                                        </Button>
+                                    </ModalFooter>
+
+                                </ModalContent>
+                            </Modal>
+                        </Box>
+
                     </Stack>
-
-
+                    <Stack ps={6} direction="row"><Text fontSize="xs" fontWeight="600">Last Updated</Text> <Text fontSize="xs">2024-05-06 17:27:29</Text></Stack>
+                    <Stack ps={6} py={1} direction="row"><Text fontSize="xs" fontWeight="600">App url</Text> <Link href="https://mule-testing.us-e2.cloudhub.io/" target="_blank"><Text fontSize="xs" textColor="boxColor">mule-testing.us-e2.cloudhub.io</Text> </Link></Stack>
+                    <Stack ps={12} pt={10}  >
+                        <Stack direction="row" gap={5}>
+                            <Text fontSize=" base" >
+                                Runtime Version:</Text>
+                            <Text fontSize=" base" >4.6-e-java8</Text>
+                        </Stack>
+                        <Stack direction="row" gap={5}>
+                            <Text fontSize=" base" >
+                                Worker size:</Text>
+                            <Text fontSize=" base" >0.1 vCores</Text>
+                        </Stack>
+                        <Stack direction="row" gap={5}>
+                            <Text fontSize=" base" >
+                                Workers:</Text>
+                            <Text fontSize=" base" >1</Text>
+                        </Stack>
+                        <Stack direction="row" gap={5}>
+                            <Text fontSize=" base" >
+                                Region:</Text>
+                            <Text fontSize=" base" >US East (Ohio)</Text>
+                        </Stack>
+                    </Stack>
+                    <Stack ps={6} pt={10} direction="row" gap={5}>
+                        <Link to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
+                            <Button colorScheme="blue" size="md"><Text fontSize="xs">Manage application</Text></Button>
+                        </Link>
+                        <Link to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
+                            <Button variant="homePageButtons" colorScheme="blue" size="md"><Text fontSize="xs">Logs</Text></Button>
+                        </Link>
+                    </Stack>
+                    <Box ps={6} py={8}>
+                        <Text color="boxColor" fontSize="base" ml={1} display="inline">
+                            <Link>View Associated Alerts</Link>
+                        </Text>
+                    </Box>
                 </Box >
             )}
         </>

@@ -71,11 +71,6 @@ const SelectedComponent = ({ options, selectedRow }) => {
         menu: (provided) => ({
             ...provided,
             width: "100%",
-            borderTop: "none",
-            borderRight: "none",
-            borderLeft: "none",
-            borderBottom: "2px solid #f4f5f6",
-            outline: "none",
             marginTop: "0",
             paddingTop: "0",
             paddingBottom: "0",
