@@ -2,7 +2,7 @@ import { Box, Flex } from "@chakra-ui/react";
 import Nav from "../../../components/NavbarHome";
 import Sidebar from "../../../components/sidebar";
 import { useState } from "react";
-import RuntimeSection from "../utils/RM-sidebar";
+import RuntimeSection from "../utils/AM-sidebar";
 import { RuntimeApplicationSandbox } from "../../../components/Runtime-Manager/Sandbox/Application-Sandbox";
 
 export default function ApplicationSandbox({ name, pathValue }) {
