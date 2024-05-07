@@ -84,7 +84,7 @@ const InviteForm = () => {
           }
         );
         setUserData(response.data);
-        console.log(response.data);
+        console.log("org users",response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -446,7 +446,7 @@ const InviteForm = () => {
             userTable
               .filter(
                 (userTable) =>
-                  userData?.id === userTable?.id ||
+                  userData?.organizationId === userTable?.organizationId ||
                   (userTable.invited_at &&
                     userData?.company === userTable?.user_metadata?.company)
               )
