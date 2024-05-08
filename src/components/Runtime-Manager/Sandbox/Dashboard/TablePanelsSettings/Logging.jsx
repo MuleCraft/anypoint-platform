@@ -16,7 +16,7 @@ export const LoggingSettings = () => {
                     <SelectComponent options={Logger} />
                 </Box>
                 <Box width="60%" p={2}>
-                    <Input bgColor="#f4f5f6" variant='filled' borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Package.name' fontSize="small" size='sm' height="40px" />
+                    <Input bgColor="#f4f5f6" variant="custom" borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Package.name' fontSize="small" size='sm' height="40px" />
                 </Box>
             </Stack></>
     )

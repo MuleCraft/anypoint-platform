@@ -166,7 +166,7 @@ export const DeployApplicationForm = () => {
                     <Box width="44%" zIndex={0}>
                         <Text fontSize="sm" color="navText">Application Name</Text>
                         <InputGroup size='md' flexDirection="column" py={3}>
-                            <Input value={inputValue} onChange={(e) => validateInput(e.target.value)} onBlur={() => setShowErrorContainer(false)} variant='filled' borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Name' size='sm' height="40px" bgColor="#f4f5f6" />
+                            <Input value={inputValue} onChange={(e) => validateInput(e.target.value)} onBlur={() => setShowErrorContainer(false)} variant="custom" borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Name' size='sm' height="40px" bgColor="#f4f5f6" />
                             {showErrorContainer && (
                                 <Box>
                                     {

@@ -196,7 +196,7 @@ export const SandboxSetting = ({ name }) => {
                         <Stack direction={['column', 'row']} spacing='4' alignItems="center">
                             <Box width="35%" py={2}>
                                 <Text fontSize="sm" color="navText">Application File</Text>
-                                <Input variant='filled' value={selectedJar} borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='No file has been loaded' size='sm' height="40px" isReadOnly bgColor="#f4f5f6" />
+                                <Input variant="custom" value={selectedJar} borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='No file has been loaded' size='sm' height="40px" isReadOnly bgColor="#f4f5f6" />
                             </Box>
                             <Box width="10%" pt={6}>
                                 <Menu>
