@@ -36,12 +36,12 @@ import {
 } from "@chakra-ui/react";
 import moment from "moment";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import userId from "../../pages/Access-Management/utils/AM-UserID";
 import FlexableTabs from "../FlexableTabs";
 import { PiPencilLight } from "react-icons/pi";
 import supabase from "../../Utils/supabase";
-import { filterFns } from "@tanstack/react-table";
+
 import axios from "axios";
 import { AuthContext } from "../../Utils/AuthProvider";
 const UserNameBreadcrumb = () => {
@@ -189,9 +189,8 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-            }`,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+              }`,
           },
         }
       );
@@ -286,9 +285,8 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-            }`,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+              }`,
           },
         }
       );
@@ -340,14 +338,13 @@ const UserNameBreadcrumb = () => {
       onClose();
     }
   };
-  const cancelInvitation = async (id) => {
-    const role = userData?.role;
 
+  const cancelInvitation = async () => {
     try {
       const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-      const response = await axios.post(
+      const { response } = await axios.post(
         import.meta.env.VITE_CANCEL_INVITE,
-        { userId: id, role },
+        { userId: id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -355,27 +352,35 @@ const UserNameBreadcrumb = () => {
           },
         }
       );
-      console.log(response);
+
+      if (userData?.id === id) {
+        await supabase.auth.signOut();
+        window.location.href = "/login";
+      } else {
+        window.location.href = "/accounts/users";
+      }
+      console.log("deleted successfully");
       toast({
-        title: "Invitation Cancelled",
-        description: "The invitation has been successfully cancelled.",
+        title: "deleted successfully",
+        description: response,
         status: "success",
         duration: 5000,
         isClosable: true,
         position: "top-right",
       });
+
     } catch (error) {
-      console.error("Error canceling invitation:", error.message);
+
       toast({
-        title: "Error Canceling Invitation",
-        description: "You do not have permission to cancel invitation",
+        title: "Deleted Failed",
+        description: "Failed to delete user",
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "top-right",
       });
     }
-  };
+  }
 
   const handleRequestCredentials = async () => {
     try {
