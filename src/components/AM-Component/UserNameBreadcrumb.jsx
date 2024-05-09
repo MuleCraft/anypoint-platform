@@ -189,8 +189,9 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-              }`,
+            Authorization: `Bearer ${
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+            }`,
           },
         }
       );
@@ -285,8 +286,9 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-              }`,
+            Authorization: `Bearer ${
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+            }`,
           },
         }
       );
@@ -340,47 +342,52 @@ const UserNameBreadcrumb = () => {
   };
 
   const cancelInvitation = async () => {
+    const role = userData?.role;
+    const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+
     try {
-      const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-      const { response } = await axios.post(
-        import.meta.env.VITE_CANCEL_INVITE,
-        { userId: id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+      if (role === "Admin" || userData?.id === id) {
+        const { response } = await axios.post(
+          import.meta.env.VITE_CANCEL_INVITE,
+          { userId: id, role },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (userData?.id === id) {
+          await supabase.auth.signOut();
+          window.location.href = "/login";
+        } else {
+          window.location.href = "/accounts/users";
         }
-      );
-
-      if (userData?.id === id) {
-        await supabase.auth.signOut();
-        window.location.href = "/login";
+        console.log("Deleted successfully");
+        toast({
+          title: "Deleted Successfully",
+          description: response.data?.message || "User has been deleted",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
       } else {
-        window.location.href = "/accounts/users";
+        throw new Error("You do not have permission to delete this user");
       }
-      console.log("deleted successfully");
-      toast({
-        title: "deleted successfully",
-        description: response,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "top-right",
-      });
-
     } catch (error) {
-
       toast({
-        title: "Deleted Failed",
-        description: "Failed to delete user",
+        title: "Permission Denied",
+        description:
+          error.message || "You do not have permission to delete users",
         status: "error",
         duration: 5000,
         isClosable: true,
         position: "top-right",
       });
     }
-  }
+  };
 
   const handleRequestCredentials = async () => {
     try {
