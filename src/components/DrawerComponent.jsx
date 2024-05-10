@@ -169,10 +169,16 @@ const DrawerComponent = ({ isOpen, onClose }) => {
                     p={1}
                     borderRadius="20px"
                   >
-                    <HStack>
-                      <Image src={runtime} alt="runtime icon" />
-                      <Text>Runtime Manager</Text>
-                    </HStack>
+                    <ChakraLink
+                      as={ReactRouterLink}
+                      to="/cloudhub/design/home/chooseEnvironment"
+                      variant="useCustomForgotLink"
+                    >
+                      <HStack>
+                        <Image src={runtime} alt="runtime icon" />
+                        <Text>Runtime Manager</Text>
+                      </HStack>
+                    </ChakraLink>
                   </ListItem>
                   <ListItem
                     _hover={{ bg: "#e5e5e5" }}

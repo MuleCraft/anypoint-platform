@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-import UseCustomDomainPage from "./pages/UseCustomDomainPage";
+import UseCustomDomainPageComingSoon from "./pages/UseCustomDomainPageComingSoon";
 import Home from "./pages/Home";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPassword from "./pages/ResetPasswordPage";
@@ -14,11 +14,20 @@ import AMPending from "./pages/Access-Management/AM-pending";
 import InviteUserPasswordPage from "./pages/InvitedUserPassword";
 import InviteUserDatailPage from "./pages/InviteUserDetailsForm";
 import AMUserBreadcrumb from "./pages/Access-Management/AM-UserNameBreadcrumb";
+import RunTimeManager from "./pages/Runtime-Manager/Application-main";
+import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/ApplicationSandbox";
+import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
+import ChooseEnv from "./pages/Runtime-Manager/ChooseEnvironment";
+import SandboxDashboard from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Dashboard-main";
+import SandboxSettingmain from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Settings";
+import DashboardLog from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Loggs";
 
 export default function App() {
   const AccessManagement = "Access Management";
   const AnypointPlatform = "Anypoint Platform";
+  const RuntimeManager = "Runtime Manager";
   const AccessManagentPath = "/accounts/users";
+  const RuntimeManagerPath = "/cloudhub/design/home/applications";
   return (
     <Router>
       <AuthProvider>
@@ -26,9 +35,15 @@ export default function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignUpPage />} />
-          <Route path="use-custom-domain" element={<UseCustomDomainPage />} />
+          <Route
+            path="use-custom-domain"
+            element={<UseCustomDomainPageComingSoon />}
+          />
           <Route path="inviteduser" element={<InviteUserPasswordPage />} />
-          <Route path="inviteduserdetails/:id" element={<InviteUserDatailPage />} />
+          <Route
+            path="inviteduserdetails/:id"
+            element={<InviteUserDatailPage />}
+          />
           <Route element={<PrivateRoutes />}>
             {" "}
             <Route
@@ -48,6 +63,15 @@ export default function App() {
             />
             <Route path="accounts/users/:id" element={<AMUserBreadcrumb name={AccessManagement} pathValue={AccessManagentPath} />} />
             <Route
+              path="accounts/users/:id"
+              element={
+                <AMUserBreadcrumb
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
               path="accounts/businessGroups"
               element={
                 <AMBusinessGroup
@@ -58,7 +82,13 @@ export default function App() {
             />
             <Route
               path="accounts/businessGroups/:groupCode"
-              element={<AMBusinessGroupDetails name={AccessManagement} pathValue={AccessManagentPath} />} />
+              element={
+                <AMBusinessGroupDetails
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
             <Route
               path="/accounts/users/list"
               element={
@@ -77,9 +107,75 @@ export default function App() {
                 />
               }
             />
+            <Route
+              path="/cloudhub/design/home/chooseEnvironment"
+              element={
+                <ChooseEnv
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/design/home/applications"
+              element={
+                <RunTimeManager
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications"
+              element={
+                <ApplicationSandbox
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications/addapplication"
+              element={
+                <DeployApplicationSandbox
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications/:name"
+              element={
+                <SandboxDashboard
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications/:name/settings"
+              element={
+                <SandboxSettingmain
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/applications/:name/logging"
+              element={
+                <DashboardLog
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+
           </Route>
+
+
           <Route
-            path="login/retrieve-username"
+            path="login /retrieve-username"
             element={<ForgotPasswordPage />}
           />
           <Route path="login/new-password" element={<ResetPassword />} />

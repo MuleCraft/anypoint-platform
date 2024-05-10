@@ -131,7 +131,7 @@ const Nav = ({ name, pathValue }) => {
         <Flex alignItems="center">
           <Stack direction="row" spacing={7}>
             <Menu>
-              {((name === "Anypoint Platform") || (name === "Api Manager")) && (
+              {((name === "Anypoint Platform") || (name === "Api Manager") || (name === "Runtime Manager")) && (
 
                 <MenuButton MenuButton
                   as={Button}

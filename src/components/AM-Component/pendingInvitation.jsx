@@ -4,42 +4,47 @@ import { Menu, MenuButton, MenuItem, MenuList, Table, Tbody, Td, Th, Thead, Tr, 
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { AuthContext } from '../../Utils/AuthProvider';
 import { FiSearch } from "react-icons/fi";
-import supabase from '../../Utils/supabase';
+import supabase from "../../Utils/supabase";
+import axios from "axios";
 
 const UserTable = () => {
   const [userTable, setUserData] = useState(null);
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [emails, setEmails] = useState("");
+  const [email, setEmails] = useState("");
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
-  const redirectTo = "http://localhost:127.0.0.1:3000/inviteduser"
   const toast = useToast();
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data, error } = await adminAuthClient.listUsers();
+  const [userId, setUserId] = useState("");
+  const [authUserId, setAuthUserId] = useState("");
 
-        if (error) {
-          console.error("Error fetching user data:", error.message);
-        } else {
-          console.log("User data fetched successfully:");
-          setUserData(data.users);
-        }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+        const response = await axios.get(import.meta.env.VITE_API_URL, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": `application/json`,
+          },
+        });
+        setUserData(response.data.users);
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchUserData();
+    fetchData();
   }, []);
 
   const calculateExpirationStatus = (invited_at) => {
     if (!invited_at) return null;
     const invitedDate = new Date(invited_at);
     const currentDate = new Date();
-    const differenceInTime = Math.abs(currentDate.getTime() - invitedDate.getTime());
+    const differenceInTime = Math.abs(
+      currentDate.getTime() - invitedDate.getTime()
+    );
     const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
     if (differenceInDays > 7) {
       return `${differenceInDays - 1} days )`;
@@ -64,11 +69,20 @@ const UserTable = () => {
     }
   };
 
-  const columnTitleStyle = { fontSize: 14, color: '#444444', fontWeight: 800, textTransform: 'capitalize', };
-  const rowValueStyle = { fontSize: 14, };
+  const columnTitleStyle = {
+    fontSize: 14,
+    color: "#444444",
+    fontWeight: 800,
+    textTransform: "capitalize",
+  };
+  const rowValueStyle = { fontSize: 14 };
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
+
+  const company = userData?.company;
+  const organizationId = userData?.organizationId;
+  const role = userData?.role;
   const handleEmailChange = (event) => {
     const value = event.target.value;
     setEmails(value);
@@ -80,7 +94,7 @@ const UserTable = () => {
   };
 
   const handleSubmit = async () => {
-    const emailList = emails.split(",").map((email) => email.trim());
+    const emailList = email.split(",").map((email) => email.trim());
 
 
     const invalidEmails = emailList.filter((email) => !validateEmail(email));
@@ -90,24 +104,57 @@ const UserTable = () => {
       return;
     }
 
-    try {
-      const invitedUserIds = [];
+    const existingEmails = userTable.map((user) => user.email.toLowerCase());
+    const duplicateEmails = emailList.filter((email) =>
+      existingEmails.includes(email.toLowerCase())
+    );
 
+    if (duplicateEmails.length > 0) {
+      toast({
+        title: "Error",
+        description: "One or more emails already exist in the table.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+      return;
+    }
+
+    const company = userData?.company;
+    const organizationId = userData?.organizationId;
+    const role = userData?.role;
+    if (role !== "Admin") {
+      toast({
+        title: "Error",
+        description: "You do not have permission to invite users.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+      return;
+    }
+
+    try {
       await Promise.all(
         emailList.map(async (email) => {
-          const { data, error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
-          if (error) {
-            console.error(`Error inviting user ${email}:`, error.message);
-            throw error;
-          }
-
-          if (data && data.user && data.user.id) {
-            invitedUserIds.push(data.user.id);
-            await insertAdditionalDetails(data.user.id);
-          }
+          const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+          const response = await axios.post(
+            import.meta.env.VITE_API_URL_INVITE,
+            { email, company, organizationId, role },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          console.log(response);
         })
       );
       setSubmissionStatus("success");
+      window.location.reload();
       onClose();
       toast({
         title: "Invitations sent successfully!",
@@ -130,114 +177,108 @@ const UserTable = () => {
       });
     }
   };
-  console.log(submissionStatus)
-  const insertAdditionalDetails = async (id) => {
-    const { error } = await supabase
-      .schema("mc_cap_develop")
-      .from("users")
-      .upsert([
-        {
-          id: id,
-          company: userData?.company,
-        },
-      ]);
-    if (error) {
-      console.error("Error invitation canceled:", error.message);
-    } else {
-      console.log("invitation canceled");
-    }
-  };
-
+  console.log(submissionStatus);
   const cancelInvitation = async (id) => {
+    const role = userData?.role;
+
     try {
+      const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+      const response = await axios.post(
+        import.meta.env.VITE_CANCEL_INVITE,
+        { userId: id, role },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
+      const updatedUserTable = userTable.filter((user) => user.id !== id);
+      setUserData(updatedUserTable);
 
-      const { error: deleteError } = await supabase
-        .schema('mc_cap_develop')
-        .from('users')
-        .delete()
-        .eq('id', id);
-
-      if (deleteError) {
-        console.error(`Error deleting user ${id}:`, deleteError.message);
-        throw deleteError;
-      } else {
-        console.log(`User with ID ${id} deleted successfully`);
-        toast({
-          title: "canceled invitation",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right"
-        });
-
-        await insertAdditional(id);
-      }
+      toast({
+        title: "Invitation Cancelled",
+        description: "The invitation has been successfully cancelled.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
     } catch (error) {
       console.error("Error canceling invitation:", error.message);
       toast({
-        title: "Error canceling invitation",
-        description: error.message,
+        title: "Permission Denied",
+        description: "You do not have permission to cancel invitation",
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: "top-right"
+        position: "top-right",
       });
     }
   };
 
-  const insertAdditional = async (id) => {
-    try {
-      const { error } = await adminAuthClient.deleteUser(id);
+  // const insertAdditional = async (id) => {
+  //   try {
+  //     const { error } = await adminAuthClient.deleteUser(id);
 
-      if (error) {
-        console.error(`Error canceling invitation for user ${id}:`, error.message);
-        throw error;
-      } else {
-        console.log(`Invitation canceled for user with ID: ${id}`);
-      }
-    } catch (error) {
-      console.error("Error delete user:", error.message);
-      toast({
-        title: "Error inserting additional details",
-        description: error.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right"
-      });
-    }
-  };
-
-
-
+  //     if (error) {
+  //       console.error(`Error canceling invitation for user ${id}:`, error.message);
+  //       throw error;
+  //     } else {
+  //       console.log(`Invitation canceled for user with ID: ${id}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error delete user:", error.message);
+  //     toast({
+  //       title: "Error inserting additional details",
+  //       description: error.message,
+  //       status: "error",
+  //       duration: 3000,
+  //       isClosable: true,
+  //       position: "top-right"
+  //     });
+  //   }
+  // };
 
   const ResendInvitation = async (email) => {
-    const { error } = await adminAuthClient.inviteUserByEmail(email, { redirectTo });
-    if (error) {
-      console.error(`Error inviting user ${email}:`, error.message);
+    if (role !== "Admin") {
       toast({
-        title: "Invitations sent not send",
+        title: "Error",
+        description: "You do not have permission to invite users.",
         status: "error",
         duration: 5000,
         isClosable: true,
-        position: "top-right"
-
-      })
+        position: "top-right",
+      });
+      return;
     }
-
+    const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+    const response = await axios.post(
+      import.meta.env.VITE_API_URL_INVITE,
+      { email, company, organizationId, role },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(response);
+    if (response) {
+      console.error(`Error inviting user ${email}:`, response.message);
+    }
     setSubmissionStatus("success");
+    window.location.reload();
     onClose();
     toast({
       title: "Invitations sent successfully!",
       status: "success",
       duration: 5000,
       isClosable: true,
-      position: "top-right"
-
-    }
-    );
-
-  }
+      position: "top-right",
+    });
+  };
 
   return (
     <div>
@@ -259,7 +300,7 @@ const UserTable = () => {
                 </Text>
                 <Input
                   type="text"
-                  value={emails}
+                  value={email}
                   onChange={handleEmailChange}
                   placeholder="max@community.com"
                   isInvalid={emailError !== ""}
@@ -318,42 +359,61 @@ const UserTable = () => {
           </Tr>
         </Thead>
         <Tbody>
-          {Array.isArray(userTable) && userTable
-            .filter(user =>
-              user.email.toLowerCase().includes(filter.toLowerCase()) && !user.last_sign_in_at
-            )
-            .map((conversion, index) => (
-              <Tr key={index}>
-                <Td style={rowValueStyle}>{conversion.email}</Td>
-                <Td style={rowValueStyle}>{calculateSendStatus(conversion.invited_at)}</Td>
-                <Td style={rowValueStyle}>{calculateExpirationStatus(conversion.invited_at)}</Td>
-                <Td style={rowValueStyle}>
-                  <Tooltip fontSize="12px" label={`Everyone at ${userData?.company} (Member)`} placement='auto'>
-                    <Text>1 team</Text>
-                  </Tooltip>
-                </Td>
-                <Td style={rowValueStyle}>
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      aria-label='Options'
-                      icon={<HiEllipsisHorizontal width="10px" />}
-                      variant='outline'
-                      h={'30px'} color="gray.500"
-                      border={'1px solid #5c5c5c'}
-                    />
-                    <MenuList borderRadius={0}>
-                      <MenuItem fontSize="sm" onClick={() => ResendInvitation(conversion.email)}>
-                        Resend Invitation...
-                      </MenuItem>
-                      <MenuItem fontSize="sm" color="red" onClick={() => cancelInvitation(conversion.id)}>
-                        Cancel Invitation...
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                </Td>
-              </Tr>
-            ))}
+          {Array.isArray(userTable) &&
+            userTable
+              .filter(
+                (user) =>
+                  user.email.toLowerCase().includes(filter.toLowerCase()) &&
+                  !user.last_sign_in_at
+              )
+              .map((conversion, index) => (
+                <Tr key={index}>
+                  <Td style={rowValueStyle}>{conversion.email}</Td>
+                  <Td style={rowValueStyle}>
+                    {calculateSendStatus(conversion.invited_at)}
+                  </Td>
+                  <Td style={rowValueStyle}>
+                    {calculateExpirationStatus(conversion.invited_at)}
+                  </Td>
+                  <Td style={rowValueStyle}>
+                    <Tooltip
+                      fontSize="12px"
+                      label={`Everyone at ${userData?.company} (Member)`}
+                      placement="auto"
+                    >
+                      <Text>1 team</Text>
+                    </Tooltip>
+                  </Td>
+                  <Td style={rowValueStyle}>
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
+                        aria-label="Options"
+                        icon={<HiEllipsisHorizontal width="10px" />}
+                        variant="outline"
+                        h={"30px"}
+                        color="gray.500"
+                        border={"1px solid #5c5c5c"}
+                      />
+                      <MenuList borderRadius={0}>
+                        <MenuItem
+                          fontSize="sm"
+                          onClick={() => ResendInvitation(conversion.email)}
+                        >
+                          Resend Invitation...
+                        </MenuItem>
+                        <MenuItem
+                          fontSize="sm"
+                          color="red"
+                          onClick={() => cancelInvitation(conversion.id)}
+                        >
+                          Cancel Invitation...
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </Td>
+                </Tr>
+              ))}
         </Tbody>
 
       </Table>

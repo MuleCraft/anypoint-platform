@@ -1,11 +1,12 @@
 import { useState } from "react";
 import Nav from "../../components/NavbarHome";
 import Sidebar from "../../components/sidebar";
-import sections from "./utils/AM-sidebar";
+
 import { Box, Flex } from "@chakra-ui/react";
 import HorizontalSidebar from "../../components/HorizontalSidebar";
 import userTab from "./utils/AM-userTab";
 import UserInvite from "../../components/AM-Component/userInvite";
+import sections from "./utils/AM-sidebar";
 
 
 export default function AMUserList({ name, pathValue }) {

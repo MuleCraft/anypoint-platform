@@ -15,7 +15,9 @@ const AuthProvider = ({ children }) => {
         const { data, error } = await supabase
           .schema("mc_cap_develop")
           .from("users")
-          .select("full_name, display_name, company,email, id")
+          .select(
+            "full_name, display_name, company,email, id,organizationId,role"
+          )
           .eq("id", session.user.id)
           .single();
 
@@ -28,7 +30,6 @@ const AuthProvider = ({ children }) => {
         console.error("Error fetching user data:", error.message);
       }
     };
-
     fetchUserData();
 
     const handleAuthStateChange = (_event, session) => {
@@ -62,7 +63,9 @@ const AuthProvider = ({ children }) => {
     }
   };
   return (
-    <AuthContext.Provider value={{ session, setSession, refreshSession, userData }}>
+    <AuthContext.Provider
+      value={{ session, setSession, refreshSession, userData }}
+    >
       {children}
     </AuthContext.Provider>
   );
