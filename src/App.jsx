@@ -172,9 +172,8 @@ export default function App() {
 
           </Route>
 
-
           <Route
-            path="login /retrieve-username"
+            path="login/retrieve-username"
             element={<ForgotPasswordPage />}
           />
           <Route path="login/new-password" element={<ResetPassword />} />
