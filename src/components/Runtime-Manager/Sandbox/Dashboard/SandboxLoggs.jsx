@@ -12,20 +12,20 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 import "../../../../assets/Common.css";
 
-export const DashboardMain = ({ name }) => {
+export const SandboxLoggs = ({ name }) => {
     const { name: routerName } = useParams();
     const [view, setView] = useState('All');
     const RuntimeDashboardSection = [
         {
             items: [
                 { name: 'Dashboard', label: 'Dashboard', path: `/cloudhub/sandbox/home/applications/${routerName}?option=Sandbox` },
-                { name: 'Logs', label: 'Logs', path: `/cloudhub/sandbox/home/applications/${routerName}/logging?option=Sandbox` },
+                { name: 'Logs', label: 'Logs', path: `/cloudhub/sandbox/home/applications/${routerName}/settings?option=Sandbox` },
                 { name: 'Settings', label: 'Settings', path: `/cloudhub/sandbox/home/applications/${routerName}/settings?option=Sandbox` },
             ],
         },
     ];
 
-    const [activeItem, setActiveItem] = useState('Dashboard');
+    const [activeItem, setActiveItem] = useState('Logs');
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
@@ -49,16 +49,15 @@ export const DashboardMain = ({ name }) => {
                 onItemSelect={handleItemSelect} />
 
         </Box>
-            <Flex direction="column" w="full" ml="190" mt="65" maxW={1600} position="fixed" borderWidth={1}>
-                <Box >
+            <Flex direction="column" w="full" ml="200" mt="75" maxW={1580} position="fixed">
+                <Box>
                     <Box p={4}>
                         <Stack direction="row" justifyContent="space-between" align="center">
                             <Flex dir='row' alignItems="center" gap={3}>
-                                <FaCircle color='#18bc65' />  <Text fontSize="lg" textColor="navText">{routerName}</Text>
+                                <FaCircle color='#18bc65' />  <Text fontSize="lg" textColor="navText">{routerName}</Text>  <Text fontSize="lg" textColor="gray.300">|</Text> <Text fontSize="lg" textColor="gray">Live Console</Text>
                             </Flex>
                             <Flex dir='row' alignItems="center" gap={3}>
-
-                                <Flex>
+                                <Flex style={{ marginRight: isDrawerOpen ? '250px' : 0 }}>
                                     <Menu>
                                         <MenuButton
                                             as={IconButton}
@@ -116,15 +115,71 @@ export const DashboardMain = ({ name }) => {
                                         </MenuList>
                                     </Menu>
                                 </Flex>
+                                <Flex>
+                                    <AiOutlineMenuFold style={{ height: 20, width: 20, color: "gray" }} onClick={toggleDrawer} />
+                                </Flex>
                             </Flex>
                         </Stack>
+                        <Box py={3} style={{ marginRight: isDrawerOpen ? '280px' : 0 }}>
+                            <Box borderRadius={1} borderColor="alertBox" p="3" bg="alertBox">Logs are kept for 30 days or up to 100 MB</Box>
+                        </Box>
+                        <Flex style={{ marginRight: isDrawerOpen ? '280px' : 0 }}>
+                            <InputGroup size='md' flexDirection="column" py={3}>
+                                <Input bgColor="#f4f5f6" variant="custom" borderRightColor={"#cacbcc "} borderRightWidth={3} borderLeftColor={"#cacbcc "} borderLeftWidth={3} placeholder='Search Application' size=' base' height={10} borderRadius={0} />
+                                <InputRightElement width='7rem' pt={6} gap={2}>
+                                    <Flex align="center" gap={2} onClick={toggleAdvancesDrawer}>
+                                        <Text fontSize="base" color="gray">Advanced</Text>
+                                        <MdOutlineKeyboardArrowDown color="formLabelColor" />
+                                    </Flex>
+                                </InputRightElement>
+                                <InputLeftElement width='2.5rem' pt={6}>
+                                    <BsSearch />
+                                </InputLeftElement>
+                            </InputGroup>
+                        </Flex>
                     </Box>
 
                 </Box>
             </Flex>
 
+            {isDrawerOpen && (
+                <Box
+                    position="fixed"
+                    top="65px"
+                    right={0}
+                    bottom={0}
+                    width="300px"
+                    bg="Drawerbg"
+                    borderWidth={1}
+                    zIndex={9999}
 
+                >
+                    <Flex borderRadius="0px" bg="Drawerheadbg" p={8} gap={3} align="center">
+                        <Flex align="center" gap={120}>
+                            <Heading color="#3a3b3c" fontSize="lg " fontWeight="400">Deployments</Heading>
+                            <CloseIcon onClick={toggleDrawer} />
+                        </Flex>
+                    </Flex>
 
+                </Box >
+            )}
+            {isAdvancesOpen && (
+                <Box
+                    position="fixed"
+                    top="250px"
+                    left={215}
+                    right={0}
+                    bottom={0}
+                    height={250}
+                    bg="#fff"
+                    borderWidth={1}
+                    zIndex={9999}
+                    borderColor="gray.400"
+                    style={{ width: isDrawerOpen ? '1270px' : '1550px' }}
+                >
+
+                </Box >
+            )}
         </>
 
     )
