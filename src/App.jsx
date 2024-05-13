@@ -21,6 +21,9 @@ import ChooseEnv from "./pages/Runtime-Manager/ChooseEnvironment";
 import SandboxDashboard from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Dashboard-main";
 import SandboxSettingmain from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Settings";
 import DashboardLog from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/Loggs";
+import ServersSandbox from "./pages/Runtime-Manager/Sandbox-pages/Dashboard/ServersSandbox";
+import CreateGroupSandbox from "./pages/Runtime-Manager/Sandbox-pages/CreateGroup";
+import CreateClusterSandbox from "./pages/Runtime-Manager/Sandbox-pages/CreateCluster";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -164,6 +167,35 @@ export default function App() {
               path="/cloudhub/sandbox/home/applications/:name/logging"
               element={
                 <DashboardLog
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+
+            <Route
+              path="/cloudhub/sandbox/home/servers"
+              element={
+                <ServersSandbox
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+
+            <Route
+              path="/cloudhub/sandbox/home/servers/serverGroup/create"
+              element={
+                <CreateGroupSandbox
+                  name={RuntimeManager}
+                  pathValue={RuntimeManagerPath}
+                />
+              }
+            />
+            <Route
+              path="/cloudhub/sandbox/home/servers/cluster/create"
+              element={
+                <CreateClusterSandbox
                   name={RuntimeManager}
                   pathValue={RuntimeManagerPath}
                 />

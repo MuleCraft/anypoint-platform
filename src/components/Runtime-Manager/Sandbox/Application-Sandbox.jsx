@@ -466,12 +466,12 @@ export const RuntimeApplicationSandbox = () => {
                         </Stack>
                     </Stack>
                     <Stack ps={6} pt={10} direction="row" gap={5}>
-                        <Link to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
+                        <NavLink to="/cloudhub/sandbox/home/applications/CloudHub/settings?option=Sandbox">
                             <Button colorScheme="blue" size="md"><Text fontSize="xs">Manage application</Text></Button>
-                        </Link>
-                        <Link to="/cloudhub/sandbox/home/applications/addapplication?option=Sandbox">
+                        </NavLink>
+                        <NavLink to="/cloudhub/sandbox/home/applications/CloudHub/logging?option=Sandbox">
                             <Button variant="homePageButtons" colorScheme="blue" size="md"><Text fontSize="xs">Logs</Text></Button>
-                        </Link>
+                        </NavLink>
                     </Stack>
                     <Box ps={6} py={8}>
                         <Text color="boxColor" fontSize="base" ml={1} display="inline">

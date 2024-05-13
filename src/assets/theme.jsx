@@ -110,7 +110,8 @@ const theme = extendTheme({
     activeColor: "#6b8a99",
     Drawerbg: "#f4f5f6",
     Drawerheadbg: "#e8e9ea",
-    alertBox: "#d9edf7"
+    alertBox: "#d9edf7",
+    infoColor: "#f3c02f"
   },
   fontSizes: {
     lg: "20px",
