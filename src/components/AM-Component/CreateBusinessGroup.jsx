@@ -4,11 +4,11 @@ import {
     SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
 import fetchBusinessGroupNames from "../../Utils/BusinessGroupData";
 
-function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization }) {
+function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization, filteredTableData }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
@@ -28,11 +28,17 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const [businessGroupNames, setBusinessGroupNames] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
 
-    // useEffect(() => {
-    // if (currentUserName && (!dataLoaded)) {
-    //     fetchGroupNames();
-    // }
-    // },[currentUserName])
+    const [isCreateGroupButtonDisabled, setIsCreateGroupButtonDisabled] = useState();
+
+    useEffect(() => {
+        if(filteredTableData.length > 0){
+            setIsCreateGroupButtonDisabled(false);
+            console.log(isCreateGroupButtonDisabled);
+        }
+        else{
+            setIsCreateGroupButtonDisabled(true);
+        }
+    }, [filteredTableData]);
 
     const fetchGroupNames = async () => {
         const bgNamesData = await fetchBusinessGroupNames(currentUserName);
@@ -104,7 +110,10 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
 
     return (
         <>
-            <Button variant="formButtons" onClick={onOpen} minW={'fit-content'}>Create Business Group</Button>
+            <Button variant="formButtons" onClick={onOpen} minW={'fit-content'}
+                isDisabled={isCreateGroupButtonDisabled}>
+                Create Business Group
+            </Button>
             <Modal onClose={onClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />
                 <ModalContent minW={'350px'}>

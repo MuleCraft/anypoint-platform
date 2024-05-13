@@ -19,6 +19,7 @@ import fetchBgTableRows from "../../Utils/BgTableRows";
 // import fetchUserSessionData from "../../Utils/SessionUserData";
 // import supabase from "../../Utils/supabase";
 import { AuthContext } from "../../Utils/AuthProvider";
+import EmptyRows from "../../components/AM-Component/EmptyRows";
 
 export default function AMBusinessGroup({ name, pathValue }) {
 
@@ -26,6 +27,8 @@ export default function AMBusinessGroup({ name, pathValue }) {
 
   const [activeItem, setActiveItem] = useState("BusinessGroups");
   const [tableData, setTableData] = useState([]);
+  const [filterValue, setFilterValue] = useState("");
+
   const [currentUserName, setCurrentUserName] = useState('');
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [currentOrganization, setCurrentOrganization] = useState('');
@@ -39,6 +42,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
   const fetchRows = async () => {
     const tableRowData = await fetchBgTableRows(currentUserName);
     setTableData(tableRowData);
+    // console.log('rows:',tableRowData);
   }
 
   if (userData && (tableData.length === 0)) {
@@ -48,6 +52,11 @@ export default function AMBusinessGroup({ name, pathValue }) {
   const handleItemSelect = (itemName) => {
     setActiveItem(itemName);
   };
+
+  const filteredTableData = tableData.filter((data) =>
+    data.businessGroupName.toLowerCase().includes(filterValue.toLowerCase())
+  );
+
   return (
     <>
       <div className="home">
@@ -63,7 +72,12 @@ export default function AMBusinessGroup({ name, pathValue }) {
             </Box>
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
               <Stack mt={"-60px"} direction={"row"} spacing={6}>
-                <CreateBusinessGroup currentUserEmail={currentUserEmail} currentUserName={currentUserName} currentOrganization={currentOrganization} />
+                <CreateBusinessGroup 
+                  currentUserEmail={currentUserEmail} 
+                  currentUserName={currentUserName} 
+                  currentOrganization={currentOrganization} 
+                  filteredTableData={filteredTableData}
+                  />
                 <Text fontSize={14} color={"#747474"} fontWeight={500}>
                   Business groups are isolated scopes for managing access. Users
                   and teams may access resources in a business group through
@@ -83,10 +97,16 @@ export default function AMBusinessGroup({ name, pathValue }) {
                     children={<FiSearch />}
                     color="gray.500"
                   />
-                  <Input placeholder="Filter Business Group" fontSize={14} />
+                  <Input placeholder="Filter Business Group" fontSize={14}
+                    onChange={(e) => {setFilterValue(e.target.value);console.log('filter value:',filterValue);}}
+                    />
                 </InputGroup>
               </Stack>
-              <BusinessGroupTable tableData={tableData} />
+              {filteredTableData.length === 0 ? (
+                <EmptyRows message={'No data to show'}/>
+              ) : (
+                <BusinessGroupTable tableData={filteredTableData} />
+              )}
             </Flex>
           </Flex>
         </div>
