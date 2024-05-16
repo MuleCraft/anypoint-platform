@@ -98,7 +98,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
                     color="gray.500"
                   />
                   <Input placeholder="Filter Business Group" fontSize={14}
-                    onChange={(e) => {setFilterValue(e.target.value);console.log('filter value:',filterValue);}}
+                    onChange={(e) => {setFilterValue(e.target.value)}}
                     />
                 </InputGroup>
               </Stack>
