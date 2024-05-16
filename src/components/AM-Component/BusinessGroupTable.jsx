@@ -66,7 +66,7 @@ export default function ({ tableData }) {
               _hover={{ bgColor: "#ececec" }}
             >
               <Td style={rowValueStyle}>
-                <Link
+                <Link href={`/accounts/businessGroups/${dataValue.businessGroupId}`}
                   _hover={{ textDecoration: "underline" }}
                   color={hoveredRows[index] ? "#0176d3" : "#444444"}
                 >

@@ -8,7 +8,6 @@ import ResetPassword from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import { AuthProvider } from "./Utils/AuthProvider";
 import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
-import AMBusinessGroupDetails from "./pages/Access-Management/AM-businessGroupDetails";
 import AMUserList from "./pages/Access-Management/AM-userList";
 import AMPending from "./pages/Access-Management/AM-pending";
 import InviteUserPasswordPage from "./pages/InvitedUserPassword";
@@ -17,6 +16,7 @@ import AMUserBreadcrumb from "./pages/Access-Management/AM-UserNameBreadcrumb";
 import RunTimeManager from "./pages/Runtime-Manager/Application-main";
 import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/ApplicationSandbox";
 import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
+import AMSettingBreadcrumb from "./pages/Access-Management/AM-SettingBreadcrumb";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -76,9 +76,9 @@ export default function App() {
               }
             />
             <Route
-              path="accounts/businessGroups/:groupCode"
+              path="accounts/businessGroups/:id"
               element={
-                <AMBusinessGroupDetails
+                <AMSettingBreadcrumb
                   name={AccessManagement}
                   pathValue={AccessManagentPath}
                 />
