@@ -40,7 +40,9 @@ export default async function createNewBusinessGroup(groupCreateParams) {
 
   if (data) {
     console.log("New group created!", data);
+    return "New group created!";
   } else {
     console.log(error);
+    return "Error occurred!";
   }
 }
