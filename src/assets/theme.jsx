@@ -27,6 +27,25 @@ const theme = extendTheme({
         },
       },
     },
+    Checkbox: {
+      baseStyle: {
+        control: {
+          _checked: {
+            bg: 'blue.500',
+            borderColor: 'blue.500',
+            color: 'white',
+          },
+          _disabled: {
+            opacity: 1,
+            _checked: {
+              bg: 'blue.500',
+              borderColor: 'blue.500',
+              color: 'white',
+            },
+          },
+        },
+      },
+    },
     Button: {
       variants: {
         signinout: {

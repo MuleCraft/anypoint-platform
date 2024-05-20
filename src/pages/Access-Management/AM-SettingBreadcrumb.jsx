@@ -22,16 +22,16 @@ export default function AMSettingBreadcrumb({ name, pathValue }) {
                 <div className="Wrapper">
                     <Flex w={'100%'} h={'100%'} flex={1}>
                         {/* <Box> */}
-                            <Sidebar
-                                sections={sections}
-                                activeItem={activeItem}
-                                onItemSelect={handleItemSelect}
-                            />
+                        <Sidebar
+                            sections={sections}
+                            activeItem={activeItem}
+                            onItemSelect={handleItemSelect}
+                        />
                         {/* </Box> */}
                         {/* <Flex direction="column" mt="130" flex={1} w={'100%'}> */}
-                            {/* <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px"> */}
-                                < BGSettingsBreadcrumb />
-                            {/* </Box> */}
+                        {/* <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px"> */}
+                        < BGSettingsBreadcrumb />
+                        {/* </Box> */}
                         {/* </Flex> */}
                     </Flex>
                 </div>

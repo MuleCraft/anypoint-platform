@@ -37,9 +37,10 @@ import { AuthContext } from "../../Utils/AuthProvider";
 import { FiSearch } from "react-icons/fi";
 import supabase from "../../Utils/supabase";
 import axios from "axios";
+import EmptyRows from "./EmptyRows";
 
 const UserTable = () => {
-  const [userTable, setUserData] = useState(null);
+  const [userTable, setUserTable] = useState([]);
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -307,6 +308,12 @@ const UserTable = () => {
     });
   };
 
+  const filteredUsers = userTable.filter(
+    (user) =>
+      user.email.toLowerCase().includes(filter.toLowerCase()) &&
+      !user.last_sign_in_at
+  );
+
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between">
@@ -382,6 +389,8 @@ const UserTable = () => {
         </InputGroup>
       </Flex>
 
+
+
       <Table variant="simple" size="md">
         <Thead borderBottomWidth="3px">
           <Tr>
@@ -392,66 +401,69 @@ const UserTable = () => {
             <Th style={columnTitleStyle} w={"10px"}></Th>
           </Tr>
         </Thead>
-        <Tbody>
-          {Array.isArray(userTable) &&
-            userTable
-              .filter(
-                (user) =>
-                  user.email.toLowerCase().includes(filter.toLowerCase()) &&
-                  !user.last_sign_in_at
-              )
-              .map((conversion, index) => (
-                <Tr key={index}>
-                  <Td style={rowValueStyle}>{conversion.email}</Td>
-                  <Td style={rowValueStyle}>
-                    {calculateSendStatus(conversion.invited_at)}
-                  </Td>
-                  <Td style={rowValueStyle}>
-                    {calculateExpirationStatus(conversion.invited_at)}
-                  </Td>
-                  <Td style={rowValueStyle}>
-                    <Tooltip
-                      fontSize="12px"
-                      label={`Everyone at ${userData?.company} (Member)`}
-                      placement="auto"
-                    >
-                      <Text>1 team</Text>
-                    </Tooltip>
-                  </Td>
-                  <Td style={rowValueStyle}>
-                    <Menu>
-                      <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<HiEllipsisHorizontal width="10px" />}
-                        variant="outline"
-                        h={"30px"}
-                        color="gray.500"
-                        border={"1px solid #5c5c5c"}
-                      />
-                      <MenuList borderRadius={0}>
-                        <MenuItem
-                          fontSize="sm"
-                          onClick={() => ResendInvitation(conversion.email)}
-                        >
-                          Resend Invitation...
-                        </MenuItem>
-                        <MenuItem
-                          fontSize="sm"
-                          color="red"
-                          onClick={() => cancelInvitation(conversion.id)}
-                        >
-                          Cancel Invitation...
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
-                  </Td>
-                </Tr>
-              ))}
-        </Tbody>
+        {userTable.length > 0 && (
+          <Tbody>
+            {filteredUsers.map((conversion, index) => (
+              <Tr key={index} _hover={{ bgColor: "#ececec" }}>
+                <Td style={rowValueStyle}>{conversion.email}</Td>
+                <Td style={rowValueStyle}>
+                  {calculateSendStatus(conversion.invited_at)}
+                </Td>
+                <Td style={rowValueStyle}>
+                  {calculateExpirationStatus(conversion.invited_at)}
+                </Td>
+                <Td style={rowValueStyle}>
+                  <Tooltip
+                    fontSize="12px"
+                    label={`Everyone at ${userData?.company} (Member)`}
+                    placement="auto"
+                  >
+                    <Text>1 team</Text>
+                  </Tooltip>
+                </Td>
+                <Td style={rowValueStyle}>
+                  <Menu>
+                    <MenuButton
+                      as={IconButton}
+                      aria-label="Options"
+                      icon={<HiEllipsisHorizontal width="10px" />}
+                      variant="outline"
+                      h={"30px"}
+                      color="gray.500"
+                      border={"1px solid #5c5c5c"}
+                    />
+                    <MenuList borderRadius={0}>
+                      <MenuItem
+                        fontSize="sm"
+                        onClick={() => ResendInvitation(conversion.email)}
+                      >
+                        Resend Invitation...
+                      </MenuItem>
+                      <MenuItem
+                        fontSize="sm"
+                        color="red"
+                        onClick={() => cancelInvitation(conversion.id)}
+                      >
+                        Cancel Invitation...
+                      </MenuItem>
+                    </MenuList>
+                  </Menu>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        )}
       </Table>
+
+
+      {userTable.length === 0 && (
+        <Box marginTop={200}>
+          <EmptyRows message="No pending invites found" />
+        </Box>
+      )}
     </div>
   );
 };
+
 
 export default UserTable;
