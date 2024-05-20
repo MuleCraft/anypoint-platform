@@ -114,7 +114,7 @@ const BGSettingsBreadcrumb = () => {
     };
 
     return (
-        <Box mt="-60px">
+        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
             <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>

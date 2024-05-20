@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import BusinessGroupMenu from "./BusinessGroupMenu";
 
-export default function ({ tableData }) {
+export default function ({ tableData, onOpenCreateChildGroup }) {
 
   const [hoveredRows, setHoveredRows] = useState([]);
   const rows = tableData || [];
@@ -76,7 +76,7 @@ export default function ({ tableData }) {
               <Td style={rowValueStyle}>{dataValue.environments.length}</Td>
               <Td style={rowValueStyle}>{dataValue.totalVcores}</Td>
               <Td style={rowValueStyle}>
-                <BusinessGroupMenu />
+                <BusinessGroupMenu onOpenCreateChildGroup={onOpenCreateChildGroup}/>
               </Td>
             </Tr>
           ))}

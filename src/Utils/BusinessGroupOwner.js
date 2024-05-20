@@ -4,7 +4,7 @@ export default async function fetchBusinessGroupOwners(userName) {
   const { data, error } = await supabase
     .schema("mc_cap_develop")
     .from("businessgroup")
-    .select("groupOwner")
+    .select("groupOwner,userName,businessGroupId")
     .eq("organizationName", userName);
 
   if (error) {

@@ -7,7 +7,7 @@ import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 
-export default function BusinessGroupMenu() {
+export default function BusinessGroupMenu({ onOpenCreateChildGroup }) {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [isDeleteOpen, setDeleteOpen] = useState(false);
@@ -51,7 +51,7 @@ export default function BusinessGroupMenu() {
                     border={'1px solid #5c5c5c'}
                 />
                 <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
-                    <MenuItem fontSize={14} onClick={onOpen}>
+                    <MenuItem fontSize={14} onClick={onOpenCreateChildGroup}>
                         Create child group
                     </MenuItem>
                     <MenuItem fontSize={14} onClick={handleDeleteOpen} color={'red.600'}
@@ -60,7 +60,7 @@ export default function BusinessGroupMenu() {
                     </MenuItem>
                 </MenuList>
             </Menu>
-            <Modal onClose={onClose} isOpen={isOpen} isCentered>
+            {/* <Modal onClose={onClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />
                 <ModalContent minW={'350px'}>
                     <ModalHeader bg={'#f3f3f3'} fontSize={20} fontWeight={800} color={'#444444'}
@@ -171,7 +171,7 @@ export default function BusinessGroupMenu() {
                         <Button onClick={onClose} variant={'formButtons'} isDisabled _hover={{ bgColor: 'navy' }}>Create</Button>
                     </ModalFooter>
                 </ModalContent>
-            </Modal>
+            </Modal> */}
             <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
                 <ModalOverlay />
                 <ModalContent minW={'600px'} >
