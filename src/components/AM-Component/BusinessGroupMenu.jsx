@@ -7,19 +7,13 @@ import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 
-export default function BusinessGroupMenu({ onOpenCreateChildGroup }) {
+export default function BusinessGroupMenu({ onOpenCreateChildGroup, menuValue }) {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [isDeleteOpen, setDeleteOpen] = useState(false);
+
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
     const [designSliderValue, setDesignSliderValue] = useState(0);
 
-    const handleDeleteOpen = () => {
-        setDeleteOpen(true);
-    }
-    const handleDeleteClose = () => {
-        setDeleteOpen(false);
-    }
 
     const handleSandboxSliderChange = (value) => {
         setSandboxSliderValue(value);
@@ -39,6 +33,12 @@ export default function BusinessGroupMenu({ onOpenCreateChildGroup }) {
         setDesignSliderValue(inputValue);
     };
 
+
+    const values = menuValue.filter(item => item.parentGroupID === '');
+
+    console.log("values", values[0].businessGroupId)
+
+
     return (
         <>
             <Menu>
@@ -54,10 +54,12 @@ export default function BusinessGroupMenu({ onOpenCreateChildGroup }) {
                     <MenuItem fontSize={14} onClick={onOpenCreateChildGroup}>
                         Create child group
                     </MenuItem>
-                    <MenuItem fontSize={14} onClick={handleDeleteOpen} color={'red.600'}
-                        _hover={{ color: 'white', bgColor: 'red.600' }}>
-                        Delete business group...
-                    </MenuItem>
+                    {values.parentGroupID === "" &&
+                        <MenuItem fontSize={14} onClick={handleDeleteOpen} color={'red.600'}
+                            _hover={{ color: 'white', bgColor: 'red.600' }}>
+                            Delete business group...
+                        </MenuItem>
+                    }
                 </MenuList>
             </Menu>
             {/* <Modal onClose={onClose} isOpen={isOpen} isCentered>

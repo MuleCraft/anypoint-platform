@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Thead,
@@ -8,10 +8,59 @@ import {
   Td,
   TableContainer,
   Link,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  IconButton,
+  Modal,
+  ModalOverlay,
+  ModalHeader,
+  ModalBody,
+  VStack,
+  FormLabel,
+  Input,
+  ModalFooter,
+  Button,
+  ModalContent,
 } from "@chakra-ui/react";
-import BusinessGroupMenu from "./BusinessGroupMenu";
+import { HiEllipsisHorizontal } from "react-icons/hi2";
+import supabase from "../../Utils/supabase";
 
-export default function ({ tableData, onOpenCreateChildGroup }) {
+const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
+  const [ownerData, setOwnerData] = useState([]);
+
+  useEffect(() => {
+    const fetchBusinessGroups = async () => {
+      const { data, error } = await supabase
+        .schema("mc_cap_develop")
+        .from("businessgroup")
+        .select("*")
+        .eq("businessGroupName", userData.company)
+
+
+      if (error) {
+        console.error("Error fetching business groups:", error);
+      } else {
+        setOwnerData(data[0]);
+      }
+    };
+
+    if (userData) {
+      fetchBusinessGroups();
+    }
+  }, [userData.company]);
+
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [selectedBusinessGroupId, setSelectedBusinessGroupId] = useState(null);
+
+
+  const handleDeleteOpen = () => {
+    setDeleteOpen(true);
+  }
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+  }
 
   const [hoveredRows, setHoveredRows] = useState([]);
   const rows = tableData || [];
@@ -32,6 +81,7 @@ export default function ({ tableData, onOpenCreateChildGroup }) {
     });
   };
 
+
   const columnTitleStyle = {
     fontSize: 14,
     color: "#444444",
@@ -40,6 +90,11 @@ export default function ({ tableData, onOpenCreateChildGroup }) {
     padding: "10px",
   };
   const rowValueStyle = { fontSize: 14, padding: "10px" };
+
+  const handleMenuOpen = (businessGroupId) => {
+    setSelectedBusinessGroupId(businessGroupId);
+  }
+
 
   return (
     <TableContainer>
@@ -76,12 +131,56 @@ export default function ({ tableData, onOpenCreateChildGroup }) {
               <Td style={rowValueStyle}>{dataValue.environments.length}</Td>
               <Td style={rowValueStyle}>{dataValue.totalVcores}</Td>
               <Td style={rowValueStyle}>
-                <BusinessGroupMenu onOpenCreateChildGroup={onOpenCreateChildGroup}/>
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label='Options'
+                    icon={<HiEllipsisHorizontal />}
+                    variant='outline'
+                    h={'28px'} color="gray.500"
+                    border={'1px solid #5c5c5c'}
+                    onClick={() => handleMenuOpen(dataValue.id)}
+                  />
+                  <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
+                    <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId)}>
+                      Create child group
+                    </MenuItem>
+                    {ownerData.id !== selectedBusinessGroupId &&
+                      <MenuItem fontSize={14} onClick={handleDeleteOpen} color={'red.600'} isDisabled=""
+                        _hover={{ color: 'white', bgColor: 'red.600' }}>
+                        Delete business group...
+                      </MenuItem>
+                    }
+                  </MenuList>
+                </Menu>
               </Td>
             </Tr>
           ))}
         </Tbody>
       </Table>
+      <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
+        <ModalOverlay />
+        <ModalContent minW={'600px'} >
+          <ModalHeader bg={'#f3f3f3'} fontSize={20} fontWeight={800} color={'#444444'}
+            borderTopRadius={15} borderBottom={'1px solid #e5e5e5'}>
+            Are you sure?
+          </ModalHeader>
+          <ModalBody p={'32px 32px'}>
+            <VStack spacing={4}>
+              <VStack spacing={0} fontSize={14} align={'flex-start'}>
+                <FormLabel color={'#747474'} fontWeight={500} fontSize={14}><b>This action cannot be undone.</b> This will delete the <b>MuleCraft</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
+                <Input placeholder='Business Group name' mt={1} fontSize={14} fontWeight={500} />
+              </VStack>
+            </VStack>
+          </ModalBody>
+          <ModalFooter borderBottomRadius={15} justifyContent={'space-between'} borderTop={'1px solid #e5e5e5'}>
+            <Button onClick={handleDeleteClose} variant={'outline'} fontSize={14}>Cancel</Button>
+            <Button onClick={handleDeleteClose} variant={'formButtons'} isDisabled _hover={{ bgColor: 'navy' }}>Delete</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </TableContainer>
-  );
-};
+  )
+}
+
+export default BusinessGroupTable

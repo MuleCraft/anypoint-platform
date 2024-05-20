@@ -74,13 +74,13 @@ export default function AMBusinessGroup({ name, pathValue }) {
             </Box>
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
               <Stack mt={"-60px"} direction={"row"} spacing={6}>
-                <CreateBusinessGroup 
-                  currentUserEmail={currentUserEmail} 
-                  currentUserName={currentUserName} 
-                  currentOrganization={currentOrganization} 
+                <CreateBusinessGroup
+                  currentUserEmail={currentUserEmail}
+                  currentUserName={currentUserName}
+                  currentOrganization={currentOrganization}
                   filteredTableData={filteredTableData}
                   isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
-                  />
+                />
                 <Text fontSize={14} color={"#747474"} fontWeight={500}>
                   Business groups are isolated scopes for managing access. Users
                   and teams may access resources in a business group through
@@ -101,14 +101,14 @@ export default function AMBusinessGroup({ name, pathValue }) {
                     color="gray.500"
                   />
                   <Input placeholder="Filter Business Group" fontSize={14}
-                    onChange={(e) => {setFilterValue(e.target.value)}}
-                    />
+                    onChange={(e) => { setFilterValue(e.target.value) }}
+                  />
                 </InputGroup>
               </Stack>
               {filteredTableData.length === 0 ? (
-                <EmptyRows message={'No data to show'}/>
+                <EmptyRows message={'No data to show'} />
               ) : (
-                <BusinessGroupTable tableData={filteredTableData} onOpenCreateChildGroup={openModal}/>
+                <BusinessGroupTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} />
               )}
             </Flex>
           </Flex>
