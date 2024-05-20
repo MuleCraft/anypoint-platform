@@ -16,8 +16,6 @@ import CreateBusinessGroup from "../../components/AM-Component/CreateBusinessGro
 import BusinessGroupTable from "../../components/AM-Component/BusinessGroupTable";
 import { FiSearch } from "react-icons/fi";
 import fetchBgTableRows from "../../Utils/BgTableRows";
-// import fetchUserSessionData from "../../Utils/SessionUserData";
-// import supabase from "../../Utils/supabase";
 import { AuthContext } from "../../Utils/AuthProvider";
 import EmptyRows from "../../components/AM-Component/EmptyRows";
 
@@ -33,6 +31,11 @@ export default function AMBusinessGroup({ name, pathValue }) {
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [currentOrganization, setCurrentOrganization] = useState('');
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   if (userData && (currentUserName === '')) {
     setCurrentUserEmail(userData.email);
     setCurrentUserName(userData.display_name);
@@ -42,7 +45,6 @@ export default function AMBusinessGroup({ name, pathValue }) {
   const fetchRows = async () => {
     const tableRowData = await fetchBgTableRows(currentUserName);
     setTableData(tableRowData);
-    // console.log('rows:',tableRowData);
   }
 
   if (userData && (tableData.length === 0)) {
@@ -77,6 +79,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
                   currentUserName={currentUserName} 
                   currentOrganization={currentOrganization} 
                   filteredTableData={filteredTableData}
+                  isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
                   />
                 <Text fontSize={14} color={"#747474"} fontWeight={500}>
                   Business groups are isolated scopes for managing access. Users
@@ -105,7 +108,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
               {filteredTableData.length === 0 ? (
                 <EmptyRows message={'No data to show'}/>
               ) : (
-                <BusinessGroupTable tableData={filteredTableData} />
+                <BusinessGroupTable tableData={filteredTableData} onOpenCreateChildGroup={openModal}/>
               )}
             </Flex>
           </Flex>
