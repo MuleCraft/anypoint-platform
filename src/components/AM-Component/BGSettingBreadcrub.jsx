@@ -136,6 +136,21 @@ const BGSettingsBreadcrumb = () => {
                             Business Groups
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+                    {group?.parentGroupID === "" ? (
+                        ""
+                    ) : (
+                        <BreadcrumbItem>
+                            <BreadcrumbLink
+                                fontSize="lg"
+                                fontWeight="400"
+                                href={`/accounts/businessGroups/${id}`}
+                            >
+                                {group?.organizationName}
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                    )
+
+                    }
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"

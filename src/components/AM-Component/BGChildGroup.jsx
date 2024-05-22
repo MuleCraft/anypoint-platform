@@ -125,7 +125,7 @@ const BGChildGroup = () => {
                         <BreadcrumbItem>
                             <BreadcrumbLink
                                 fontSize="lg"
-                                fontWeight="600"
+                                fontWeight="400"
                                 href={`/accounts/businessGroups/${id}`}
                             >
                                 {group?.organizationName}
