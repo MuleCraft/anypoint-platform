@@ -100,11 +100,6 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
 
   };
 
-  const handleMenuOpen = (businessGroupId) => {
-    setSelectedBusinessGroupId(businessGroupId);
-  }
-
-
   return (
     <TableContainer>
       <Table variant="simple" size="md">
