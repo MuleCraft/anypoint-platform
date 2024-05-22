@@ -1,4 +1,4 @@
-import { Flex, VStack, Box, useColorModeValue, Link, HStack } from '@chakra-ui/react';
+import { Flex, VStack, Box, useColorModeValue, Link, HStack, LinkBox } from '@chakra-ui/react';
 import "../assets/Common.css";
 
 const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
@@ -14,6 +14,7 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
             position="fixed"
             top="65px"
             zIndex={998}
+            mt={4}
         >
             {sections.map((section, sectionIndex) => (
                 <Box key={sectionIndex} mr={2}>
@@ -33,7 +34,7 @@ const HorizontalSidebar = ({ sections, activeItem, onItemSelect }) => {
                                     _hover={{ color: "boxColor", textDecoration: "underline" }}
                                 >
                                     {isActive(item.name) ?
-                                        <Box p={"3px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined}>
+                                        <Box p={"3px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined} _hover={{ borderColor: 'boxColor', bg: "#fff", borderWidth: "2px", borderRadius: "4px" }}>
                                             {item.label}
                                         </Box>
                                         :

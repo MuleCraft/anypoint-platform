@@ -23,6 +23,8 @@ import {
   ModalFooter,
   Button,
   ModalContent,
+  useToast,
+  Tooltip,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import supabase from "../../Utils/supabase";
@@ -90,6 +92,13 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
     padding: "10px",
   };
   const rowValueStyle = { fontSize: 14, padding: "10px" };
+  const handleMenuOpen = (businessGroupId) => {
+
+    setSelectedBusinessGroupId(businessGroupId);
+
+
+
+  };
 
   const handleMenuOpen = (businessGroupId) => {
     setSelectedBusinessGroupId(businessGroupId);
@@ -139,18 +148,27 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
                     variant='outline'
                     h={'28px'} color="gray.500"
                     border={'1px solid #5c5c5c'}
-                    onClick={() => handleMenuOpen(dataValue.id)}
+                    onClick={() => handleMenuOpen(dataValue)}
                   />
+
+
                   <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
-                    <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId)}>
-                      Create child group
-                    </MenuItem>
-                    {ownerData.id !== selectedBusinessGroupId &&
-                      <MenuItem fontSize={14} onClick={handleDeleteOpen} color={'red.600'} isDisabled=""
-                        _hover={{ color: 'white', bgColor: 'red.600' }}>
-                        Delete business group...
+                    <Tooltip label='This business group is not entitled to create child groups' placement='auto' fontSize="4xl" isDisabled={selectedBusinessGroupId?.canCreateChildGroup !== false}>
+                      <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId)} isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}>
+                        Create child group
                       </MenuItem>
+                    </Tooltip>
+                    {ownerData.id !== selectedBusinessGroupId?.id &&
+                      <Tooltip label='Cannot delete a Business Group with children' placement='auto' fontSize="4xl" isDisabled={selectedBusinessGroupId?.childGroups === false}>
+
+
+                        <MenuItem fontSize={14} onClick={handleDeleteOpen} color={'red.600'} isDisabled={selectedBusinessGroupId?.childGroups !== false}
+                          _hover={{ color: selectedBusinessGroupId?.childGroups !== false ? '#000' : "white", bgColor: selectedBusinessGroupId?.childGroups !== false ? '' : 'red.600' }}>
+                          Delete business group...
+                        </MenuItem>
+                      </Tooltip>
                     }
+
                   </MenuList>
                 </Menu>
               </Td>

@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-// import adminAuthClient from "../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -454,7 +453,7 @@ const InviteForm = () => {
           </Thead>
           <Tbody>
             {filteredData.map((user, index) => (
-              <Tr key={index}>
+              <Tr key={index} _hover={{ bgColor: "#ececec" }}>
                 <Td
                   style={rowValueStyle}
                   hidden={!showNameColumn}

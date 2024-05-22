@@ -135,6 +135,7 @@ const theme = extendTheme({
     sm: "16px",
     base: "14px",
     "2xl": "12px",
+    "4xl": "10px"
   },
   fontWeights: {
     normal: 400,
