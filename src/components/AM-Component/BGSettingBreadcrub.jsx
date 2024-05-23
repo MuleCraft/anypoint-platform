@@ -20,7 +20,6 @@ import {
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import supabase from "../../Utils/supabase";
-import userId from "../../pages/Access-Management/utils/AM-UserID";
 import FlexableTabs from "../FlexableTabs";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { FiSearch } from "react-icons/fi";
@@ -113,15 +112,44 @@ const BGSettingsBreadcrumb = () => {
         setActiveItem(itemName);
     };
 
+    const userId = [
+        {
+            heading: 'Access Management',
+            items: [
+
+                { name: 'Settings', label: 'Settings', path: `/accounts/businessGroups/${id}` },
+                { name: 'Child Groups', label: 'Child Groups', path: `/accounts/businessGroups/${id}/children` },
+
+            ],
+        },
+
+    ];
+
+
     return (
         <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
             <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>
-                        <BreadcrumbLink fontSize="lg" href="/accounts/users/">
+                        <BreadcrumbLink fontSize="lg" href="/accounts/businessGroups">
                             Business Groups
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+                    {group?.parentGroupID === "" ? (
+                        ""
+                    ) : (
+                        <BreadcrumbItem>
+                            <BreadcrumbLink
+                                fontSize="lg"
+                                fontWeight="400"
+                                href={`/accounts/businessGroups/${id}`}
+                            >
+                                {group?.organizationName}
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                    )
+
+                    }
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
@@ -141,7 +169,7 @@ const BGSettingsBreadcrumb = () => {
                     onItemSelect={handleItemSelect}
                 />
             </Box>
-            <Stack spacing={1} mt={7} mb={7}>
+            <Stack spacing={1} mt={7} mb={7} ml={7}>
                 <HStack justify="space-between">
                     <Box w="full" h="40px">
                         <Text fontSize="xs">Business Group ID</Text>
@@ -173,7 +201,7 @@ const BGSettingsBreadcrumb = () => {
                 </HStack>
                 <Divider mt={5} />
             </Stack>
-            <Stack spacing={1} mt={7} mb={7}>
+            <Stack spacing={1} mt={7} mb={7} ml={7}>
                 <HStack justify="space-between" >
                     <Box w="full" h="40px">
                         <Text fontSize="xs">Name</Text>
@@ -274,7 +302,7 @@ const BGSettingsBreadcrumb = () => {
                 </HStack>
                 <Divider mt={5} />
             </Stack>
-            <Stack spacing={1} mt={7} mb={7}>
+            <Stack spacing={1} mt={7} mb={7} ml={7}>
                 <HStack justify="space-between" >
                     <Box w="full" h="40px">
                         <Text fontSize="xs">Confidentiality Notification</Text>
@@ -301,7 +329,7 @@ const BGSettingsBreadcrumb = () => {
                 </HStack>
                 <Divider mt={5} />
             </Stack>
-            <Stack spacing={1} mt={7} mb={7}>
+            <Stack spacing={1} mt={7} mb={7} ml={7}>
                 <HStack justify="space-between" >
                     <Box w="full" h="40px">
                         <Text fontSize="xs">Runtime Manager</Text>
@@ -339,6 +367,7 @@ const BGSettingsBreadcrumb = () => {
                 spacing={5}
                 px={4}
                 justifyContent="space-between"
+                ml={7}
             >
                 <Button
                     size="md"
@@ -363,7 +392,7 @@ const BGSettingsBreadcrumb = () => {
             </Stack>
 
             <Divider mt={5} />
-            <Stack spacing={1} mt={7} mb={7}>
+            <Stack spacing={1} mt={7} mb={7} ml={7}>
                 <HStack justify="space-between" alignItems="center">
                     <Box w="full" h="40px">
                         <Text fontSize="xs">Audit Log Retention Period</Text>

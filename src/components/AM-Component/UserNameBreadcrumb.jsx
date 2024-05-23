@@ -37,7 +37,6 @@ import {
 import moment from "moment";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { Navigate, useParams } from "react-router-dom";
-import userId from "../../pages/Access-Management/utils/AM-UserID";
 import FlexableTabs from "../FlexableTabs";
 import { PiPencilLight } from "react-icons/pi";
 import supabase from "../../Utils/supabase";
@@ -189,9 +188,8 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-            }`,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+              }`,
           },
         }
       );
@@ -286,9 +284,8 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${
-              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-            }`,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+              }`,
           },
         }
       );
@@ -418,9 +415,22 @@ const UserNameBreadcrumb = () => {
   };
   const rowValueStyle = { fontSize: 14 };
 
+
+  const userId = [
+    {
+      heading: 'Access Management',
+      items: [
+
+        { name: 'Settings', label: 'Settings', path: `/accounts/users/${id}` },
+
+      ],
+    },
+
+  ];
+
   return (
     <Box mt="-60px">
-      <Flex alignItems="center" justify="space-between">
+      <Flex alignItems="center" justify="space-between" ml={7}>
         <Breadcrumb>
           <BreadcrumbItem>
             <BreadcrumbLink fontSize="lg" href="/accounts/users/">
@@ -470,7 +480,7 @@ const UserNameBreadcrumb = () => {
           onItemSelect={handleItemSelect}
         />
       </Box>
-      <Stack spacing={3} mt={7} mb={7}>
+      <Stack spacing={3} mt={7} mb={7} ml={7}>
         <HStack justify="space-between">
           <Box w="full" h="40px">
             <Text fontSize="xs">Full name</Text>
@@ -502,7 +512,7 @@ const UserNameBreadcrumb = () => {
         </HStack>
         <Divider mt={5} />
       </Stack>
-      <Box mt="10">
+      <Box mt="10" ml={7}>
         <Box mt={5} mb={10}>
           <Heading fontSize="sm" mb={7}>
             Identity Provider Profiles
@@ -623,6 +633,7 @@ const UserNameBreadcrumb = () => {
           mt={20}
           px={4}
           justifyContent="space-between"
+
         >
           <Button
             size="md"

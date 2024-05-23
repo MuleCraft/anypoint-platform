@@ -1,4 +1,4 @@
-import { Flex, VStack, Box, useColorModeValue, Link, HStack, Divider } from '@chakra-ui/react';
+import { Flex, VStack, Box, useColorModeValue, Link, HStack, Divider, Text } from '@chakra-ui/react';
 import "../assets/Common.css";
 
 const FlexableTabs = ({ sections, activeItem, onItemSelect }) => {
@@ -20,12 +20,13 @@ const FlexableTabs = ({ sections, activeItem, onItemSelect }) => {
 
             {sections.map((section, sectionIndex) => (
                 <Box key={sectionIndex} mr={2} >
-                    <HStack spacing={2}>
+                    <HStack spacing={2} ml={5}>
                         {section.items.map((item) => (
                             <VStack
                                 key={item.name}
                                 spacing={0}
                                 align="center"
+
                             >
                                 <Link
                                     p={2}
@@ -34,13 +35,14 @@ const FlexableTabs = ({ sections, activeItem, onItemSelect }) => {
                                     href={item.path}
                                     color={isActive(item.name) ? "boxColor" : "black"}
                                     _hover={{ color: "boxColor", textDecoration: "underline" }}
+
                                 >
                                     {isActive(item.name) ?
-                                        <Box p={"3px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined}>
-                                            {item.label}
+                                        <Box p={"7px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined} width="auto">
+                                            <Text fontSize="xs" fontWeight="600">{item.label}</Text>
                                         </Box>
                                         :
-                                        <>{item.label}</>
+                                        <> <Text fontSize="xs">{item.label}</Text></>
                                     }
                                 </Link>
                                 <Box

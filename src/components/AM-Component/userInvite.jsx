@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-// import adminAuthClient from "../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -35,6 +34,7 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import { Link as RouterLink } from "react-router-dom";
 import axios from "axios";
+import EmptyRows from "./EmptyRows";
 
 const InviteForm = () => {
   const [userTable, setUserData] = useState(null);
@@ -237,7 +237,24 @@ const InviteForm = () => {
       });
     }
   };
-
+  const filteredData = userTable
+    ? userTable
+      .filter(
+        (user) =>
+          userData?.organizationId === user?.organizationId ||
+          (user.invited_at && userData?.company === user?.user_metadata?.company)
+      )
+      .filter((user) => {
+        if (!user.full_name) {
+          return false;
+        }
+        return (
+          typeof filter === "string" &&
+          (user.full_name.toLowerCase().includes(filter.toLowerCase()) ||
+            (user.email && user.email.toLowerCase().includes(filter.toLowerCase())))
+        );
+      })
+    : [];
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between" zIndex={0}>
@@ -408,119 +425,87 @@ const InviteForm = () => {
           </Menu>
         </Flex>
       </Flex>
-
-      <Table variant="simple" size="md">
-        <Thead borderBottomWidth="3px">
-          <Tr>
-            <Th style={columnTitleStyle} hidden={!showNameColumn}>
-              {" "}
-              Full name
-            </Th>
-
-            <Th style={columnTitleStyle} hidden={!showEmailColumn}>
-              Email
-            </Th>
-            <Th style={columnTitleStyle} hidden={!showVerifiedDateColumn}>
-              Email verified date
-            </Th>
-            <Th style={columnTitleStyle} hidden={!showIdentityProviderColumn}>
-              Identity provider
-            </Th>
-            <Th style={columnTitleStyle} hidden={!showCreatedDateColumn}>
-              Created date
-            </Th>
-            <Th style={columnTitleStyle} hidden={!showLastModifiedDateColumn}>
-              Last modified date
-            </Th>
-            <Th style={columnTitleStyle} hidden={!showLastLoginDateColumn}>
-              {" "}
-              Last login date
-            </Th>
-            <Th style={columnTitleStyle} hidden={!showStatusColumn}>
-              {" "}
-              Status
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {Array.isArray(userTable) &&
-            userTable
-              .filter(
-                (userTable) =>
-                  userData?.organizationId === userTable?.organizationId ||
-                  (userTable.invited_at &&
-                    userData?.company === userTable?.user_metadata?.company)
-              )
-              .filter((userTable) => {
-                if (!userTable.full_name) {
-                  return false;
-                }
-
-                return (
-                  typeof filter === "string" &&
-                  (userTable.full_name
-                    .toLowerCase()
-                    .includes(filter.toLowerCase()) ||
-                    (userTable.email &&
-                      userTable.email
-                        .toLowerCase()
-                        .includes(filter.toLowerCase())))
-                );
-              })
-
-              .map((conversion, index) => (
-                <Tr key={index}>
-                  <Td
-                    style={rowValueStyle}
-                    hidden={!showNameColumn}
-                    _hover={{ color: "boxColor" }}
+      {filteredData.length === 0 ? (
+        <EmptyRows message="No users found" />
+      ) : (
+        <Table variant="simple" size="md">
+          <Thead borderBottomWidth="3px">
+            <Tr>
+              {showNameColumn && <Th style={columnTitleStyle}>Name</Th>}
+              {showEmailColumn && <Th style={columnTitleStyle}>Email</Th>}
+              {showVerifiedDateColumn && (
+                <Th style={columnTitleStyle}>Verified Date</Th>
+              )}
+              {showIdentityProviderColumn && (
+                <Th style={columnTitleStyle}>Identity Provider</Th>
+              )}
+              {showCreatedDateColumn && (
+                <Th style={columnTitleStyle}>Created Date</Th>
+              )}
+              {showLastModifiedDateColumn && (
+                <Th style={columnTitleStyle}>Last Modified Date</Th>
+              )}
+              {showLastLoginDateColumn && (
+                <Th style={columnTitleStyle}>Last Login Date</Th>
+              )}
+              {showStatusColumn && <Th style={columnTitleStyle}>Status</Th>}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {filteredData.map((user, index) => (
+              <Tr key={index} _hover={{ bgColor: "#ececec" }}>
+                <Td
+                  style={rowValueStyle}
+                  hidden={!showNameColumn}
+                  _hover={{ color: "boxColor" }}
+                >
+                  <RouterLink
+                    to={`/accounts/users/${user.id}`}
+                    onClick={(event) =>
+                      handleReload(event, `/accounts/users/${user.id}`)
+                    }
                   >
-                    <RouterLink
-                      to={`/accounts/users/${conversion.id}`}
-                      onClick={(event) =>
-                        handleReload(event, `/accounts/users/${conversion.id}`)
-                      }
-                    >
-                      {conversion.full_name}
-                    </RouterLink>
-                  </Td>
-                  <Td style={rowValueStyle} hidden={!showEmailColumn}>
-                    {conversion.email}
-                  </Td>
-                  <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>
-                    {moment(conversion.confirmation_sent_at).format(
-                      "h:mm A MMM D, YYYY"
-                    )}
-                  </Td>
-                  <Td
-                    style={rowValueStyle}
-                    hidden={!showIdentityProviderColumn}
-                  >
-                    {conversion.identities}Anypoint
-                  </Td>
-                  <Td style={rowValueStyle} hidden={!showCreatedDateColumn}>
-                    {" "}
-                    {moment(conversion.created_at).format("h:mm A MMM D, YYYY")}
-                  </Td>
-                  <Td
-                    style={rowValueStyle}
-                    hidden={!showLastModifiedDateColumn}
-                  >
-                    {moment(conversion.updated_at).format("h:mm A MMM D, YYYY")}
-                  </Td>
-                  <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>
-                    {moment(conversion.last_sign_in_at).format(
-                      "h:mm A MMM D, YYYY"
-                    )}
-                  </Td>
-                  <Td style={rowValueStyle} hidden={!showStatusColumn}>
-                    Enabled
-                  </Td>
-                  <Td></Td>
-                </Tr>
-              ))}
-        </Tbody>
-      </Table>
+                    {user.full_name}
+                  </RouterLink>
+                </Td>
+                <Td style={rowValueStyle} hidden={!showEmailColumn}>
+                  {user.email}
+                </Td>
+                <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>
+                  {moment(user.confirmation_sent_at).format(
+                    "h:mm A MMM D, YYYY"
+                  )}
+                </Td>
+                <Td
+                  style={rowValueStyle}
+                  hidden={!showIdentityProviderColumn}
+                >
+                  {user.identities}Anypoint
+                </Td>
+                <Td style={rowValueStyle} hidden={!showCreatedDateColumn}>
+                  {" "}
+                  {moment(user.created_at).format("h:mm A MMM D, YYYY")}
+                </Td>
+                <Td
+                  style={rowValueStyle}
+                  hidden={!showLastModifiedDateColumn}
+                >
+                  {moment(user.updated_at).format("h:mm A MMM D, YYYY")}
+                </Td>
+                <Td style={rowValueStyle} hidden={!showLastLoginDateColumn}>
+                  {moment(user.last_sign_in_at).format(
+                    "h:mm A MMM D, YYYY"
+                  )}
+                </Td>
+                <Td style={rowValueStyle} hidden={!showStatusColumn}>
+                  Enabled
+                </Td>
+                <Td></Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      )}
     </div>
   );
 };

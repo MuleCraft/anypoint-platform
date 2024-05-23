@@ -34,13 +34,14 @@ export default function AMUserList({ name, pathValue }) {
                             />
                         </Box>
                         <Flex direction="column" w="full" ml="200" mt="200">
-                            <HorizontalSidebar
-                                sections={userTab}
-                                activeItem={selectedItem}
-                                onItemSelect={handleselectedItem}
-                            />
-
-                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-80px">
+                            <Box>
+                                <HorizontalSidebar
+                                    sections={userTab}
+                                    activeItem={selectedItem}
+                                    onItemSelect={handleselectedItem}
+                                />
+                            </Box>
+                            <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-70px">
                                 <UserInvite />
                             </Box>
                         </Flex>

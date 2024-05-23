@@ -29,7 +29,7 @@ export default function AMUserBreadcrumb({ name, pathValue }) {
                                 onItemSelect={handleItemSelect}
                             />
                         </Box>
-                        <Flex direction="column" w="full" ml="200" mt="200">
+                        <Flex direction="column" w="full" ml="180" mt="200">
 
 
                             <Box p="4" w="100%" alignItems="center" justifyContent="center" mt="-60px">

@@ -102,11 +102,11 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
   };
 
     useEffect(() => {
-        if(filteredTableData.length > 0){
+        if (filteredTableData.length > 0) {
             setIsCreateGroupButtonDisabled(false);
             console.log(filteredTableData);
         }
-        else{
+        else {
             setIsCreateGroupButtonDisabled(true);
         }
     }, [filteredTableData]);
@@ -161,26 +161,26 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
         try {
             const response = await createNewBusinessGroup(groupCreateParams);
             onClose();
-            
-                if(response === "Error occurred!"){
-                    toast({
-                        title: "Error",
-                        description: "Error occurred.",
-                        status: "error",
-                        duration: 5000,
-                        isClosable: true,
-                        position: "top-right",
-                    });
-                }
-                else{
-                    toast({
-                        description: "Business group successfully created.",
-                        status: "success",
-                        duration: 5000,
-                        isClosable: true,
-                        position: "top-right",
-                    });
-                }
+
+            if (response === "Error occurred!") {
+                toast({
+                    title: "Error",
+                    description: "Error occurred.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right",
+                });
+            }
+            else {
+                toast({
+                    description: "Business group successfully created.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right",
+                });
+            }
 
             setTimeout(() => {
                 window.location.reload();
