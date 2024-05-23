@@ -11,6 +11,7 @@ import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
 
 function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization, filteredTableData, isOpen, onOpen, onClose }) {
     const toast = useToast();
+    console.log('filtered table data:',filteredTableData);
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
     const [designSliderValue, setDesignSliderValue] = useState(0);
 
@@ -37,6 +38,8 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const [filteredGroups, setFilteredGroups] = useState([]);
     const [isOwnerMenuOpen, setIsOwnerMenuOpen] = useState(false);
     const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false);
+
+    const [selectedGroupParentId, setSelectedGroupParentId] = useState('');
 
   const handleOwnerChange = (e) => {
     const value = e.target.value;
@@ -65,10 +68,21 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
 
     const filtered = filteredTableData.filter((item) =>
         (typeof item.groupOwner === 'string' && item.groupOwner.toLowerCase().includes(value.toLowerCase())) ||
-        (typeof item.userName === 'string' && item.userName.toLowerCase().includes(value.toLowerCase()))
+        (typeof item.businessGroupId === 'string' && item.businessGroupId.toLowerCase().includes(value.toLowerCase()))
       );
+      console.log('filtered id:',filtered);
     setFilteredGroups(filtered);
     setIsGroupMenuOpen(true);
+  };
+
+  const filterBusinessGroupId = (data, groupName) => {
+
+    // console.log('Filtering for:', groupName); // Debugging log
+    // console.log('Data array:', data); // Debugging log
+    const result = data.filter(item => item.businessGroupName === groupName);
+    console.log('result:',result[0].businessGroupId);
+    setSelectedGroupParentId(result[0].businessGroupId);
+    // return result.length > 0 ? result[0].parentGroupID : '';
   };
 
   const handleGroupSelect = (group) => {
@@ -77,6 +91,8 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     setSelectedGroupValue(group.businessGroupName);
     setIsGroupMenuOpen(false);
     setIsGroupSelected(true);
+    filterBusinessGroupId(filteredTableData, selectedGroupValue);
+    // console.log("parent id",selectedGroupParentId);
   };
 
   const handleInputFocus = () => {
@@ -124,6 +140,9 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const handleEnvCheckboxChange = () => {
         setIsEnvCheckboxSelected(!isEnvCheckboxSelected);
     }
+
+    
+
     const groupCreateParams = {
         groupName: groupName,
         selectedGroupValue: selectedGroupValue,
@@ -134,7 +153,8 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
         designSliderValue: designSliderValue,
         currentUserName: currentUserName,
         currentUserEmail: currentUserEmail,
-        currentOrganization: currentOrganization
+        currentOrganization: currentOrganization,
+        parentGroupId: selectedGroupParentId
     };
 
     async function invokeGroupCreateFunction() {

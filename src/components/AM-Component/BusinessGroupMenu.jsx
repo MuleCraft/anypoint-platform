@@ -1,18 +1,18 @@
 import {
     Menu, MenuButton, MenuList, MenuItem, IconButton, Modal, ModalOverlay, ModalContent,
-    ModalHeader, ModalFooter, ModalBody, useDisclosure, Button, VStack, Text, Select, Checkbox,
-    Input, InputGroup, InputLeftElement, InputRightElement, HStack, Slider, SliderTrack, SliderFilledTrack, SliderThumb, FormControl, FormLabel
+    ModalHeader, ModalFooter, ModalBody, Button, VStack,
+    Input, FormLabel
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
-import { FiSearch } from "react-icons/fi";
+// import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 
 export default function BusinessGroupMenu({ onOpenCreateChildGroup }) {
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    // const { isOpen, onOpen, onClose } = useDisclosure();
     const [isDeleteOpen, setDeleteOpen] = useState(false);
-    const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
-    const [designSliderValue, setDesignSliderValue] = useState(0);
+    // const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
+    // const [designSliderValue, setDesignSliderValue] = useState(0);
 
     const handleDeleteOpen = () => {
         setDeleteOpen(true);
@@ -21,23 +21,23 @@ export default function BusinessGroupMenu({ onOpenCreateChildGroup }) {
         setDeleteOpen(false);
     }
 
-    const handleSandboxSliderChange = (value) => {
-        setSandboxSliderValue(value);
-    };
+    // const handleSandboxSliderChange = (value) => {
+    //     setSandboxSliderValue(value);
+    // };
 
-    const handleSandboxInputChange = (event) => {
-        const inputValue = parseFloat(event.target.value);
-        setSandboxSliderValue(inputValue);
-    };
+    // const handleSandboxInputChange = (event) => {
+    //     const inputValue = parseFloat(event.target.value);
+    //     setSandboxSliderValue(inputValue);
+    // };
 
-    const handleDesignSliderChange = (value) => {
-        setDesignSliderValue(value);
-    };
+    // const handleDesignSliderChange = (value) => {
+    //     setDesignSliderValue(value);
+    // };
 
-    const handleDesignInputChange = (event) => {
-        const inputValue = parseFloat(event.target.value);
-        setDesignSliderValue(inputValue);
-    };
+    // const handleDesignInputChange = (event) => {
+    //     const inputValue = parseFloat(event.target.value);
+    //     setDesignSliderValue(inputValue);
+    // };
 
     return (
         <>
