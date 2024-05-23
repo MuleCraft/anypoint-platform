@@ -11,8 +11,11 @@ export default async function createNewBusinessGroup(groupCreateParams) {
   // const [designTotalReassignedVcores, setDesignTotalReassignedVcores] = useState(0);
 
   const clientId = uuidv4().replace(/-/g, "");
-
   const clientSecret = uuidv4().replace(/-/g, "");
+
+  const envId = uuidv4();
+  const envClientId = uuidv4().replace(/-/g, "");
+  const envClientSecret = uuidv4().replace(/-/g, "");
 
   const { data, error } = await supabase
     .schema("mc_cap_develop")
@@ -27,7 +30,20 @@ export default async function createNewBusinessGroup(groupCreateParams) {
         userEmail: groupCreateParams.currentUserEmail,
         orgDomain: groupCreateParams.groupName,
         sessionTimeout: "60",
-        environments: [{envName:"Design",envType:"Design"}, {envName:"Sandbox",envType:"Sandbox"}],
+        environments: [
+          { envId:uuidv4(),
+            envName:"Design",
+            envType:"Design",
+            envClientId:uuidv4().replace(/-/g, ""),
+            envClientSecret:uuidv4().replace(/-/g, "")
+          },
+          { envId:uuidv4(),
+            envName:"Sandbox",
+            envType:"Sandbox",
+            envClientId:uuidv4().replace(/-/g, ""),
+            envClientSecret:uuidv4().replace(/-/g, "")
+          }
+        ],
         totalVcores:
           groupCreateParams.sandboxSliderValue +
           groupCreateParams.designSliderValue,
