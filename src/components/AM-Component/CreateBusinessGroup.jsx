@@ -104,7 +104,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     useEffect(() => {
         if (filteredTableData.length > 0) {
             setIsCreateGroupButtonDisabled(false);
-            console.log(filteredTableData);
+            // console.log(filteredTableData);
         }
         else {
             setIsCreateGroupButtonDisabled(true);
