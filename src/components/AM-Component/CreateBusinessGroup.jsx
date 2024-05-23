@@ -11,6 +11,7 @@ import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
 
 function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization, filteredTableData, isOpen, onOpen, onClose }) {
     const toast = useToast();
+    console.log('filtered table data:',filteredTableData);
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
     const [designSliderValue, setDesignSliderValue] = useState(0);
 
@@ -38,52 +39,67 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const [isOwnerMenuOpen, setIsOwnerMenuOpen] = useState(false);
     const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false);
 
-    const handleOwnerChange = (e) => {
-        const value = e.target.value;
-        setOwnerName(value);
-        setSearchInput(value);
+    const [selectedGroupParentId, setSelectedGroupParentId] = useState('');
 
-        const filtered = filteredTableData.filter((item) =>
-            (typeof item.groupOwner === 'string' && item.groupOwner.toLowerCase().includes(value.toLowerCase())) ||
-            (typeof item.userName === 'string' && item.userName.toLowerCase().includes(value.toLowerCase()))
-        );
-        setFilteredOwners(filtered);
-        setIsOwnerMenuOpen(true);
-    };
+  const handleOwnerChange = (e) => {
+    const value = e.target.value;
+    setOwnerName(value);
+    setSearchInput(value);
 
-    const handleOwnerSelect = (owner) => {
-        setOwnerName(`${owner.groupOwner} (username: ${owner.userName})`);
-        setIsOwnerMenuOpen(false);
-    };
+    const filtered = filteredTableData.filter((item) =>
+        (typeof item.groupOwner === 'string' && item.groupOwner.toLowerCase().includes(value.toLowerCase())) ||
+        (typeof item.userName === 'string' && item.userName.toLowerCase().includes(value.toLowerCase()))
+      );
+    setFilteredOwners(filtered);
+    setIsOwnerMenuOpen(true);
+  };
 
-    const handleGroupChange = (e) => {
-        const value = e.target.value;
-        setParentGroupName(value);
-        setSearchInput(value);
-        setSelectedGroupValue(value);
-        setIsGroupSelected(value !== "");
+  const handleOwnerSelect = (owner) => {
+    setOwnerName(`${owner.groupOwner} (username: ${owner.userName})`);
+    setIsOwnerMenuOpen(false);
+  };
 
-        const filtered = filteredTableData.filter((item) =>
-            (typeof item.groupOwner === 'string' && item.groupOwner.toLowerCase().includes(value.toLowerCase())) ||
-            (typeof item.userName === 'string' && item.userName.toLowerCase().includes(value.toLowerCase()))
-        );
-        setFilteredGroups(filtered);
-        setIsGroupMenuOpen(true);
-    };
+  const handleGroupChange = (e) => {
+    const value = e.target.value;
+    setParentGroupName(value);
+    setSearchInput(value);
+    setSelectedGroupValue(value);
+    setIsGroupSelected(value !== "");
 
-    const handleGroupSelect = (group) => {
-        setParentGroupName(group.businessGroupName);
-        setSearchInput(group.businessGroupName);
-        setSelectedGroupValue(group.businessGroupName);
-        setIsGroupMenuOpen(false);
-        setIsGroupSelected(true);
-    };
+    const filtered = filteredTableData.filter((item) =>
+        (typeof item.groupOwner === 'string' && item.groupOwner.toLowerCase().includes(value.toLowerCase())) ||
+        (typeof item.businessGroupId === 'string' && item.businessGroupId.toLowerCase().includes(value.toLowerCase()))
+      );
+      console.log('filtered id:',filtered);
+    setFilteredGroups(filtered);
+    setIsGroupMenuOpen(true);
+  };
 
-    const handleInputFocus = () => {
-        setIsGroupMenuOpen(true);
-        setIsOwnerMenuOpen(false);
-        setFilteredGroups(filteredTableData);
-    };
+  const filterBusinessGroupId = (data, groupName) => {
+
+    // console.log('Filtering for:', groupName); // Debugging log
+    // console.log('Data array:', data); // Debugging log
+    const result = data.filter(item => item.businessGroupName === groupName);
+    console.log('result:',result[0].businessGroupId);
+    setSelectedGroupParentId(result[0].businessGroupId);
+    // return result.length > 0 ? result[0].parentGroupID : '';
+  };
+
+  const handleGroupSelect = (group) => {
+    setParentGroupName(group.businessGroupName);
+    setSearchInput(group.businessGroupName);
+    setSelectedGroupValue(group.businessGroupName);
+    setIsGroupMenuOpen(false);
+    setIsGroupSelected(true);
+    filterBusinessGroupId(filteredTableData, selectedGroupValue);
+    // console.log("parent id",selectedGroupParentId);
+  };
+
+  const handleInputFocus = () => {
+    setIsGroupMenuOpen(true);
+    setIsOwnerMenuOpen(false);
+    setFilteredGroups(filteredTableData);
+  };
 
     useEffect(() => {
         if (filteredTableData.length > 0) {
@@ -124,6 +140,9 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const handleEnvCheckboxChange = () => {
         setIsEnvCheckboxSelected(!isEnvCheckboxSelected);
     }
+
+    
+
     const groupCreateParams = {
         groupName: groupName,
         selectedGroupValue: selectedGroupValue,
@@ -134,7 +153,8 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
         designSliderValue: designSliderValue,
         currentUserName: currentUserName,
         currentUserEmail: currentUserEmail,
-        currentOrganization: currentOrganization
+        currentOrganization: currentOrganization,
+        parentGroupId: selectedGroupParentId
     };
 
     async function invokeGroupCreateFunction() {
@@ -178,7 +198,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
         setSandboxSliderValue(0);
         setDesignSliderValue(0);
         onClose();
-    };
+      };
 
     return (
         <>
@@ -200,39 +220,39 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                     <FormLabel fontWeight={500} fontSize={14} color={'#444444'}>Name</FormLabel>
                                     <Text color={'#747474'} fontWeight={500}>You can use alphanumeric characters, hyphens, and spaces.</Text>
                                     <Input placeholder='Business Group name' mt={1} fontSize={14} fontWeight={500}
-                                        value={groupName}
-                                        onChange={handleNameChange}
-                                        onFocus={() => { setIsGroupMenuOpen(false); setIsOwnerMenuOpen(false); }} />
+                                            value={groupName}
+                                            onChange={handleNameChange}
+                                            onFocus={()=> {setIsGroupMenuOpen(false);setIsOwnerMenuOpen(false);}} />
                                 </VStack>
                                 <VStack spacing={0} fontSize={14} align={'flex-start'}>
                                     <FormLabel fontWeight={500} fontSize={14} color={'#444444'}>Parent business group</FormLabel>
                                     <Text color={'#747474'} fontWeight={500}>Select a group you’re an administrator of to be the parent of this group.</Text>
                                     <InputGroup mt={1} zIndex={3}>
                                         <InputRightElement
-                                            pointerEvents="none"
-                                            children={<SlArrowDown />}
-                                            color="gray.500"
+                                        pointerEvents="none"
+                                        children={<SlArrowDown />}
+                                        color="gray.500"
                                         />
                                         <Input
-                                            placeholder="Select..."
-                                            fontSize={14} color={'#747474'}
-                                            value={parentGroupName}
-                                            onChange={handleGroupChange}
-                                            onFocus={handleInputFocus}
+                                        placeholder="Select..."
+                                        fontSize={14} color={'#747474'}
+                                        value={parentGroupName}
+                                        onChange={handleGroupChange}
+                                        onFocus={handleInputFocus}
                                         />
                                         {isGroupMenuOpen && (
-                                            <Box>
-                                                <Menu isOpen={isGroupMenuOpen}>
-                                                    <MenuButton as="div" width="100%" height="0" visibility="hidden" />
-                                                    <MenuList position="absolute" width='384px' right={0} top={'35px'}>
-                                                        {filteredGroups.map((group, index) => (
-                                                            <MenuItem key={index} onClick={() => handleGroupSelect(group)}>
-                                                                {group.businessGroupName}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </MenuList>
-                                                </Menu>
-                                            </Box>
+                                        <Box>
+                                            <Menu isOpen={isGroupMenuOpen}>
+                                            <MenuButton as="div" width="100%" height="0" visibility="hidden" />
+                                            <MenuList position="absolute" width='384px'right={0} top={'35px'}>
+                                                {filteredGroups.map((group, index) => (
+                                                <MenuItem key={index} onClick={() => handleGroupSelect(group)}>
+                                                    {group.businessGroupName}
+                                                </MenuItem>
+                                                ))}
+                                            </MenuList>
+                                            </Menu>
+                                        </Box>
                                         )}
                                     </InputGroup>
                                 </VStack>
@@ -242,38 +262,38 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                             <FormLabel fontWeight={500} fontSize={14} color={'#444444'}>Owner</FormLabel>
                                             <InputGroup zIndex={2}>
                                                 <InputLeftElement
-                                                    pointerEvents="none"
-                                                    children={<FiSearch />}
-                                                    color="gray.500"
+                                                pointerEvents="none"
+                                                children={<FiSearch />}
+                                                color="gray.500"
                                                 />
                                                 <Input
-                                                    placeholder="Add owner by name, username, or email."
-                                                    fontSize={14}
-                                                    value={ownerName}
-                                                    onChange={handleOwnerChange}
-                                                    onFocus={() => { setIsGroupMenuOpen(false); }}
+                                                placeholder="Add owner by name, username, or email."
+                                                fontSize={14}
+                                                value={ownerName}
+                                                onChange={handleOwnerChange}
+                                                onFocus={()=>{setIsGroupMenuOpen(false);}}
                                                 />
                                                 {isOwnerMenuOpen && (
-                                                    <Box>
-                                                        <Menu isOpen={isOwnerMenuOpen} onClose={isOwnerMenuOpen}>
-                                                            <MenuButton as="div" height="0" visibility="hidden" />
-                                                            <MenuList position="absolute" width='384px' right={0} top={'35px'}>
-                                                                {filteredOwners.map((owner, index) => (
-                                                                    <MenuItem key={index} onClick={() => handleOwnerSelect(owner)}>
-                                                                        {owner.groupOwner} (username: {owner.userName})
-                                                                    </MenuItem>
-                                                                ))}
-                                                            </MenuList>
-                                                        </Menu>
-                                                    </Box>
+                                                <Box>
+                                                    <Menu isOpen={isOwnerMenuOpen} onClose={isOwnerMenuOpen}>
+                                                    <MenuButton as="div" height="0" visibility="hidden" />
+                                                    <MenuList position="absolute" width='384px'right={0} top={'35px'}>
+                                                        {filteredOwners.map((owner, index) => (
+                                                            <MenuItem key={index} onClick={() => handleOwnerSelect(owner)}>
+                                                                {owner.groupOwner} (username: {owner.userName})
+                                                            </MenuItem>
+                                                        ))}
+                                                    </MenuList>
+                                                    </Menu>
+                                                </Box>
                                                 )}
                                             </InputGroup>
-                                            <Checkbox size='lg' mt={1} value={isGroupCheckboxSelected}
+                                            <Checkbox size='lg' mt={1} value={isGroupCheckboxSelected} 
                                                 onChange={handleGroupCheckboxChange}
-                                                onFocus={() => { setIsGroupMenuOpen(false); }}>Can create business groups</Checkbox>
+                                                onFocus={()=>{setIsGroupMenuOpen(false);}}>Can create business groups</Checkbox>
                                             <Checkbox size='lg' mt={1} value={isEnvCheckboxSelected}
                                                 onChange={handleEnvCheckboxChange}
-                                                onFocus={() => { setIsGroupMenuOpen(false); }}>Can create environments</Checkbox>
+                                                onFocus={()=>{setIsGroupMenuOpen(false);}}>Can create environments</Checkbox>
                                         </VStack>
                                         <VStack align={'flex-start'} minW={'-webkit-fill-available'}>
                                             <FormLabel fontWeight={500} color={'#444444'} fontSize={14}>Sandbox vCores</FormLabel>
@@ -291,7 +311,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                                         max={sandboxVcoresMax}
                                                         step={0.1}
                                                         onChange={handleSandboxInputChange}
-                                                        onFocus={() => { setIsGroupMenuOpen(false); }}
+                                                        onFocus={()=>{setIsGroupMenuOpen(false);}}
                                                         fontSize={14}
                                                     />
                                                 </InputGroup>
@@ -302,7 +322,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                                     max={sandboxVcoresMax}
                                                     step={0.1}
                                                     onChange={handleSandboxSliderChange}
-                                                    onFocus={() => { setIsGroupMenuOpen(false); }}
+                                                    onFocus={()=>{setIsGroupMenuOpen(false);}}
                                                 >
                                                     <SliderTrack>
                                                         <SliderFilledTrack />
@@ -325,7 +345,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                                         max={designVcoresMax}
                                                         step={0.1}
                                                         onChange={handleDesignInputChange}
-                                                        onFocus={() => { setIsGroupMenuOpen(false); }}
+                                                        onFocus={()=>{setIsGroupMenuOpen(false);}}
                                                         fontSize={14}
                                                     />
                                                 </InputGroup>
@@ -336,7 +356,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                                     max={designVcoresMax}
                                                     step={0.1}
                                                     onChange={handleDesignSliderChange}
-                                                    onFocus={() => { setIsGroupMenuOpen(false); }}
+                                                    onFocus={()=>{setIsGroupMenuOpen(false);}}
                                                 >
                                                     <SliderTrack>
                                                         <SliderFilledTrack />

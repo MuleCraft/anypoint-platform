@@ -127,9 +127,8 @@ const BGSettingsBreadcrumb = () => {
 
 
     return (
-
-        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={190} mt={'90px'}>
-            <Flex alignItems="center" justify="space-between" ml={7}>
+        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
+            <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>
                         <BreadcrumbLink fontSize="lg" href="/accounts/businessGroups">
