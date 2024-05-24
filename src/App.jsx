@@ -18,6 +18,7 @@ import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Applicatio
 import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
 import AMSettingBreadcrumb from "./pages/Access-Management/AM-SettingBreadcrumb";
 import AMChildGroup from "./pages/Access-Management/AM-childGroup";
+import AMEnvironment from "./pages/Access-Management/AM-environment";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -89,6 +90,15 @@ export default function App() {
               path="accounts/businessGroups/:id/children"
               element={
                 <AMChildGroup
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="accounts/businessGroups/:id/environments"
+              element={
+                <AMEnvironment
                   name={AccessManagement}
                   pathValue={AccessManagentPath}
                 />

@@ -4,21 +4,17 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
-    Checkbox,
-    Divider,
     Flex,
-    HStack,
     Input,
-    Stack,
     Text,
-    Textarea,
-    Button,
     InputGroup,
-    InputRightElement,
-    VStack,
-    useToast,
     InputLeftElement,
     Link,
+    Menu,
+    MenuButton,
+    IconButton,
+    MenuList,
+    MenuItem,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import supabase from "../../Utils/supabase";
@@ -29,11 +25,11 @@ import fetchBgTableRows from "../../Utils/BgTableRows";
 import { AuthContext } from "../../Utils/AuthProvider";
 import EmptyRows from "./EmptyRows";
 import CreateBusinessGroup from "./CreateBusinessGroup";
+import { HiEllipsisHorizontal } from "react-icons/hi2";
 
 const BGChildGroup = () => {
     const { id } = useParams();
     const [group, setGroup] = useState(null);
-    const toast = useToast();
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -68,6 +64,7 @@ const BGChildGroup = () => {
 
                 { name: 'Settings', label: 'Settings', path: `/accounts/businessGroups/${id}` },
                 { name: 'Child Groups', label: 'Child Groups', path: `/accounts/businessGroups/${id}/children` },
+                { name: 'Environments', label: 'Environments', path: `/accounts/businessGroups/${id}/environments` },
 
             ],
         },
@@ -82,7 +79,6 @@ const BGChildGroup = () => {
     const [currentUserName, setCurrentUserName] = useState('');
     const [currentUserEmail, setCurrentUserEmail] = useState('');
     const [currentOrganization, setCurrentOrganization] = useState('');
-
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => setIsModalOpen(true);
@@ -104,11 +100,21 @@ const BGChildGroup = () => {
     }
 
     const filteredTableData = tableData.filter((data) =>
-        (data.businessGroupId === id || data.parentGroupID === id) &&
-        data.organizationName === group.organizationName || group.parentGroupID === ""
+
+        (data.parentGroupID === id &&
+            group.parentGroupID === "") || (data.businessGroupId !== id && data.businessGroupId !== group.parentGroupID) && data.childGroups === false
+
+    );
+
+    const filtered = tableData.filter((data) =>
+
+        (data.businessGroupId === id)
+
+
     );
 
     console.log(filteredTableData)
+
     return (
 
         <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={190} mt={'90px'}>
@@ -144,7 +150,27 @@ const BGChildGroup = () => {
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-
+                {filtered?.childGroups !== false ? (
+                    ""
+                ) : (
+                    <Menu>
+                        <MenuButton
+                            as={IconButton}
+                            aria-label="Options"
+                            icon={<HiEllipsisHorizontal width="10px" />}
+                            variant="outline"
+                            h={"30px"}
+                            color="gray.500"
+                            border={"1px solid #5c5c5c"}
+                            right={30}
+                        />
+                        <MenuList borderRadius={0}>
+                            <MenuItem fontSize="sm" color="red" onClick="">
+                                Delete business group...
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
+                )}
             </Flex>
             <Box pt={7}>
                 <FlexableTabs
@@ -153,13 +179,13 @@ const BGChildGroup = () => {
                     onItemSelect={handleItemSelect}
                 />
             </Box>
-            <Flex alignItems="center" justifyContent="space-between" zIndex={0} width="1550px" mt={7} ml={7} >
+            <Flex alignItems="center" justifyContent="space-between" zIndex={0} width="1550px" mt={10} ml={7} >
                 <Flex alignItems="center" gap={5}>
                     <CreateBusinessGroup
                         currentUserEmail={currentUserEmail}
                         currentUserName={currentUserName}
                         currentOrganization={currentOrganization}
-                        filteredTableData={filteredTableData}
+                        filteredTableData={filtered}
                         isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
                     />
                     <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
