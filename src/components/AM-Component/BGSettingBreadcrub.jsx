@@ -17,12 +17,18 @@ import {
     InputRightElement,
     VStack,
     useToast,
+    Menu,
+    MenuButton,
+    IconButton,
+    MenuList,
+    MenuItem,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import supabase from "../../Utils/supabase";
 import FlexableTabs from "../FlexableTabs";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { FiSearch } from "react-icons/fi";
+import { HiEllipsisHorizontal } from "react-icons/hi2";
 
 const BGSettingsBreadcrumb = () => {
     const { id } = useParams();
@@ -30,7 +36,6 @@ const BGSettingsBreadcrumb = () => {
     const [editedGroup, setEditedGroup] = useState(null);
     const [changesMade, setChangesMade] = useState(false);
     const toast = useToast();
-    console.log(editedGroup)
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -119,6 +124,7 @@ const BGSettingsBreadcrumb = () => {
 
                 { name: 'Settings', label: 'Settings', path: `/accounts/businessGroups/${id}` },
                 { name: 'Child Groups', label: 'Child Groups', path: `/accounts/businessGroups/${id}/children` },
+                { name: 'Environments', label: 'Environments', path: `/accounts/businessGroups/${id}/environments` },
 
             ],
         },
@@ -160,7 +166,27 @@ const BGSettingsBreadcrumb = () => {
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-
+                {group?.childGroups !== false ? (
+                    ""
+                ) : (
+                    <Menu>
+                        <MenuButton
+                            as={IconButton}
+                            aria-label="Options"
+                            icon={<HiEllipsisHorizontal width="10px" />}
+                            variant="outline"
+                            h={"30px"}
+                            color="gray.500"
+                            border={"1px solid #5c5c5c"}
+                            right={30}
+                        />
+                        <MenuList borderRadius={0}>
+                            <MenuItem fontSize="sm" color="red" onClick="">
+                                Delete business group...
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
+                )}
             </Flex>
             <Box pt={7}>
                 <FlexableTabs

@@ -80,6 +80,25 @@ const theme = extendTheme({
             bg: "#014486",
           },
         },
+        DeleteButtons: {
+          borderColor: "#d30f01",
+          border: "1px solid ",
+          color: "#d30f01",
+          fontSize: "14px",
+          fontWeight: "600",
+          _disabled: {
+            bg: "#d30f01",
+            opacity: "0.4",
+            _hover: {
+              bg: "#d30f01",
+              opacity: "0.4",
+            },
+          },
+          _hover: {
+            bg: "#d30f01",
+            color: "#fff"
+          },
+        },
         homePageButtons: {
           border: "1px solid ",
           borderColor: "#c9c9c9",
