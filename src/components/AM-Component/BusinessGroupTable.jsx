@@ -28,9 +28,11 @@ import {
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import supabase from "../../Utils/supabase";
+import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
 
 const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
   const [ownerData, setOwnerData] = useState([]);
+  const toast = useToast();
 
   useEffect(() => {
     const fetchBusinessGroups = async () => {
@@ -54,15 +56,41 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
   }, [userData.company]);
 
   const [isDeleteOpen, setDeleteOpen] = useState(false);
-  const [selectedBusinessGroupId, setSelectedBusinessGroupId] = useState(null);
+  const [deleteInputValue, setDeleteInputValue] = useState("");
+  const [isDeleteButtonDisabled, setDeleteButtonDisabled] = useState(true);
 
+  const [selectedBusinessGroupId, setSelectedBusinessGroupId] = useState(null);
+  const [targetGroupName, setTargetGroupName] = useState("");
+
+
+  useEffect(() => {
+    if (selectedBusinessGroupId) {
+      setTargetGroupName(selectedBusinessGroupId.businessGroupName);
+    }
+  }, [selectedBusinessGroupId]);
 
   const handleDeleteOpen = () => {
     setDeleteOpen(true);
+    setTargetGroupName(selectedBusinessGroupId.businessGroupName);
   }
   const handleDeleteClose = () => {
     setDeleteOpen(false);
+    setDeleteInputValue("");
+    setDeleteButtonDisabled(true);
+    setTargetGroupName(selectedBusinessGroupId.businessGroupName);
   }
+
+  const handleDeleteInputChange = (e) => {
+    const value = e.target.value;
+    setDeleteInputValue(value);
+    const matchingGroup = tableData.find(
+      (group) =>
+        group.businessGroupName.toLowerCase() === value.toLowerCase() &&
+        group.organizationName.toLowerCase() === ownerData.organizationName.toLowerCase()
+    );
+    console.log('matching group:',matchingGroup.businessGroupId);
+    setDeleteButtonDisabled(!matchingGroup);
+  };
 
   const [hoveredRows, setHoveredRows] = useState([]);
   const rows = tableData || [];
@@ -92,13 +120,45 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
     padding: "10px",
   };
   const rowValueStyle = { fontSize: 14, padding: "10px" };
+
   const handleMenuOpen = (businessGroupId) => {
-
     setSelectedBusinessGroupId(businessGroupId);
-
-
-
   };
+  
+
+  async function invokeGroupDeleteFunction(selectedBusinessGroupId) {
+    try {
+        // console.log("group id to be deleted:",selectedBusinessGroupId.businessGroupId);
+        const response = await deleteBusinessGroup(selectedBusinessGroupId);
+        handleDeleteClose();
+
+        if (response === "Error occurred!") {
+            toast({
+                title: "Error",
+                description: "Error occurred.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right",
+            });
+        }
+        else {
+            toast({
+                description: "Business group successfully deleted.",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right",
+            });
+        }
+
+        setTimeout(() => {
+            window.location.reload();
+        }, 800);
+    } catch (error) {
+        console.error("Error occurred:", error);
+    }
+}
 
   return (
     <TableContainer>
@@ -145,8 +205,6 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
                     border={'1px solid #5c5c5c'}
                     onClick={() => handleMenuOpen(dataValue)}
                   />
-
-
                   <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
                     <Tooltip label='This business group is not entitled to create child groups' placement='auto' fontSize="4xl" isDisabled={selectedBusinessGroupId?.canCreateChildGroup !== false}>
                       <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId)} isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}>
@@ -155,8 +213,6 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
                     </Tooltip>
                     {ownerData.id !== selectedBusinessGroupId?.id &&
                       <Tooltip label='Cannot delete a Business Group with children' placement='auto' fontSize="4xl" isDisabled={selectedBusinessGroupId?.childGroups === false}>
-
-
                         <MenuItem fontSize={14} onClick={handleDeleteOpen} color={'red.600'} isDisabled={selectedBusinessGroupId?.childGroups !== false}
                           _hover={{ color: selectedBusinessGroupId?.childGroups !== false ? '#000' : "white", bgColor: selectedBusinessGroupId?.childGroups !== false ? '' : 'red.600' }}>
                           Delete business group...
@@ -181,14 +237,20 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
           <ModalBody p={'32px 32px'}>
             <VStack spacing={4}>
               <VStack spacing={0} fontSize={14} align={'flex-start'}>
-                <FormLabel color={'#747474'} fontWeight={500} fontSize={14}><b>This action cannot be undone.</b> This will delete the <b>MuleCraft</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
-                <Input placeholder='Business Group name' mt={1} fontSize={14} fontWeight={500} />
+                <FormLabel color={'#747474'} fontWeight={500} fontSize={14}>
+                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
+                <Input placeholder='Business Group name' mt={1} fontSize={14} fontWeight={500}
+                  value={deleteInputValue}
+                  onChange={handleDeleteInputChange}
+                  />
               </VStack>
             </VStack>
           </ModalBody>
           <ModalFooter borderBottomRadius={15} justifyContent={'space-between'} borderTop={'1px solid #e5e5e5'}>
             <Button onClick={handleDeleteClose} variant={'outline'} fontSize={14}>Cancel</Button>
-            <Button onClick={handleDeleteClose} variant={'formButtons'} isDisabled _hover={{ bgColor: 'navy' }}>Delete</Button>
+            <Button onClick={() => invokeGroupDeleteFunction(selectedBusinessGroupId)}
+              variant={"formButtons"}
+              isDisabled={isDeleteButtonDisabled} _hover={{ bgColor: 'navy' }}>Delete</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
