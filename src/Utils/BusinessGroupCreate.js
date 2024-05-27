@@ -13,9 +13,9 @@ export default async function createNewBusinessGroup(groupCreateParams) {
   const clientId = uuidv4().replace(/-/g, "");
   const clientSecret = uuidv4().replace(/-/g, "");
 
-  const envId = uuidv4();
-  const envClientId = uuidv4().replace(/-/g, "");
-  const envClientSecret = uuidv4().replace(/-/g, "");
+  // const envId = uuidv4();
+  // const envClientId = uuidv4().replace(/-/g, "");
+  // const envClientSecret = uuidv4().replace(/-/g, "");
 
   const { data, error } = await supabase
     .schema("mc_cap_develop")
@@ -51,6 +51,7 @@ export default async function createNewBusinessGroup(groupCreateParams) {
         designVcores: groupCreateParams.designSliderValue,
         productionVcores: 0,
         parentGroupName: groupCreateParams.selectedGroupValue,
+        parentGroupID:groupCreateParams.parentGroupId||'',
         canCreateChildGroup: groupCreateParams.isGroupCheckboxSelected,
         canCreateEnvironments: groupCreateParams.isEnvCheckboxSelected,
         organizationName: groupCreateParams.currentOrganization,
@@ -74,7 +75,7 @@ export default async function createNewBusinessGroup(groupCreateParams) {
         console.log('vcoreData',vcoreData);
 
         if(vcoreError){
-          console.log(error);
+          console.log(vcoreError);
           return "Error occurred!";
         } 
         // else {
@@ -101,7 +102,7 @@ export default async function createNewBusinessGroup(groupCreateParams) {
             .eq('businessGroupId', groupCreateParams.parentGroupId)
             .select()
             if(updateError){
-              console.log(error);
+              console.log(updateError);
               return "Error occurred!";
             }
             console.log('update result:',updateVcores);
