@@ -39,10 +39,10 @@ const FlexableTabs = ({ sections, activeItem, onItemSelect }) => {
                                 >
                                     {isActive(item.name) ?
                                         <Box p={"7px"} borderColor={'boxColor'} bg={"#fff"} borderWidth={"2px"} borderRadius={4} color={isActive(item.name) ? useColorModeValue('boxColor') : undefined} width="auto">
-                                            <Text fontSize="xs" fontWeight="600">{item.label}</Text>
+                                            <Text fontSize="14px" fontWeight="600">{item.label}</Text>
                                         </Box>
                                         :
-                                        <> <Text fontSize="xs">{item.label}</Text></>
+                                        <> <Text fontSize="14px">{item.label}</Text></>
                                     }
                                 </Link>
                                 <Box

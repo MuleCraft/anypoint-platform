@@ -30,6 +30,7 @@ import {
     RadioGroup,
     useDisclosure,
     Stack,
+    HStack,
     Radio,
     Text,
     InputGroup,
@@ -303,9 +304,9 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
 
     return (
         <>
-            <Flex alignItems="center" justifyContent="space-between" zIndex={0} width="1550px">
-                <Flex alignItems="center" gap={5}>
-                    <Button colorScheme="blue" onClick={onOpen} fontSize="xs" fontWeight="600">
+            <Stack mt={"15px"} direction={"row"} spacing={6} align={'center'} justify={'space-between'} px={5}>
+                <HStack spacing={6}>
+                    <Button colorScheme="blue" onClick={onOpen} fontSize="14px" fontWeight={600} variant="formButtons" minW={'fit-content'}>
                         Create environment
                     </Button>
                     <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
@@ -362,8 +363,8 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                             Learn more
                         </Link>
                     </Text>
-                </Flex>
-                <Flex gap={10} alignItems="center">
+                </HStack>
+                {/* <Flex gap={10} alignItems="center"> */}
                     <InputGroup maxW="-webkit-fit-content">
                         <InputLeftElement
                             pointerEvents="none"
@@ -371,21 +372,20 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                             left={4}
                             children={<FiSearch color="gray" />} />
                         <Input
-                            placeholder="Filter Environments"
+                            placeholder="Filter environments"
                             value={filterText}
                             onChange={handleFilterChange}
                             my={4}
                             ml={4}
-                            fontSize="base"
-                            fontWeight="500" />
-
+                            fontSize="14px"
+                            fontWeight={500} />
                     </InputGroup>
-                </Flex>
-            </Flex>
+                {/* </Flex> */}
+            </Stack>
             {filteredTableData.length === 0 ? (
                 <EmptyRows message={'No data to show'} />
             ) : (
-                <TableContainer>
+                <TableContainer px={5}>
                     <Table>
                         <Thead borderBottomWidth="3px">
                             <Tr>
