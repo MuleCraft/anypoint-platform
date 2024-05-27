@@ -240,7 +240,7 @@ export default function SimpleCard() {
         const groupCreateParams = {
           groupName: company,
           selectedGroupValue: null,
-          ownerName: email,
+          ownerName: fullName,
           isGroupCheckboxSelected: true,
           isEnvCheckboxSelected: true,
           sandboxSliderValue: 1,
