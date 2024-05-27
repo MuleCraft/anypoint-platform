@@ -10,11 +10,13 @@ import {
     InputGroup,
     InputLeftElement,
     Link,
+    Stack,
     Menu,
     MenuButton,
     IconButton,
     MenuList,
     MenuItem,
+    HStack,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import supabase from "../../Utils/supabase";
@@ -117,8 +119,8 @@ const BGChildGroup = () => {
 
     return (
 
-        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={190} mt={'90px'}>
-            <Flex alignItems="center" justify="space-between" ml={7}>
+        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
+            <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>
                         <BreadcrumbLink fontSize="lg" href="/accounts/businessGroups">
@@ -179,42 +181,30 @@ const BGChildGroup = () => {
                     onItemSelect={handleItemSelect}
                 />
             </Box>
-            <Flex alignItems="center" justifyContent="space-between" zIndex={0} width="1550px" mt={10} ml={7} >
-                <Flex alignItems="center" gap={5}>
-                    <CreateBusinessGroup
-                        currentUserEmail={currentUserEmail}
-                        currentUserName={currentUserName}
-                        currentOrganization={currentOrganization}
-                        filteredTableData={filtered}
-                        isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
-                    />
-                    <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
-                        Business groups are isolated scopes for managing access. Users
-                        and teams may access resources in a business group through
-                        their permissions.{" "}
-                        <Link
-                            color={"#0176d3"}
-                            textDecoration={"underline"}
-                            href="https://docs.mulesoft.com/access-management/business-groups"
-                            target="_blank"
-                        >
-                            Learn more
-                        </Link>
-                    </Text>
-                </Flex>
-                <Flex gap={10} alignItems="center">
-                    <InputGroup maxW={"fit-content"}>
+            <Stack mt={"25px"} direction={"row"} spacing={6} align={'center'} justify={'space-between'} px={5}>
+                    <HStack spacing={6}>
+                        <CreateBusinessGroup
+                            currentUserEmail={currentUserEmail}
+                            currentUserName={currentUserName}
+                            currentOrganization={currentOrganization}
+                            filteredTableData={filtered}
+                            isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
+                        />
+                        <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
+                            Permissions for a business group do not apply to its child business groups.
+                        </Text>
+                    </HStack>
+                    <InputGroup maxW={"fit-content"} ml={0}>
                         <InputLeftElement
                             pointerEvents="none"
                             children={<FiSearch />}
                             color="gray.500"
                         />
-                        <Input placeholder="Filter Business Group" fontSize={14}
+                        <Input placeholder="Filter business group" fontSize={14}
                             onChange={(e) => { setFilterValue(e.target.value) }}
                         />
                     </InputGroup>
-                </Flex>
-            </Flex>
+            </Stack>
             {filteredTableData.length === 0 ? (
                 <EmptyRows message={'No data to show'} />
             ) : (

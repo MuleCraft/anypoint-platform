@@ -21,15 +21,12 @@ export default function AMChildGroup({ name, pathValue }) {
                 <Nav name={name} pathValue={pathValue} />
                 <div className="Wrapper">
                     <Flex w={'100%'} h={'100%'} flex={1}>
-
                         <Sidebar
                             sections={sections}
                             activeItem={activeItem}
                             onItemSelect={handleItemSelect}
                         />
-
                         < BGChildGroup />
-
                     </Flex>
                 </div>
             </div>

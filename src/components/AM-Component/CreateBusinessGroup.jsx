@@ -11,7 +11,7 @@ import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
 
 function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization, filteredTableData, isOpen, onOpen, onClose }) {
     const toast = useToast();
-    console.log('filtered table data:',filteredTableData);
+    // console.log('filtered table data:',filteredTableData);
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
     const [designSliderValue, setDesignSliderValue] = useState(0);
 
@@ -46,13 +46,24 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     setOwnerName(value);
     setSearchInput(value);
 
-    const filtered = filteredTableData.filter((item) =>
+    const uniqueItems = new Set();
+    const filtered = filteredTableData.filter((item) => {
+        const isMatch =
         (typeof item.groupOwner === 'string' && item.groupOwner.toLowerCase().includes(value.toLowerCase())) ||
-        (typeof item.userName === 'string' && item.userName.toLowerCase().includes(value.toLowerCase()))
-      );
-    setFilteredOwners(filtered);
-    setIsOwnerMenuOpen(true);
-  };
+        (typeof item.userName === 'string' && item.userName.toLowerCase().includes(value.toLowerCase()));
+
+        if (isMatch) {
+            const uniqueKey = item.userName;
+            if (!uniqueItems.has(uniqueKey)) {
+                uniqueItems.add(uniqueKey);
+                return true;
+            }
+        }
+        return false;
+    });
+        setFilteredOwners(filtered);
+        setIsOwnerMenuOpen(true);
+    };
 
   const handleOwnerSelect = (owner) => {
     setOwnerName(`${owner.groupOwner} (username: ${owner.userName})`);
@@ -204,7 +215,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
         <>
             <Button variant="formButtons" onClick={onOpen} minW={'fit-content'}
                 isDisabled={isCreateGroupButtonDisabled}>
-                Create Business Group
+                Create business group
             </Button>
             <Modal onClose={onClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />

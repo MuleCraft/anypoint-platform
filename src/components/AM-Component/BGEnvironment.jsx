@@ -99,8 +99,8 @@ const BGEnvironment = () => {
 
     return (
 
-        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={190} mt={'90px'}>
-            <Flex alignItems="center" justify="space-between" ml={7}>
+        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
+            <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>
                         <BreadcrumbLink fontSize="lg" href="/accounts/businessGroups">
@@ -165,9 +165,9 @@ const BGEnvironment = () => {
             {filteredTableData.length === 0 ? (
                 <EmptyRows message={'No data to show'} />
             ) : (
-                <Box m={7}>
+                // <Box m={7}>
                     <BGEnvironmentTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
-                </Box>
+                // </Box>
             )}
         </Box >
     );
