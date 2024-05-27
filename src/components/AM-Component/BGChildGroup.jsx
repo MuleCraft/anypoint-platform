@@ -152,7 +152,7 @@ const BGChildGroup = () => {
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-                {filtered?.childGroups !== false ? (
+                {group?.childGroups !== false ? (
                     ""
                 ) : (
                     <Menu>
@@ -200,7 +200,7 @@ const BGChildGroup = () => {
                             children={<FiSearch />}
                             color="gray.500"
                         />
-                        <Input placeholder="Filter business group" fontSize={14}
+                        <Input placeholder="Filter business group" fontSize={14} fontWeight={500}
                             onChange={(e) => { setFilterValue(e.target.value) }}
                         />
                     </InputGroup>

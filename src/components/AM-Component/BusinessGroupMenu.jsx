@@ -1,54 +1,57 @@
 import {
     Menu, MenuButton, MenuList, MenuItem, IconButton, Modal, ModalOverlay, ModalContent,
     ModalHeader, ModalFooter, ModalBody, Button, VStack,
-    Input, FormLabel,useDisclosure
+    Input, FormLabel
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
+// import { FiSearch } from "react-icons/fi";
 import { useState } from "react";
 import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
 
 export default function BusinessGroupMenu({ onOpenCreateChildGroup }) {
 
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    // const { isOpen, onOpen, onClose } = useDisclosure();
     const [isDeleteOpen, setDeleteOpen] = useState(false);
+    // const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
+    // const [designSliderValue, setDesignSliderValue] = useState(0);
 
-    const handleDeleteOpen = () => {
-        console.log("values", values[0].businessGroupId);
+    if (response === "Error occurred!") {
+        toast({
+            title: "Error",
+            description: "Error occurred.",
+            status: "error",
+            duration: 5000,
+            isClosable: true,
+            position: "top-right",
+        });
     }
-    
-    async function invokeGroupDeleteFunction() {
-        try {
-            
-            const response = await deleteBusinessGroup();
-            onClose();
-
-            if (response === "Error occurred!") {
-                toast({
-                    title: "Error",
-                    description: "Error occurred.",
-                    status: "error",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-right",
-                });
-            }
-            else {
-                toast({
-                    description: "Business group successfully deleted.",
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true,
-                    position: "top-right",
-                });
-            }
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 800);
-        } catch (error) {
-            console.error("Error occurred:", error);
-        }
+    else {
+        toast({
+            description: "Business group successfully deleted.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: "top-right",
+        });
     }
+
+    // const handleSandboxSliderChange = (value) => {
+    //     setSandboxSliderValue(value);
+    // };
+
+    // const handleSandboxInputChange = (event) => {
+    //     const inputValue = parseFloat(event.target.value);
+    //     setSandboxSliderValue(inputValue);
+    // };
+
+    // const handleDesignSliderChange = (value) => {
+    //     setDesignSliderValue(value);
+    // };
+
+    // const handleDesignInputChange = (event) => {
+    //     const inputValue = parseFloat(event.target.value);
+    //     setDesignSliderValue(inputValue);
+    // };
 
 
     const values = menuValue.filter(item => item.parentGroupID === '');
