@@ -24,7 +24,11 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const [isGroupCheckboxSelected, setIsGroupCheckboxSelected] = useState(false);
     const [isEnvCheckboxSelected, setIsEnvCheckboxSelected] = useState(false);
 
-    const isCreateButtonDisabled = !groupName || !selectedGroupValue || !ownerName;
+    const [nameError, setNameError] = useState('');
+    const [sandboxSliderError, setSandboxSliderError] = useState('');
+    const [designSliderError, setDesignSliderError] = useState('');
+
+    const isCreateButtonDisabled = !groupName || !selectedGroupValue || !ownerName || nameError || sandboxSliderError || designSliderError;
 
     const selectedGroupData = filteredTableData.find(group => group.businessGroupName === selectedGroupValue);
 
@@ -88,12 +92,9 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
 
   const filterBusinessGroupId = (data, groupName) => {
 
-    // console.log('Filtering for:', groupName); // Debugging log
-    // console.log('Data array:', data); // Debugging log
     const result = data.filter(item => item.businessGroupName === groupName);
     console.log('result:',result[0].businessGroupId);
     setSelectedGroupParentId(result[0].businessGroupId);
-    // return result.length > 0 ? result[0].parentGroupID : '';
   };
 
   const handleGroupSelect = (group) => {
@@ -102,8 +103,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     setSelectedGroupValue(group.businessGroupName);
     setIsGroupMenuOpen(false);
     setIsGroupSelected(true);
-    filterBusinessGroupId(filteredTableData, selectedGroupValue);
-    // console.log("parent id",selectedGroupParentId);
+    filterBusinessGroupId(filteredTableData, group.businessGroupName);
   };
 
   const handleInputFocus = () => {
@@ -115,7 +115,6 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     useEffect(() => {
         if (filteredTableData.length > 0) {
             setIsCreateGroupButtonDisabled(false);
-            // console.log(filteredTableData);
         }
         else {
             setIsCreateGroupButtonDisabled(true);
@@ -129,6 +128,13 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const handleSandboxInputChange = (event) => {
         const inputValue = parseFloat(event.target.value);
         setSandboxSliderValue(inputValue);
+
+        if (inputValue > sandboxVcoresMax) {
+            setSandboxSliderError(`Must be between 0 and ${sandboxVcoresMax}`);
+        }
+        else {
+            setSandboxSliderError('');
+        }
     };
 
     const handleDesignSliderChange = (value) => {
@@ -138,10 +144,33 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
     const handleDesignInputChange = (event) => {
         const inputValue = parseFloat(event.target.value);
         setDesignSliderValue(inputValue);
+
+        if (inputValue > designVcoresMax) {
+            setDesignSliderError(`Must be between 0 and ${designVcoresMax}`);
+        }
+        else {
+            setDesignSliderError('');
+        }
     };
 
     const handleNameChange = (event) => {
         setGroupName(event.target.value);
+        const value = event.target.value;
+        const isValid = /^[a-zA-Z0-9\s',._-]+$/.test(value);
+        if (value === '') {
+            setNameError('Required');
+        } else if (value.length < 2 && !isValid) {
+            setNameError(`Name must only contain alphanumeric characters, spaces, and the following symbols: ' , . _ - Name must be between 2 and 255 characters.`);
+        } 
+        else if (value.length < 2) {
+            setNameError('Name must be between 2 and 255 characters.');
+        }
+        else if(!isValid){
+            setNameError(`Name must only contain alphanumeric characters, spaces, and the following symbols: ' , . _ -`);
+        } 
+        else {
+            setNameError('');
+        }
     }
 
     const handleGroupCheckboxChange = () => {
@@ -230,10 +259,25 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                 <VStack spacing={0} fontSize={14} align={'flex-start'}>
                                     <FormLabel fontWeight={500} fontSize={14} color={'#444444'}>Name</FormLabel>
                                     <Text color={'#747474'} fontWeight={500}>You can use alphanumeric characters, hyphens, and spaces.</Text>
-                                    <Input placeholder='Business Group name' mt={1} fontSize={14} fontWeight={500}
-                                            value={groupName}
-                                            onChange={handleNameChange}
-                                            onFocus={()=> {setIsGroupMenuOpen(false);setIsOwnerMenuOpen(false);}} />
+                                    <HStack position={'relative'} justify={'space-between'}
+                                        w={nameError ? '385px':'full'} maxW={'401px'}
+                                        >
+                                        <Input placeholder='Business Group name' mt={1} fontSize={14} fontWeight={500}
+                                                value={groupName}
+                                                autoComplete="off"
+                                                onChange={handleNameChange}
+                                                onFocus={()=> {setIsGroupMenuOpen(false);setIsOwnerMenuOpen(false);}}
+                                                isInvalid={!!nameError}
+                                                borderColor={nameError ? '#ba0516':''} 
+                                                w={nameError ? '':'full'}
+                                                />
+                                        {nameError && (
+                                            <Text color="#ba0516" fontWeight={500}
+                                                fontSize={14} ml={'20px'} maxW={'228px'}>
+                                                {nameError}
+                                            </Text>
+                                        )}
+                                    </HStack>
                                 </VStack>
                                 <VStack spacing={0} fontSize={14} align={'flex-start'}>
                                     <FormLabel fontWeight={500} fontSize={14} color={'#444444'}>Parent business group</FormLabel>
@@ -246,6 +290,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                         />
                                         <Input
                                         placeholder="Select..."
+                                        autoComplete="off"
                                         fontSize={14} color={'#747474'}
                                         value={parentGroupName}
                                         onChange={handleGroupChange}
@@ -256,11 +301,17 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                             <Menu isOpen={isGroupMenuOpen}>
                                             <MenuButton as="div" width="100%" height="0" visibility="hidden" />
                                             <MenuList position="absolute" width='384px'right={0} top={'35px'}>
-                                                {filteredGroups.map((group, index) => (
-                                                <MenuItem key={index} onClick={() => handleGroupSelect(group)}>
-                                                    {group.businessGroupName}
-                                                </MenuItem>
-                                                ))}
+                                                {filteredGroups.length === 0 ? (
+                                                    <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontWeight={500}>
+                                                        No results found
+                                                    </MenuItem>
+                                                ) : (
+                                                    filteredGroups.map((group, index) => (
+                                                        <MenuItem key={index} onClick={() => handleGroupSelect(group)}>
+                                                            {group.businessGroupName}
+                                                        </MenuItem>
+                                                    ))
+                                                )}
                                             </MenuList>
                                             </Menu>
                                         </Box>
@@ -280,29 +331,36 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                                 <Input
                                                 placeholder="Add owner by name, username, or email."
                                                 fontSize={14}
+                                                autoComplete="off"
                                                 value={ownerName}
                                                 onChange={handleOwnerChange}
-                                                onFocus={()=>{setIsGroupMenuOpen(false);}}
+                                                onFocus={()=>{setIsGroupMenuOpen(false)}}
                                                 />
                                                 {isOwnerMenuOpen && (
                                                 <Box>
                                                     <Menu isOpen={isOwnerMenuOpen} onClose={isOwnerMenuOpen}>
-                                                    <MenuButton as="div" height="0" visibility="hidden" />
-                                                    <MenuList position="absolute" width='384px'right={0} top={'35px'}>
-                                                        {filteredOwners.map((owner, index) => (
+                                                        <MenuButton as="div" height="0" visibility="hidden" />
+                                                        <MenuList position="absolute" width='384px'right={0} top={'35px'}>
+                                                        {filteredOwners.length === 0 ? (
+                                                            <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontWeight={500}>
+                                                                No results found
+                                                            </MenuItem>
+                                                        ) : (
+                                                            filteredOwners.map((owner, index) => (
                                                             <MenuItem key={index} onClick={() => handleOwnerSelect(owner)}>
                                                                 {owner.groupOwner} (username: {owner.userName})
                                                             </MenuItem>
-                                                        ))}
-                                                    </MenuList>
+                                                            ))
+                                                        )}
+                                                        </MenuList>
                                                     </Menu>
                                                 </Box>
                                                 )}
                                             </InputGroup>
-                                            <Checkbox size='lg' mt={1} value={isGroupCheckboxSelected} 
+                                            <Checkbox size='lg' mt={2} value={isGroupCheckboxSelected} 
                                                 onChange={handleGroupCheckboxChange}
                                                 onFocus={()=>{setIsGroupMenuOpen(false);}}>Can create business groups</Checkbox>
-                                            <Checkbox size='lg' mt={1} value={isEnvCheckboxSelected}
+                                            <Checkbox size='lg' mt={2} value={isEnvCheckboxSelected}
                                                 onChange={handleEnvCheckboxChange}
                                                 onFocus={()=>{setIsGroupMenuOpen(false);}}>Can create environments</Checkbox>
                                         </VStack>
@@ -341,6 +399,12 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                                     <SliderThumb boxSize={5} bgColor={'#006dec'} />
                                                 </Slider>
                                             </HStack>
+                                                {sandboxSliderError && (
+                                                    <Text color="#ba0516" fontWeight={500} 
+                                                        fontSize={14} maxW={'234px'}>
+                                                        {sandboxSliderError}
+                                                    </Text>
+                                                )}
                                             <FormLabel fontWeight={500} color={'#444444'} fontSize={14}>Design vCores</FormLabel>
                                             <HStack minW={'-webkit-fill-available'} spacing={6}>
                                                 <InputGroup w={'200px'}>
@@ -375,6 +439,12 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                                                     <SliderThumb boxSize={5} bgColor={'#006dec'} />
                                                 </Slider>
                                             </HStack>
+                                                {designSliderError && (
+                                                    <Text color="#ba0516" fontWeight={500} 
+                                                        fontSize={14} maxW={'234px'}>
+                                                        {designSliderError}
+                                                    </Text>
+                                                )}
                                         </VStack>
                                     </>
                                 )}

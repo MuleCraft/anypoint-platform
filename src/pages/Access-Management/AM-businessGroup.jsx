@@ -100,7 +100,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
                     children={<FiSearch />}
                     color="gray.500"
                   />
-                  <Input placeholder="Filter Business Group" fontSize={14}
+                  <Input placeholder="Filter business group" fontSize={14} fontWeight={500}
                     onChange={(e) => { setFilterValue(e.target.value) }}
                   />
                 </InputGroup>

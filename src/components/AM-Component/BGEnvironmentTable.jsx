@@ -540,7 +540,7 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                                     <Button onClick={onDetailModalClose} variant="homePageButtons" borderRadius={4} fontWeight={600} fontSize="base" color="gray" borderColor="#1b1a1a">
                                         Cancel
                                     </Button>
-                                    <Button onClick={handleUpdateEnvironment} colorScheme="blue" fontWeight="600" borderRadius={4} fontWeight={600} fontSize="base">
+                                    <Button onClick={handleUpdateEnvironment} colorScheme="blue" borderRadius={4} fontWeight={600} fontSize="base">
                                         Update
                                     </Button>
                                 </Flex>
