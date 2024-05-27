@@ -371,12 +371,14 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                             left={4}
                             children={<FiSearch color="gray" />} />
                         <Input
-                            placeholder="Filter Environment"
+                            placeholder="Filter Environments"
                             value={filterText}
                             onChange={handleFilterChange}
                             my={4}
                             ml={4}
-                            fontSize="xs" />
+                            fontSize="base"
+                            fontWeight="500" />
+
                     </InputGroup>
                 </Flex>
             </Flex>
@@ -424,8 +426,8 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                                                     border={'1px solid #5c5c5c'}
                                                     onClick={() => handleMenuOpen(dataValue)} />
                                                 <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
-                                                    <MenuItem fontSize={14} onClick={() => handleDeleteOpen(env)} color={'red.600'}
-                                                        _hover={{ color: selectedBusinessGroupId?.childGroups !== false ? '#000' : "white", bgColor: selectedBusinessGroupId?.childGroups !== false ? '' : 'red.600' }}>
+                                                    <MenuItem fontSize={14} onClick={() => handleDeleteOpen(env)} color={'white'}
+                                                        bgColor='red.600' >
                                                         Delete business group...
                                                     </MenuItem>
                                                 </MenuList>
@@ -532,13 +534,13 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                             <Divider mt={6} />
                             <Flex justifyContent="space-between" width="100%" mt={5}>
                                 <Button onClick={() => handleDeleteOpen(selectedEnvironment)} variant="DeleteButtons" borderRadius={4}>
-                                    Delete environment
+                                    Delete Environment
                                 </Button>
                                 <Flex gap={5} ml="auto">
-                                    <Button onClick={onDetailModalClose} variant="homePageButtons" borderRadius={4}>
-                                        Close
+                                    <Button onClick={onDetailModalClose} variant="homePageButtons" borderRadius={4} fontWeight={600} fontSize="base" color="gray" borderColor="#1b1a1a">
+                                        Cancel
                                     </Button>
-                                    <Button onClick={handleUpdateEnvironment} colorScheme="blue" fontWeight="600" borderRadius={4}>
+                                    <Button onClick={handleUpdateEnvironment} colorScheme="blue" fontWeight="600" borderRadius={4} fontWeight={600} fontSize="base">
                                         Update
                                     </Button>
                                 </Flex>

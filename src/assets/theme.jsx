@@ -81,21 +81,21 @@ const theme = extendTheme({
           },
         },
         DeleteButtons: {
-          borderColor: "#d30f01",
+          borderColor: "#ba0517",
           border: "1px solid ",
-          color: "#d30f01",
+          color: "#ba0517",
           fontSize: "14px",
           fontWeight: "600",
           _disabled: {
-            bg: "#d30f01",
+            bg: "#ba0517",
             opacity: "0.4",
             _hover: {
-              bg: "#d30f01",
+              bg: "#ba0517",
               opacity: "0.4",
             },
           },
           _hover: {
-            bg: "#d30f01",
+            bg: "#ba0517",
             color: "#fff"
           },
         },

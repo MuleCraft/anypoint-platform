@@ -150,7 +150,7 @@ const BGChildGroup = () => {
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-                {filtered?.childGroups !== false ? (
+                {group?.childGroups !== false ? (
                     ""
                 ) : (
                     <Menu>
@@ -189,17 +189,7 @@ const BGChildGroup = () => {
                         isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
                     />
                     <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
-                        Business groups are isolated scopes for managing access. Users
-                        and teams may access resources in a business group through
-                        their permissions.{" "}
-                        <Link
-                            color={"#0176d3"}
-                            textDecoration={"underline"}
-                            href="https://docs.mulesoft.com/access-management/business-groups"
-                            target="_blank"
-                        >
-                            Learn more
-                        </Link>
+                        Permissions for a business group do not apply to its child business groups.
                     </Text>
                 </Flex>
                 <Flex gap={10} alignItems="center">
@@ -209,7 +199,7 @@ const BGChildGroup = () => {
                             children={<FiSearch />}
                             color="gray.500"
                         />
-                        <Input placeholder="Filter Business Group" fontSize={14}
+                        <Input placeholder="Filter Business Group" fontSize={14} fontWeight="500"
                             onChange={(e) => { setFilterValue(e.target.value) }}
                         />
                     </InputGroup>
