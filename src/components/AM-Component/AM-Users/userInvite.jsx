@@ -28,15 +28,15 @@ import {
   InputGroup,
   InputLeftElement,
 } from "@chakra-ui/react";
-import { AuthContext } from "../../Utils/AuthProvider";
+import { AuthContext } from "../../../Utils/AuthProvider";
 import { FiSearch } from "react-icons/fi";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import { Link as RouterLink } from "react-router-dom";
 import axios from "axios";
-import EmptyRows from "./EmptyRows";
+import EmptyRows from "../EmptyRows";
 
-const InviteForm = () => {
+const UserInvite = () => {
   const [userTable, setUserData] = useState(null);
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState("");
@@ -510,4 +510,4 @@ const InviteForm = () => {
   );
 };
 
-export default InviteForm;
+export default UserInvite;

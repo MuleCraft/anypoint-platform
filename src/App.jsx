@@ -8,17 +8,17 @@ import ResetPassword from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import { AuthProvider } from "./Utils/AuthProvider";
 import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
-import AMUserList from "./pages/Access-Management/AM-userList";
-import AMPending from "./pages/Access-Management/AM-pending";
 import InviteUserPasswordPage from "./pages/InvitedUserPassword";
 import InviteUserDatailPage from "./pages/InviteUserDetailsForm";
-import AMUserBreadcrumb from "./pages/Access-Management/AM-UserNameBreadcrumb";
 import RunTimeManager from "./pages/Runtime-Manager/Application-main";
 import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/ApplicationSandbox";
 import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
 import AMSettingBreadcrumb from "./pages/Access-Management/AM-SettingBreadcrumb";
 import AMChildGroup from "./pages/Access-Management/AM-childGroup";
 import AMEnvironment from "./pages/Access-Management/AM-environment";
+import AMUserList from "./pages/Access-Management/Users/AM-userList";
+import AMUserBreadcrumb from "./pages/Access-Management/Users/AM-UserNameBreadcrumb";
+import AMPending from "./pages/Access-Management/Users/AM-pending";
 
 export default function App() {
   const AccessManagement = "Access Management";

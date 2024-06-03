@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import adminAuthClient from "../../Utils/api";
+import adminAuthClient from "../../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -33,14 +33,13 @@ import {
   InputLeftElement,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
-import { AuthContext } from "../../Utils/AuthProvider";
+import { AuthContext } from "../../../Utils/AuthProvider";
 import { FiSearch } from "react-icons/fi";
-import supabase from "../../Utils/supabase";
+import supabase from "../../../Utils/supabase";
 import axios from "axios";
-import EmptyRows from "./EmptyRows";
 
 const UserTable = () => {
-  const [userTable, setUserTable] = useState([]);
+  const [userTable, setUserData] = useState(null);
   const { userData } = useContext(AuthContext);
   const [filter, setFilter] = useState("");
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -246,28 +245,6 @@ const UserTable = () => {
     }
   };
 
-  // const insertAdditional = async (id) => {
-  //   try {
-  //     const { error } = await adminAuthClient.deleteUser(id);
-
-  //     if (error) {
-  //       console.error(`Error canceling invitation for user ${id}:`, error.message);
-  //       throw error;
-  //     } else {
-  //       console.log(`Invitation canceled for user with ID: ${id}`);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error delete user:", error.message);
-  //     toast({
-  //       title: "Error inserting additional details",
-  //       description: error.message,
-  //       status: "error",
-  //       duration: 3000,
-  //       isClosable: true,
-  //       position: "top-right"
-  //     });
-  //   }
-  // };
 
   const ResendInvitation = async (email) => {
     if (role !== "Admin") {
@@ -307,12 +284,6 @@ const UserTable = () => {
       position: "top-right",
     });
   };
-
-  const filteredUsers = userTable.filter(
-    (user) =>
-      user.email.toLowerCase().includes(filter.toLowerCase()) &&
-      !user.last_sign_in_at
-  );
 
   return (
     <div>
@@ -389,8 +360,6 @@ const UserTable = () => {
         </InputGroup>
       </Flex>
 
-
-
       <Table variant="simple" size="md">
         <Thead borderBottomWidth="3px">
           <Tr>
@@ -401,69 +370,66 @@ const UserTable = () => {
             <Th style={columnTitleStyle} w={"10px"}></Th>
           </Tr>
         </Thead>
-        {userTable.length > 0 && (
-          <Tbody>
-            {filteredUsers.map((conversion, index) => (
-              <Tr key={index} _hover={{ bgColor: "#ececec" }}>
-                <Td style={rowValueStyle}>{conversion.email}</Td>
-                <Td style={rowValueStyle}>
-                  {calculateSendStatus(conversion.invited_at)}
-                </Td>
-                <Td style={rowValueStyle}>
-                  {calculateExpirationStatus(conversion.invited_at)}
-                </Td>
-                <Td style={rowValueStyle}>
-                  <Tooltip
-                    fontSize="12px"
-                    label={`Everyone at ${userData?.company} (Member)`}
-                    placement="auto"
-                  >
-                    <Text>1 team</Text>
-                  </Tooltip>
-                </Td>
-                <Td style={rowValueStyle}>
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      aria-label="Options"
-                      icon={<HiEllipsisHorizontal width="10px" />}
-                      variant="outline"
-                      h={"30px"}
-                      color="gray.500"
-                      border={"1px solid #5c5c5c"}
-                    />
-                    <MenuList borderRadius={0}>
-                      <MenuItem
-                        fontSize="sm"
-                        onClick={() => ResendInvitation(conversion.email)}
-                      >
-                        Resend Invitation...
-                      </MenuItem>
-                      <MenuItem
-                        fontSize="sm"
-                        color="red"
-                        onClick={() => cancelInvitation(conversion.id)}
-                      >
-                        Cancel Invitation...
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        )}
+        <Tbody>
+          {Array.isArray(userTable) &&
+            userTable
+              .filter(
+                (user) =>
+                  user.email.toLowerCase().includes(filter.toLowerCase()) &&
+                  !user.last_sign_in_at
+              )
+              .map((conversion, index) => (
+                <Tr key={index}>
+                  <Td style={rowValueStyle}>{conversion.email}</Td>
+                  <Td style={rowValueStyle}>
+                    {calculateSendStatus(conversion.invited_at)}
+                  </Td>
+                  <Td style={rowValueStyle}>
+                    {calculateExpirationStatus(conversion.invited_at)}
+                  </Td>
+                  <Td style={rowValueStyle}>
+                    <Tooltip
+                      fontSize="12px"
+                      label={`Everyone at ${userData?.company} (Member)`}
+                      placement="auto"
+                    >
+                      <Text>1 team</Text>
+                    </Tooltip>
+                  </Td>
+                  <Td style={rowValueStyle}>
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
+                        aria-label="Options"
+                        icon={<HiEllipsisHorizontal width="10px" />}
+                        variant="outline"
+                        h={"30px"}
+                        color="gray.500"
+                        border={"1px solid #5c5c5c"}
+                      />
+                      <MenuList borderRadius={0}>
+                        <MenuItem
+                          fontSize="sm"
+                          onClick={() => ResendInvitation(conversion.email)}
+                        >
+                          Resend Invitation...
+                        </MenuItem>
+                        <MenuItem
+                          fontSize="sm"
+                          color="red"
+                          onClick={() => cancelInvitation(conversion.id)}
+                        >
+                          Cancel Invitation...
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </Td>
+                </Tr>
+              ))}
+        </Tbody>
       </Table>
-
-
-      {userTable.length === 0 && (
-        <Box marginTop={200}>
-          <EmptyRows message="No pending invites found" />
-        </Box>
-      )}
     </div>
   );
 };
-
 
 export default UserTable;
