@@ -58,8 +58,10 @@ const BGEnvironment = () => {
             items: [
 
                 { name: 'Settings', label: 'Settings', path: `/accounts/businessGroups/${id}` },
+                { name: 'AccessOverview', label: 'Access Overview', path: `/accounts/businessGroups/${id}/access` },
                 { name: 'Child Groups', label: 'Child Groups', path: `/accounts/businessGroups/${id}/children` },
                 { name: 'Environments', label: 'Environments', path: `/accounts/businessGroups/${id}/environments` },
+
             ],
         },
 
@@ -165,9 +167,7 @@ const BGEnvironment = () => {
             {filteredTableData.length === 0 ? (
                 <EmptyRows message={'No data to show'} />
             ) : (
-                // <Box m={7}>
-                    <BGEnvironmentTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
-                // </Box>
+                <BGEnvironmentTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
             )}
         </Box >
     );

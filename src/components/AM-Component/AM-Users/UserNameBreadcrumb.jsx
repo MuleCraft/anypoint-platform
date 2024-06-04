@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState } from "react";
-import adminAuthClient from "../../Utils/api";
+import adminAuthClient from "../../../Utils/api";
 import {
   Menu,
   MenuButton,
@@ -36,13 +36,13 @@ import {
 } from "@chakra-ui/react";
 import moment from "moment";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
-import { Navigate, useParams } from "react-router-dom";
-import FlexableTabs from "../FlexableTabs";
+import { useParams } from "react-router-dom";
+import FlexableTabs from "../../FlexableTabs";
 import { PiPencilLight } from "react-icons/pi";
-import supabase from "../../Utils/supabase";
+import supabase from "../../../Utils/supabase";
 
 import axios from "axios";
-import { AuthContext } from "../../Utils/AuthProvider";
+import { AuthContext } from "../../../Utils/AuthProvider";
 const UserNameBreadcrumb = () => {
   const { id } = useParams();
   const [user, setUser] = useState(null);

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import Nav from "../../components/NavbarHome";
-import Sidebar from "../../components/sidebar";
-import sections from "./utils/AM-sidebar";
+import Nav from "../../../components/NavbarHome";
+import Sidebar from "../../../components/sidebar";
+import sections from "../utils/AM-sidebar";
+
 import { Box, Flex } from "@chakra-ui/react";
 
 
-import UserNameBreadcrumb from "../../components/AM-Component/UserNameBreadcrumb";
+import UserNameBreadcrumb from "../../../components/AM-Component/AM-Users/UserNameBreadcrumb";
 
 
 

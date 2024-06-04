@@ -8,17 +8,24 @@ import ResetPassword from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./Utils/PrivateRoutes";
 import { AuthProvider } from "./Utils/AuthProvider";
 import AMBusinessGroup from "./pages/Access-Management/AM-businessGroup";
-import AMUserList from "./pages/Access-Management/AM-userList";
-import AMPending from "./pages/Access-Management/AM-pending";
 import InviteUserPasswordPage from "./pages/InvitedUserPassword";
 import InviteUserDatailPage from "./pages/InviteUserDetailsForm";
-import AMUserBreadcrumb from "./pages/Access-Management/AM-UserNameBreadcrumb";
 import RunTimeManager from "./pages/Runtime-Manager/Application-main";
 import ApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/ApplicationSandbox";
 import DeployApplicationSandbox from "./pages/Runtime-Manager/Sandbox-pages/Deploy-application";
 import AMSettingBreadcrumb from "./pages/Access-Management/AM-SettingBreadcrumb";
 import AMChildGroup from "./pages/Access-Management/AM-childGroup";
 import AMEnvironment from "./pages/Access-Management/AM-environment";
+import AMUserList from "./pages/Access-Management/Users/AM-userList";
+import AMUserBreadcrumb from "./pages/Access-Management/Users/AM-UserNameBreadcrumb";
+import AMPending from "./pages/Access-Management/Users/AM-pending";
+import AMTeams from "./pages/Access-Management/Teams/AM-teams";
+import AMTeamsSettings from "./pages/Access-Management/Teams/AM-settings";
+import AMTeamsLimits from "./pages/Access-Management/Teams/AM-Limits";
+import AMChildTeams from "./pages/Access-Management/Teams/AM-childTeams";
+import AMMenbers from "./pages/Access-Management/Teams/AM-members";
+import AMPermissions from "./pages/Access-Management/Teams/AM-permissions";
+import AMAccessOverview from "./pages/Access-Management/Business-Group/AM-accessOverview";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -68,6 +75,61 @@ export default function App() {
                 />
               }
             />
+
+            <Route
+              path="/accounts/teams/:id/settings"
+              element={
+                <AMTeamsSettings
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/"
+              element={
+                <AMTeams
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/limits"
+              element={
+                <AMTeamsLimits
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/child_teams"
+              element={
+                <AMChildTeams
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/users"
+              element={
+                <AMMenbers
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/permissions"
+              element={
+                <AMPermissions
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
             <Route
               path="accounts/businessGroups"
               element={
@@ -81,6 +143,15 @@ export default function App() {
               path="accounts/businessGroups/:id"
               element={
                 <AMSettingBreadcrumb
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="accounts/businessGroups/:id/access"
+              element={
+                <AMAccessOverview
                   name={AccessManagement}
                   pathValue={AccessManagentPath}
                 />

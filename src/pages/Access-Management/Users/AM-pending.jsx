@@ -1,11 +1,12 @@
 import { useState } from "react";
-import Nav from "../../components/NavbarHome";
-import Sidebar from "../../components/sidebar";
-import sections from "./utils/AM-sidebar";
 import { Box, Flex } from "@chakra-ui/react";
-import HorizontalSidebar from "../../components/HorizontalSidebar";
-import userTab from "./utils/AM-userTab";
-import PendingInvitation from "../../components/AM-Component/pendingInvitation";
+import userTab from "../utils/AM-userTab";
+import Nav from "../../../components/NavbarHome";
+import Sidebar from "../../../components/sidebar";
+import sections from "../utils/AM-sidebar";
+import HorizontalSidebar from "../../../components/HorizontalSidebar";
+import PendingInvitation from "../../../components/AM-Component/AM-Users/pendingInvitation";
+
 
 export default function AMPending({ name, pathValue }) {
   const [activeItem, setActiveItem] = useState("users");
