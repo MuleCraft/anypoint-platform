@@ -295,7 +295,7 @@ const Members = () => {
                         </Tr>
                     </Thead>
                     <Tbody >
-                        <Tr borderBottomWidth={1.5}>
+                        <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }}>
                             <Td style={rowValueStyle}><Box display="flex" alignItems="center" gap={3}><Text >Kavi kasi</Text> <Text fontSize="12" fontWeight="500" color="gray">This is you</Text></Box></Td>
                             <Td style={rowValueStyle}>kaizee1</Td>
                             <Td style={rowValueStyle}>kaviyarasumaran@gmail.com</Td>

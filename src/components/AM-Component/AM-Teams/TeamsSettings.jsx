@@ -33,79 +33,79 @@ const TeamSetting = () => {
     const [changesMade, setChangesMade] = useState(false);
     const toast = useToast();
     const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false);
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         try {
-    //             const { data, error } = await supabase
-    //                 .schema("mc_cap_develop")
-    //                 .from("businessgroup")
-    //                 .select("*")
-    //                 .eq("businessGroupId", id);
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .schema("mc_cap_develop")
+                    .from("businessgroup")
+                    .select("*")
+                    .eq("businessGroupId", id);
 
-    //             if (error) {
-    //                 console.error("Error fetching user data:", error.message);
-    //             } else {
-    //                 setGroup(data[0]);
-    //                 setEditedGroup(data[0]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching user data:", error);
-    //         }
-    //     };
+                if (error) {
+                    console.error("Error fetching user data:", error.message);
+                } else {
+                    setGroup(data[0]);
+                    setEditedGroup(data[0]);
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
 
-    //     fetchUserData();
-    // }, []);
+        fetchUserData();
+    }, []);
 
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setEditedGroup((prevGroup) => ({
-    //         ...prevGroup,
-    //         [name]: value,
-    //     }));
-    //     setChangesMade(true);
-    // };
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditedGroup((prevGroup) => ({
+            ...prevGroup,
+            [name]: value,
+        }));
+        setChangesMade(true);
+    };
 
-    // const handleSaveChanges = async () => {
-    //     try {
-    //         const { data: supabaseData, error: supabaseError } = await supabase
-    //             .schema("mc_cap_develop")
-    //             .from("businessgroup")
-    //             .update({
-    //                 businessGroupName: editedGroup.businessGroupName,
-    //                 groupOwner: editedGroup.groupOwner,
-    //                 orgDomain: editedGroup.orgDomain,
-    //                 sessionTimeout: editedGroup.sessionTimeout
-    //             })
-    //             .eq("businessGroupId", id);
+    const handleSaveChanges = async () => {
+        try {
+            const { data: supabaseData, error: supabaseError } = await supabase
+                .schema("mc_cap_develop")
+                .from("businessgroup")
+                .update({
+                    businessGroupName: editedGroup.businessGroupName,
+                    groupOwner: editedGroup.groupOwner,
+                    orgDomain: editedGroup.orgDomain,
+                    sessionTimeout: editedGroup.sessionTimeout
+                })
+                .eq("businessGroupId", id);
 
-    //         if (supabaseError) {
-    //             console.error("Error updating data in Supabase:", supabaseError.message);
-    //             throw new Error(supabaseError.message);
-    //         }
+            if (supabaseError) {
+                console.error("Error updating data in Supabase:", supabaseError.message);
+                throw new Error(supabaseError.message);
+            }
 
-    //         console.log("Saving changes:", editedGroup);
-    //         toast({
-    //             title: "update successfully",
-    //             description: "Settings updated successfully.",
-    //             status: "success",
-    //             duration: 5000,
-    //             isClosable: true,
-    //             position: "top-right",
-    //         });
-    //         setChangesMade(false);
-    //     } catch (error) {
-    //         toast({
-    //             title: "Update Failed",
-    //             description:
-    //                 "Setting update failed",
-    //             status: "error",
-    //             duration: 5000,
-    //             isClosable: true,
-    //             position: "top-right",
-    //         });
-    //         console.error("Error saving changes:", error);
-    //     }
-    // };
+            console.log("Saving changes:", editedGroup);
+            toast({
+                title: "update successfully",
+                description: "Settings updated successfully.",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right",
+            });
+            setChangesMade(false);
+        } catch (error) {
+            toast({
+                title: "Update Failed",
+                description:
+                    "Setting update failed",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top-right",
+            });
+            console.error("Error saving changes:", error);
+        }
+    };
 
 
 

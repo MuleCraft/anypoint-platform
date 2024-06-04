@@ -292,8 +292,8 @@ const ChildTeams = () => {
                         </Tr>
                     </Thead>
                     <Tbody >
-                        <Tr borderBottomWidth={1.5}>
-                            <Td style={rowValueStyle}>inches</Td>
+                        <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }}>
+                            <Td _hover={{ bgColor: "#ececec" }} style={rowValueStyle}>inches</Td>
                             <Td style={rowValueStyle}><Menu>
                                 <MenuButton
                                     as={IconButton}

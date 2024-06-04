@@ -192,7 +192,7 @@ const AMCreateTeams = () => {
                         </Tr>
                     </Thead>
                     <Tbody >
-                        <Tr borderBottomWidth={1.5}>
+                        <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }}>
                             <Td style={rowValueStyle}>inches</Td>
                             <Td style={rowValueStyle}><Menu>
                                 <MenuButton
