@@ -1,9 +1,12 @@
 import { useState } from "react";
-import Nav from "../../components/NavbarHome";
-import Sidebar from "../../components/sidebar";
+import Nav from "../../../components/NavbarHome";
+import Sidebar from "../../../components/sidebar";
 import sections from "../utils/AM-sidebar";
+import Permissions from "../../../components/AM-Component/AM-Teams/Permissions";
 
-export default function AMTeams({ name }) {
+
+
+export default function AMPermissions({ name }) {
     const [activeItem, setActiveItem] = useState('teams');
 
 
@@ -18,11 +21,12 @@ export default function AMTeams({ name }) {
                 <div className="Wrapper">
                     <Sidebar
                         sections={sections}
-                        activeItem={activeItem} // The name of the currently active item
-                        onItemSelect={handleItemSelect} // Function to handle item selection
+                        activeItem={activeItem}
+                        onItemSelect={handleItemSelect}
                     />
+                    <Permissions />
                 </div>
-            </div>
+            </div >
         </>
     );
 }

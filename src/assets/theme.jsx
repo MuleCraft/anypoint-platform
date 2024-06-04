@@ -145,7 +145,8 @@ const theme = extendTheme({
     boxColor: "#0376d3",
     modelColor: "#f3f3f3",
     textColor: "#9e9e9e",
-    activeColor: "#6b8a99"
+    activeColor: "#6b8a99",
+    delete: "#ba0517"
   },
   fontSizes: {
     lg: "20px",

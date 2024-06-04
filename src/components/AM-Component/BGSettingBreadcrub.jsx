@@ -123,6 +123,7 @@ const BGSettingsBreadcrumb = () => {
             items: [
 
                 { name: 'Settings', label: 'Settings', path: `/accounts/businessGroups/${id}` },
+                { name: 'AccessOverview', label: 'Access Overview', path: `/accounts/businessGroups/${id}/access` },
                 { name: 'Child Groups', label: 'Child Groups', path: `/accounts/businessGroups/${id}/children` },
                 { name: 'Environments', label: 'Environments', path: `/accounts/businessGroups/${id}/environments` },
 

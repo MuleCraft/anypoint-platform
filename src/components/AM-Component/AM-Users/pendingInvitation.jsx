@@ -35,7 +35,6 @@ import {
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { AuthContext } from "../../../Utils/AuthProvider";
 import { FiSearch } from "react-icons/fi";
-import supabase from "../../../Utils/supabase";
 import axios from "axios";
 
 const UserTable = () => {
@@ -47,8 +46,6 @@ const UserTable = () => {
   const [emailError, setEmailError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const toast = useToast();
-  const [userId, setUserId] = useState("");
-  const [authUserId, setAuthUserId] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
