@@ -170,11 +170,11 @@ export default function HomeMain() {
           borderRadius="10px"
           mt={10}
         >
-          <Heading py={2}>Management Center</Heading>
-          <Divider color="#747474" />
-          <VStack spacing={8} pt={5} align="stretch">
+          <Heading fontSize={26}>Management Center</Heading>
+          <Divider borderColor="#747474" my={7}/>
+          <VStack spacing={8} align="stretch">
             <Flex alignItems="center" gap={2}>
-              <Image src={apiManager} alt="api-manager" />
+              <Image src={apiManager} alt="api-manager"/>
               <Box flex="1">
                 <ChakraLink
                   as={ReactRouterLink}
@@ -183,7 +183,7 @@ export default function HomeMain() {
                 >
                   <Heading fontSize="sm">API Manager</Heading>
                 </ChakraLink>
-                <Text>
+                <Text fontSize={14} fontWeight={500}>
                   Manage clients, policies, SLAs, traffic, and alerts.
                 </Text>
               </Box>
@@ -193,7 +193,7 @@ export default function HomeMain() {
               <Image src={apigov} />
               <Box flex="1">
                 <Heading fontSize="sm">API Governance</Heading>
-                <Text>Govern and monitor API conformance.</Text>
+                <Text fontSize={14} fontWeight={500}>Govern and monitor API conformance.</Text>
               </Box>
               <ArrowForwardIcon />
             </Flex>
@@ -207,7 +207,7 @@ export default function HomeMain() {
                 >
                   <Heading fontSize="sm">Runtime Manager</Heading>
                 </ChakraLink>
-                <Text>Deploy, manage, and monitor deployed applications.</Text>
+                <Text fontSize={14} fontWeight={500}>Deploy, manage, and monitor deployed applications.</Text>
               </Box>
               <ArrowForwardIcon />
             </Flex>
@@ -215,7 +215,7 @@ export default function HomeMain() {
               <Image src={visualizer} />
               <Box flex="1">
                 <Heading fontSize="sm">Visualizer</Heading>
-                <Text>Visualize your Application Network.</Text>
+                <Text fontSize={14} fontWeight={500}>Visualize your Application Network.</Text>
               </Box>
               <ArrowForwardIcon />
             </Flex>
@@ -223,7 +223,7 @@ export default function HomeMain() {
               <Image src={monitoring} />
               <Box flex="1">
                 <Heading fontSize="sm">Monitoring</Heading>
-                <Text>Create alerts for and troubleshoot applications.</Text>
+                <Text fontSize={14} fontWeight={500}>Create alerts for and troubleshoot applications.</Text>
               </Box>
               <ArrowForwardIcon />
             </Flex>
@@ -238,7 +238,7 @@ export default function HomeMain() {
                 >
                   <Heading fontSize="sm">Access Management</Heading>
                 </ChakraLink>
-                <Text className="home-main__indexText">
+                <Text className="home-main__indexText" fontSize={14} fontWeight={500}>
                   Manage users, business groups, and audit logs.
                 </Text>
               </Box>
@@ -248,7 +248,7 @@ export default function HomeMain() {
               <Image src={servicemesh} />
               <Box flex="1">
                 <Heading fontSize="sm">Secrets Manager</Heading>
-                <Text>Manage public keys for SSL communication.</Text>
+                <Text fontSize={14} fontWeight={500}>Manage public keys for SSL communication.</Text>
               </Box>
               <ArrowForwardIcon />
             </Flex>
