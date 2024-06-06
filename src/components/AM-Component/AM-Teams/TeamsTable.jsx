@@ -28,32 +28,34 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
-import supabase from "../../Utils/supabase";
-import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
+import supabase from "../../../Utils/supabase";
+// import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
 
-const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
+const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
   const [ownerData, setOwnerData] = useState([]);
   const toast = useToast();
 
-  useEffect(() => {
-    const fetchBusinessGroups = async () => {
-      const { data, error } = await supabase
-        .schema("mc_cap_develop")
-        .from("businessgroup")
-        .select("*")
-        .eq("businessGroupName", userData.company);
+//   console.log('passed teams data:',tableData);
 
-      if (error) {
-        console.error("Error fetching business groups:", error);
-      } else {
-        setOwnerData(data[0]);
-      }
-    };
+//   useEffect(() => {
+//     const fetchBusinessGroups = async () => {
+//       const { data, error } = await supabase
+//         .schema("mc_cap_develop")
+//         .from("businessgroup")
+//         .select("*")
+//         .eq("businessGroupName", userData.company);
 
-    if (userData) {
-      fetchBusinessGroups();
-    }
-  }, [userData.company]);
+//       if (error) {
+//         console.error("Error fetching business groups:", error);
+//       } else {
+//         setOwnerData(data[0]);
+//       }
+//     };
+
+//     if (userData) {
+//       fetchBusinessGroups();
+//     }
+//   }, [userData.company]);
 
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [deleteInputValue, setDeleteInputValue] = useState("");
@@ -76,12 +78,13 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
   useEffect(() => {
     const filteredData = tableData.filter(dataValue => {
       if (applyCondition) {
-        return dataValue.parentGroupID === clickedRowId || dataValue.parentGroupID === "";
+        return dataValue.ancestor_group_ids === clickedRowId || dataValue.ancestor_group_ids === null;
       } else {
-        return dataValue.parentGroupID === "";
+        return dataValue.ancestor_group_ids === null;
       }
     });
     setFilteredRows(filteredData);
+    console.log('filtered teams rows:',filteredData);
   }, [tableData, applyCondition, clickedRowId]);
 
   const handleDeleteOpen = () => {
@@ -154,7 +157,7 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
 
   async function invokeGroupDeleteFunction(selectedBusinessGroupId) {
     try {
-      const response = await deleteBusinessGroup(selectedBusinessGroupId);
+    //   const response = await deleteBusinessGroup(selectedBusinessGroupId);
       handleDeleteClose();
 
       if (response === "Error occurred!") {
@@ -190,17 +193,11 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
         <Thead borderBottomWidth="3px">
           <Tr>
             <Th style={columnTitleStyle}>Name</Th>
-            <Th style={columnTitleStyle} w={"150px"}>
-              Environments
-            </Th>
-            <Th style={columnTitleStyle} w={"120px"}>
-              Total vCores
-            </Th>
             <Th style={columnTitleStyle} w={"80px"}></Th>
           </Tr>
         </Thead>
         <Tbody>
-          {filteredRows.map((dataValue, index) => (
+          {tableData.map((dataValue, index) => (
             <>
               <Tr
                 key={index}
@@ -210,35 +207,33 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
                 _hover={{ bgColor: "#ececec" }}
               >
                 <Td style={rowValueStyle}>
-                  <Box paddingLeft={dataValue.parentGroupID === "" ? 0 : 35}>
+                  <Box paddingLeft={dataValue.ancestor_group_ids === null ? 0 : 35}>
 
                     <IconButton
                       aria-label="Toggle Details"
                       icon={openRow === index ? <HiChevronDown /> : <HiChevronRight />}
                       size=""
                       variant="ghost"
-                      onClick={() => handleRowClick(index, dataValue.businessGroupId)} // Pass the ID here
+                      onClick={() => handleRowClick(index, dataValue.teamid)} // Pass the ID here
                       mr={2}
-                      display={(dataValue.parentGroupID === "" || dataValue.childGroups === true) ? "inline-flex" : "none"}
+                      display={(dataValue.ancestor_group_ids === '' || dataValue.childTeams === true) ? "inline-flex" : "none"}
                     />
 
-                    <Link href={`/accounts/businessGroups/${dataValue.businessGroupId}`}
+                    <Link href={`/accounts/teams/${dataValue.teamid}`}
                       _hover={{ textDecoration: "underline" }}
                       color={hoveredRows[index] ? "#0176d3" : "#444444"}
                     >
-                      {dataValue.childGroups === false ? (
+                      {dataValue.childTeams === false ? (
                         <Box paddingLeft={55}>
-                          {dataValue.businessGroupName}
+                          {dataValue.teamname}
                         </Box>
                       ) : (
-                        dataValue.businessGroupName
+                        dataValue.teamname
                       )}
 
                     </Link>
                   </Box>
                 </Td>
-                <Td style={rowValueStyle}>{dataValue.environments.length}</Td>
-                <Td style={rowValueStyle}>{dataValue.totalVcores}</Td>
                 <Td style={rowValueStyle}>
                   <Menu>
                     <MenuButton
@@ -304,4 +299,4 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
   )
 }
 
-export default BusinessGroupTable;
+export default TeamsTable;

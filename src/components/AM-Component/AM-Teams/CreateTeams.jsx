@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
     Box,
     Button,
@@ -10,6 +10,7 @@ import {
     Input,
     InputGroup,
     InputLeftElement,
+    InputRightElement,
     Menu,
     MenuButton,
     MenuItem,
@@ -20,84 +21,37 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
-    Stack,
-    Table,
-    TableContainer,
-    Tbody,
-    Td,
     Text,
-    Th,
-    Thead,
-    Tr,
     useDisclosure,
-
+    useToast
 } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
-
-
-import fetchBgTableRows from "../../../Utils/BgTableRows";
+// import { useParams } from "react-router-dom";
 import { AuthContext } from "../../../Utils/AuthProvider";
-// import EmptyRows from "../EmptyRows";
-import { HiEllipsisHorizontal } from "react-icons/hi2";
-// import supabase from "../../../Utils/supabase";
+import { SlArrowDown } from "react-icons/sl";
+import createNewTeams from "../../../Utils/TeamsCreate";
 
-import { FiSearch } from "react-icons/fi";
-
-const AMCreateTeams = () => {
-    const { id } = useParams();
-    const [group, setGroup] = useState(null);
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         try {
-    //             const { data, error } = await supabase
-    //                 .schema("mc_cap_develop")
-    //                 .from("businessgroup")
-    //                 .select("*")
-    //                 .eq("businessGroupId", id);
-
-    //             if (error) {
-    //                 console.error("Error fetching user data:", error.message);
-    //             } else {
-    //                 setGroup(data[0]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching user data:", error);
-    //         }
-    //     };
-
-    //     fetchUserData();
-    // }, []);
-
-
-
-
+const CreateTeams = ({filteredTeamsTableData,orgId}) => {
+    // const { id } = useParams();
+    // const [group, setGroup] = useState(null);
+    console.log('filteredTeamsTableData:', filteredTeamsTableData);
+    const toast = useToast();
 
     const { userData } = useContext(AuthContext);
-    const [tableData, setTableData] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const [currentUserName, setCurrentUserName] = useState('');
+    const [teamName, setTeamName] = useState('');
+    const [teamNameError, setTeamNameError] = useState('');
+    const [parentTeamName, setParentTeamName] = useState('');
 
+    const [searchInput, setSearchInput] = useState('');
+    const [selectedParentValue, setSelectedParentValue] = useState("");
+
+    const [filteredTeams, setFilteredTeams] = useState([]);
+    const [isTeamsMenuOpen, setIsTeamsMenuOpen] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => setIsModalOpen(true);
-
-
-    if (userData && (currentUserName === '')) {
-
-        setCurrentUserName(userData.display_name);
-
-    }
-
-    const fetchRows = async () => {
-        const tableRowData = await fetchBgTableRows(currentUserName);
-        setTableData(tableRowData);
-    }
-
-    if (userData && (tableData.length === 0)) {
-        fetchRows();
-    }
 
     // const filteredTableData = tableData.filter((data) =>
     //     (data?.businessGroupId === id || data?.parentGroupID === id) &&
@@ -113,48 +67,190 @@ const AMCreateTeams = () => {
     };
     const rowValueStyle = { fontSize: 14, padding: "10px" };
 
+        const teamsCreateParams = {
+            teamname: teamName,
+            teamtype: 'internal',
+            organizationId: orgId,
+            parentTeam: parentTeamName
+            // ancestor_group_ids: '',
+            // ancestors: '',
+        };
+
+    async function invokeTeamsCreate() {
+        try {
+            console.log(teamsCreateParams)
+            const response = await createNewTeams(teamsCreateParams);
+            onClose();
+
+            if (response === "Error occurred!") {
+                toast({
+                    title: "Error",
+                    description: "Error occurred.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right",
+                });
+            }
+            else {
+                toast({
+                    description: "Team successfully created.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true,
+                    position: "top-right",
+                });
+            }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+        } catch (error) {
+            console.error("Error occurred:", error);
+        }
+    }
+
+    const handleTeamNameChange = (event) => {
+        setTeamName(event.target.value);
+        const value = event.target.value;
+        const isValid = /^[a-zA-Z0-9\s_-]+$/.test(value);
+        if (value.trim() === '') {
+            setTeamNameError(`Required. Team name must only contain alphanumeric characters, spaces, and the following symbols: _ -`);
+        }
+        // else if (value.length < 2 && !isValid) {
+        //     setTeamNameError(`Name must only contain alphanumeric characters, spaces, and the following symbols: ' , . _ - Name must be between 2 and 255 characters.`);
+        // } 
+        // else if (value.length < 2) {
+        //     setTeamNameError('Name must be between 2 and 255 characters.');
+        // }
+        else if(!isValid){
+            setTeamNameError(`Team name must only contain alphanumeric characters, spaces, and the following symbols: _ -`);
+        } 
+        else {
+            setTeamNameError('');
+        }
+    }
+
+    const handleParentTeamChange = (e) => {
+        const value = e.target.value;
+        setParentTeamName(value);
+        setSearchInput(value);
+        setSelectedParentValue(value);
+    
+        const filtered = filteredTeamsTableData.filter((item) =>
+            (typeof item.teamname === 'string' && item.teamname.toLowerCase().includes(value.toLowerCase()))
+          );
+          console.log('filtered id:',filtered);
+        setFilteredTeams(filtered);
+        setIsTeamsMenuOpen(true);
+      };
+
+      const filterBusinessGroupId = (data, groupName) => {
+        const result = data.filter(item => item.businessGroupName === groupName);
+        console.log('result:',result[0].businessGroupId);
+        setSelectedGroupParentId(result[0].businessGroupId);
+      };
+
+      const handleTeamSelect = (team) => {
+        setParentTeamName(team.teamname);
+        setSearchInput(team.teamname);
+        setSelectedParentValue(team.teamname);
+        setIsTeamsMenuOpen(false);
+        filterBusinessGroupId(filteredTeamsTableData, team.teamname);
+      };
+    
+      const handleInputFocus = () => {
+        setIsTeamsMenuOpen(true);
+        setFilteredTeams(filteredTeamsTableData);
+      };
 
     return (
 
-        <Box h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
-            <Stack mt={"25px"} direction={"row"} spacing={6} align={'center'} justify={'space-between'} px={5}>
-                <HStack spacing={6}>
-                    <Button colorScheme="blue" onClick={onOpen} fontSize="xs">
-                        Create Team
-                    </Button>
-                    <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
-                        <ModalOverlay />
+        <>
+            <Button variant="formButtons" onClick={onOpen} >
+                Create Team
+            </Button>
+            <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
+                <ModalOverlay />
                         <ModalContent>
-                            <Box bg="modelColor" borderRadius="4px" p={4}>
-                                <ModalHeader fontSize="lg" fontWeight="800">
+                                <ModalHeader bg={'#f3f3f3'} fontSize={20} fontWeight={800} color={'#444444'}
+                                    borderTopRadius={15} borderBottom={'0.5px solid #e5e5e5'} p={6}>
                                     Create Team
                                 </ModalHeader>
-                            </Box>
                             <Divider />
                             <ModalBody>
                                 <FormControl id="email" p={4}>
-                                    <FormLabel fontSize="base">Name</FormLabel>
-                                    <Text pb={2} maxW="450px" fontSize="base" color="textColor">
+                                    <FormLabel fontWeight={500} fontSize={14} color={'#444444'} >Name</FormLabel>
+                                    <Text pb={1} maxW="450px" color={'#747474'} fontSize={14} fontWeight={500}>
                                         You can use alphanumeric characters, hyphens, and spaces.
                                     </Text>
+                                    <HStack position={'relative'} justify={'space-between'}
+                                        w={teamNameError ? '432px':'full'} maxW={'432px'}
+                                        >
                                     <Input
                                         type="text"
-                                        value=""
-                                        onChange=""
+                                        fontSize={14}
+                                        color={'#747474'}
+                                        fontWeight={500}
+                                        value={teamName}
+                                        onChange={handleTeamNameChange}
                                         placeholder="e.g. MyTeam"
-                                        isInvalid=""
+                                        onFocus={()=> {setIsTeamsMenuOpen(false);}}
+                                        isInvalid={!!teamNameError}
+                                        borderColor={teamNameError ? '#ba0516':''} 
+                                        w={teamNameError ? '':'full'}
+                                        autoComplete="off"
                                     />
-
-                                    <FormLabel fontSize="base" pt={5}>
+                                    {teamNameError && (
+                                        <Text color="#ba0516" fontWeight={500}
+                                            fontSize={14} ml={'20px'} maxW={'240px'}>
+                                            {teamNameError}
+                                        </Text>
+                                    )}
+                                    </HStack>
+                                    <FormLabel fontWeight={500} fontSize={14} color={'#444444'} mt={5}>
                                         Parent team
                                     </FormLabel>
-                                    <Text pb={2} maxW="450px" fontSize="base" color="textColor">
+                                    <Text pb={1} maxW="450px" color={'#747474'} fontSize={14} fontWeight={500}>
                                         Teams inherit permissions from their parents.
                                     </Text>
-                                    <Input
-                                        type="text"
-                                        value={userData?.company}
-                                    />
+                                    <InputGroup mt={1} zIndex={3}>
+                                        <InputRightElement
+                                        pointerEvents="none"
+                                        children={<SlArrowDown />}
+                                        color="gray.500"
+                                        />
+                                        <Input
+                                        placeholder="Select..."
+                                        autoComplete="off"
+                                        fontSize={14} color={'#747474'}
+                                        value={parentTeamName}
+                                        onChange={handleParentTeamChange}
+                                        onFocus={handleInputFocus}
+                                        />
+                                        {isTeamsMenuOpen && (
+                                        <Box>
+                                            <Menu isOpen={isTeamsMenuOpen}>
+                                            <MenuButton as="div" width="100%" height="0" visibility="hidden" />
+                                            <MenuList position="absolute" width='432px'right={0} top={'35px'}>
+                                                {filteredTeams.length === 0 ? (
+                                                    <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontSize={14} fontWeight={500}>
+                                                        No results found
+                                                    </MenuItem>
+                                                ) : (
+                                                    filteredTeams.map((team, index) => (
+                                                        <MenuItem key={index} fontSize={14}
+                                                        onClick={() => handleTeamSelect(team)}
+                                                        >
+                                                            {team.teamname}
+                                                        </MenuItem>
+                                                    ))
+                                                )}
+                                            </MenuList>
+                                            </Menu>
+                                        </Box>
+                                        )}
+                                    </InputGroup>
                                 </FormControl>
                             </ModalBody>
                             <Divider />
@@ -162,64 +258,14 @@ const AMCreateTeams = () => {
                                 <Button variant="homePageButtons" onClick={onClose} fontSize="base">
                                     Cancel
                                 </Button>
-                                <Button onClick="" colorScheme="blue" fontSize="base">
+                                <Button onClick={invokeTeamsCreate} colorScheme="blue" fontSize="base">
                                     Create
                                 </Button>
                             </ModalFooter>
                         </ModalContent>
                     </Modal>
-                    <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
-                        Teams are groups of users. Manage access more efficiently by organizing teams to reflect your company structure.
-                    </Text>
-                </HStack>
-                <InputGroup maxW={"fit-content"} ml={0}>
-                    <InputLeftElement
-                        pointerEvents="none"
-                        children={<FiSearch />}
-                        color="gray.500"
-                    />
-                    <Input placeholder="Filter Teams" fontSize={14} fontWeight={500}
-                        onChange={(e) => { setFilterValue(e.target.value) }}
-                    />
-                </InputGroup>
-            </Stack>
-            <TableContainer pt={5} px={5}>
-                <Table variant="simple" size="md">
-                    <Thead borderBottomWidth="3px">
-                        <Tr >
-                            <Th style={columnTitleStyle} w={"120%"}>Name</Th>
-                            <Th style={columnTitleStyle}></Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody >
-                        <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }}>
-                            <Td style={rowValueStyle}>inches</Td>
-                            <Td style={rowValueStyle}><Menu>
-                                <MenuButton
-                                    as={IconButton}
-                                    aria-label="Options"
-                                    icon={<HiEllipsisHorizontal width="10px" />}
-                                    variant="outline"
-                                    h={"30px"}
-                                    color="gray.500"
-                                    border={"1px solid #5c5c5c"}
-                                    right={30}
-                                />
-                                <MenuList borderRadius={0} >
-                                    <MenuItem fontSize="base" color="black" onClick={onOpen}  >
-                                        Create child team
-                                    </MenuItem>
-                                    <MenuItem fontSize="base" color="white" onClick="" bgColor="delete" >
-                                        Delete team...
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu></Td>
-                        </Tr>
-                    </Tbody>
-                </Table>
-            </TableContainer>
-        </Box >
+        </ >
     );
 };
 
-export default AMCreateTeams;
+export default CreateTeams;
