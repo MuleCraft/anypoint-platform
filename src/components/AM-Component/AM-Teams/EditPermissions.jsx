@@ -28,22 +28,15 @@ import {
     ModalHeader,
     Divider,
     ModalBody,
-    FormControl,
     FormLabel,
     Text,
     Input,
     ModalFooter,
     InputGroup,
     InputLeftElement,
-    Radio,
-    Heading,
-    FormErrorMessage,
+
     Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionIcon,
-    AccordionPanel,
-    Checkbox,
+
 } from "@chakra-ui/react";
 import { Link, useParams } from "react-router-dom";
 import supabase from "../../../Utils/supabase";
@@ -58,7 +51,7 @@ const Members = () => {
     const { id } = useParams();
     const [group, setGroup] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const toast = useToast();
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
