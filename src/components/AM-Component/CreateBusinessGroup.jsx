@@ -157,7 +157,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
         setGroupName(event.target.value);
         const value = event.target.value;
         const isValid = /^[a-zA-Z0-9\s',._-]+$/.test(value);
-        if (value === '') {
+        if (value.trim() === '') {
             setNameError('Required');
         } else if (value.length < 2 && !isValid) {
             setNameError(`Name must only contain alphanumeric characters, spaces, and the following symbols: ' , . _ - Name must be between 2 and 255 characters.`);

@@ -66,14 +66,14 @@ export default function AMBusinessGroup({ name, pathValue }) {
         <div className="Wrapper">
           <Flex>
             <Box>
-              <Sidebar
+              <Sidebar 
                 sections={sections}
                 activeItem={activeItem}
                 onItemSelect={handleItemSelect}
               />
             </Box>
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
-              <Stack mt={"-60px"} direction={"row"} spacing={6}>
+              <Stack mt={"-60px"} direction={"row"} spacing={6} align={'center'}>
                 <CreateBusinessGroup
                   currentUserEmail={currentUserEmail}
                   currentUserName={currentUserName}
