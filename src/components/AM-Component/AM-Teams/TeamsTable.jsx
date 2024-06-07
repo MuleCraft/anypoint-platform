@@ -23,94 +23,42 @@ import {
   ModalFooter,
   Button,
   ModalContent,
-  useToast,
-  Tooltip,
   Box,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
-import supabase from "../../../Utils/supabase";
-// import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
 
-const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
-  const [ownerData, setOwnerData] = useState([]);
-  const toast = useToast();
-
-  //   console.log('passed teams data:',tableData);
-
-  //   useEffect(() => {
-  //     const fetchBusinessGroups = async () => {
-  //       const { data, error } = await supabase
-  //         .schema("mc_cap_develop")
-  //         .from("businessgroup")
-  //         .select("*")
-  //         .eq("businessGroupName", userData.company);
-
-  //       if (error) {
-  //         console.error("Error fetching business groups:", error);
-  //       } else {
-  //         setOwnerData(data[0]);
-  //       }
-  //     };
-
-  //     if (userData) {
-  //       fetchBusinessGroups();
-  //     }
-  //   }, [userData.company]);
-
+const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
+  const [targetGroupName, setTargetGroupName] = useState("");
+  const [expandedRows, setExpandedRows] = useState([]);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [deleteInputValue, setDeleteInputValue] = useState("");
   const [isDeleteButtonDisabled, setDeleteButtonDisabled] = useState(true);
-
-  const [selectedBusinessGroupId, setSelectedBusinessGroupId] = useState(null);
-  const [targetGroupName, setTargetGroupName] = useState("");
-  const [openRow, setOpenRow] = useState(null); // State to track the open row
-  const [applyCondition, setApplyCondition] = useState(false); // State to apply condition
-  const [clickedRowId, setClickedRowId] = useState(null); // State to store clicked row ID
+  const [filteredRows, setFilteredRows] = useState([]);
+  const [hoveredRows, setHoveredRows] = useState([]);
 
   useEffect(() => {
-    if (selectedBusinessGroupId) {
-      setTargetGroupName(selectedBusinessGroupId.businessGroupName);
+    if (selectedTeamId) {
+      setTargetGroupName(selectedTeamId.teamname);
     }
-  }, [selectedBusinessGroupId]);
-
-  const [filteredRows, setFilteredRows] = useState([]);
+  }, [selectedTeamId]);
 
   useEffect(() => {
     const filteredData = tableData.filter(dataValue => {
-      if (applyCondition) {
-        return dataValue.ancestor_group_ids === clickedRowId || dataValue.ancestor_group_ids === null;
-      } else {
-        return dataValue.ancestor_group_ids === null;
-      }
+      return dataValue.parentteamId === null ||
+        expandedRows.includes(dataValue.teamId) ||
+        expandedRows.includes(dataValue.parentteamId);
     });
+
+
+    filteredData.sort((a, b) => {
+      const idA = a.teamid === "" ? -1 : parseInt(a.teamid, 10);
+      const idB = b.teamid === "" ? -1 : parseInt(b.teamid, 10);
+      return idA - idB;
+    });
+
     setFilteredRows(filteredData);
-    // console.log('filtered teams rows:',filteredData);
-  }, [tableData, applyCondition, clickedRowId]);
-
-  const handleDeleteOpen = () => {
-    setDeleteOpen(true);
-    setTargetGroupName(selectedBusinessGroupId.businessGroupName);
-  };
-
-  const handleDeleteClose = () => {
-    setDeleteOpen(false);
-    setDeleteInputValue("");
-    setDeleteButtonDisabled(true);
-    setTargetGroupName(selectedBusinessGroupId.businessGroupName);
-  };
-
-  const handleDeleteInputChange = (e) => {
-    const value = e.target.value;
-    setDeleteInputValue(value);
-    const matchingGroup = tableData.find(
-      (group) =>
-        group.businessGroupName.toLowerCase() === value.toLowerCase() &&
-        group.organizationName.toLowerCase() === ownerData.organizationName.toLowerCase()
-    );
-    setDeleteButtonDisabled(!matchingGroup);
-  };
-
-  const [hoveredRows, setHoveredRows] = useState([]);
+  }, [tableData, expandedRows]);
 
   const handleRowHover = (index) => {
     setHoveredRows((prevHoveredRows) => {
@@ -129,17 +77,28 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
   };
 
   const handleRowClick = (index, id) => {
-    if (openRow === index) {
-      // If the clicked row is already open, close it
-      setOpenRow(null);
-      setApplyCondition(false);
-      setClickedRowId(null);
+    if (expandedRows.includes(id)) {
+      setExpandedRows(expandedRows.filter(rowId => rowId !== id));
     } else {
-      // If the clicked row is not open, open it
-      setOpenRow(index);
-      setApplyCondition(true);
-      setClickedRowId(id);
+      setExpandedRows([...expandedRows, id]);
     }
+  };
+
+  const handleMenuOpen = (teamId) => {
+    setSelectedTeamId(teamId);
+  };
+
+  const handleDeleteClose = () => {
+    setDeleteOpen(false);
+    setDeleteInputValue("");
+    setDeleteButtonDisabled(true);
+    setTargetGroupName(selectedTeamId.teamname);
+  };
+
+  const handleDeleteInputChange = (e) => {
+    const value = e.target.value;
+    setDeleteInputValue(value);
+    setDeleteButtonDisabled(value.toLowerCase() !== targetGroupName.toLowerCase());
   };
 
   const columnTitleStyle = {
@@ -151,42 +110,6 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
   };
   const rowValueStyle = { fontSize: 14, padding: "10px" };
 
-  const handleMenuOpen = (businessGroupId) => {
-    setSelectedBusinessGroupId(businessGroupId);
-  };
-
-  async function invokeGroupDeleteFunction(selectedBusinessGroupId) {
-    try {
-      //   const response = await deleteBusinessGroup(selectedBusinessGroupId);
-      handleDeleteClose();
-
-      if (response === "Error occurred!") {
-        toast({
-          title: "Error",
-          description: "Error occurred.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-      } else {
-        toast({
-          description: "Business group successfully deleted.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-      }
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 800);
-    } catch (error) {
-      console.error("Error occurred:", error);
-    }
-  }
-
   return (
     <TableContainer>
       <Table variant="simple" size="md">
@@ -197,90 +120,106 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
           </Tr>
         </Thead>
         <Tbody>
-          {tableData.map((dataValue, index) => (
-            <>
-              <Tr
-                key={index}
-                fontWeight={500}
-                onMouseOver={() => handleRowHover(index)}
-                onMouseLeave={() => handleRowNotHover(index)}
-                _hover={{ bgColor: "#ececec" }}
-              >
-                <Td style={rowValueStyle}>
-                  <Box paddingLeft={dataValue.ancestor_group_ids === null ? 0 : 35}>
-
-                    <IconButton
-                      aria-label="Toggle Details"
-                      icon={openRow === index ? <HiChevronDown /> : <HiChevronRight />}
-                      size=""
-                      variant="ghost"
-                      onClick={() => handleRowClick(index, dataValue.teamid)} // Pass the ID here
-                      mr={2}
-                      display={(dataValue.ancestor_group_ids === '' || dataValue.childTeams === true) ? "inline-flex" : "none"}
-                    />
-
-                    <Link href={`/accounts/teams/${dataValue.teamid}`}
-                      _hover={{ textDecoration: "underline" }}
-                      color={hoveredRows[index] ? "#0176d3" : "#444444"}
+          {filteredRows.map((dataValue, index) => (
+            <Tr
+              key={index}
+              fontWeight={500}
+              onMouseOver={() => handleRowHover(index)}
+              onMouseLeave={() => handleRowNotHover(index)}
+              _hover={{ bgColor: "#ececec" }}
+            >
+              <Td style={rowValueStyle}>
+                <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 25}px`}>
+                  <IconButton
+                    aria-label="Toggle Details"
+                    icon={expandedRows.includes(dataValue.teamid) ? <HiChevronDown /> : <HiChevronRight />}
+                    size=""
+                    variant="ghost"
+                    onClick={() => handleRowClick(index, dataValue.teamid)}
+                    mr={2}
+                    display={(dataValue.ancestors.length === 0 || dataValue.childTeams === true) ? "inline-flex" : "none"}
+                  />
+                  <Link
+                    href={`/accounts/teams/${dataValue.teamid}`}
+                    _hover={{ textDecoration: "underline" }}
+                    color={hoveredRows[index] ? "#0176d3" : "#444444"}
+                  >
+                    {dataValue.childGroups === false ? (
+                      <Box paddingLeft={25}>
+                        {dataValue.teamname}
+                      </Box>
+                    ) : (
+                      dataValue.teamname
+                    )}
+                  </Link>
+                </Box>
+              </Td>
+              <Td style={rowValueStyle}>
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="Options"
+                    icon={<HiEllipsisHorizontal />}
+                    variant="outline"
+                    h={"28px"}
+                    color="gray.500"
+                    border={"1px solid #5c5c5c"}
+                    onClick={() => handleMenuOpen(dataValue)}
+                  />
+                  <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
+                    <MenuItem
+                      fontSize={14}
+                      onClick={() => onOpenCreateChildteam(dataValue.teamid, dataValue.teamname)}
                     >
-                      {dataValue.childTeams === false ? (
-                        <Box paddingLeft={55}>
-                          {dataValue.teamname}
-                        </Box>
-                      ) : (
-                        dataValue.teamname
-                      )}
-
-                    </Link>
-                  </Box>
-                </Td>
-                <Td style={rowValueStyle}>
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      aria-label="Options"
-                      icon={<HiEllipsisHorizontal />}
-                      variant="outline"
-                      h={"28px"} color="gray.500"
-                      border={"1px solid #5c5c5c"}
-                      onClick={() => handleMenuOpen(dataValue)}
-                    />
-                    <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
-                      <Tooltip label="This business group is not entitled to create child groups" placement="auto" fontSize="4xl" isDisabled={selectedBusinessGroupId?.canCreateChildGroup !== false}>
-                        <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId, dataValue.businessGroupName)} isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}>
-                          Create child group
-                        </MenuItem>
-                      </Tooltip>
-                      {ownerData.id !== selectedBusinessGroupId?.id &&
-                        <Tooltip label="Cannot delete a Business Group with children" placement="auto" fontSize="4xl" isDisabled={selectedBusinessGroupId?.childGroups === false}>
-                          <MenuItem fontSize={14} onClick={handleDeleteOpen} color={"red.600"} isDisabled={selectedBusinessGroupId?.childGroups !== false}
-                            _hover={{ color: selectedBusinessGroupId?.childGroups !== false ? '#000' : "white", bgColor: selectedBusinessGroupId?.childGroups !== false ? '' : 'red.600' }}>
-                            Delete business group...
-                          </MenuItem>
-                        </Tooltip>
-                      }
-                    </MenuList>
-                  </Menu>
-                </Td>
-              </Tr>
-
-            </>
+                      Create child team
+                    </MenuItem>
+                    {(dataValue.ancestors.length === 0) ? (
+                      ""
+                    ) : (
+                      <MenuItem
+                        fontSize={14}
+                        onClick={() => setDeleteOpen(true)}
+                        color={"red.600"}
+                        _hover={{
+                          color: "#000",
+                          bgColor: "red.600",
+                        }}
+                      >
+                        Delete team...
+                      </MenuItem>
+                    )}
+                  </MenuList>
+                </Menu>
+              </Td>
+            </Tr>
           ))}
         </Tbody>
       </Table>
       <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
         <ModalOverlay />
-        <ModalContent minW={"600px"} >
-          <ModalHeader bg={"#f3f3f3"} fontSize={20} fontWeight={800} color={"#444444"}
-            borderTopRadius={15} borderBottom={"1px solid #e5e5e5"}>
+        <ModalContent minW={"600px"}>
+          <ModalHeader
+            bg={"#f3f3f3"}
+            fontSize={20}
+            fontWeight={800}
+            color={"#444444"}
+            borderTopRadius={15}
+            borderBottom={"1px solid #e5e5e5"}
+          >
             Are you sure?
           </ModalHeader>
           <ModalBody p={"32px 32px"}>
             <VStack spacing={4}>
               <VStack spacing={0} fontSize={14} align={"flex-start"}>
                 <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
-                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
-                <Input placeholder="Business Group name" mt={1} fontSize={14} fontWeight={500}
+                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> team and all of its associated information.
+                  Please type the name of the team to confirm.
+                </FormLabel>
+                <Input
+                  placeholder="Team name"
+                  mt={1}
+                  fontSize={14}
+                  fontWeight={500}
                   value={deleteInputValue}
                   onChange={handleDeleteInputChange}
                 />
@@ -288,15 +227,22 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
             </VStack>
           </ModalBody>
           <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
-            <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>Cancel</Button>
-            <Button onClick={() => invokeGroupDeleteFunction(selectedBusinessGroupId)}
+            <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>
+              Cancel
+            </Button>
+            <Button
+              // onClick={() => invokeGroupDeleteFunction(selectedTeamId)}
               variant={"formButtons"}
-              isDisabled={isDeleteButtonDisabled} _hover={{ bgColor: 'navy' }}>Delete</Button>
+              isDisabled={isDeleteButtonDisabled}
+              _hover={{ bgColor: "navy" }}
+            >
+              Delete
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
     </TableContainer>
-  )
-}
+  );
+};
 
-export default TeamsTable;
+export default TeamTable;

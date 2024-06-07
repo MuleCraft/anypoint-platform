@@ -26,6 +26,7 @@ import {
   useToast,
   Tooltip,
   Box,
+  Flex,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
 import supabase from "../../Utils/supabase";
@@ -211,7 +212,7 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
               _hover={{ bgColor: "#ececec" }}
             >
               <Td style={rowValueStyle}>
-                <Box paddingLeft={dataValue.parentGroupID === "" ? 0 : `${index * 55}px`}>
+                <Flex paddingLeft={dataValue.parentGroupID === "" ? 0 : `${index * 55}px`}>
                   <IconButton
                     aria-label="Toggle Details"
                     icon={expandedRows.includes(dataValue.businessGroupId) ? <HiChevronDown /> : <HiChevronRight />}
@@ -227,14 +228,14 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
                     color={hoveredRows[index] ? "#0176d3" : "#444444"}
                   >
                     {dataValue.childGroups === false ? (
-                      <Box paddingLeft={25}>
+                      <Box >
                         {dataValue.businessGroupName}
                       </Box>
                     ) : (
                       dataValue.businessGroupName
                     )}
                   </Link>
-                </Box>
+                </Flex>
               </Td>
               <Td style={rowValueStyle}>{dataValue.environments.length}</Td>
               <Td style={rowValueStyle}>{dataValue.totalVcores}</Td>

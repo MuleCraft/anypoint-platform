@@ -127,7 +127,7 @@ export default function AMTeams({ name }) {
                             {filteredTableData.length === 0 ? (
                                 <EmptyRows message={'No data to show'} />
                             ) : (
-                                <TeamsTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} />
+                                <TeamsTable tableData={filteredTableData} onOpenCreateChildteam={openModal} />
                             )}
                         </Flex>
                     </Flex>

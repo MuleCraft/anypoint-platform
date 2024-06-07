@@ -18,15 +18,14 @@ import {
     InputGroup,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import supabase from "../../../Utils/supabase";
 import FlexableTabs from "../../FlexableTabs";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
 import EmptyRows from "../../../components/AM-Component/EmptyRows";
 import fetchTeamsTableRows from "../../../Utils/TeamsTableRows";
 import { AuthContext } from "../../../Utils/AuthProvider";
-import TeamsTable from "./TeamsTable";
 import CreateTeams from "./CreateTeams";
+import ChildTeamsTable from "./ChildTeamsTable";
 const ChildTeams = () => {
     const { id } = useParams();
     const { userData } = useContext(AuthContext);
@@ -155,7 +154,7 @@ const ChildTeams = () => {
                     <EmptyRows message={'No data to show'} />
                 ) : (
                     <Box p={5}>
-                        <TeamsTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} />
+                        <ChildTeamsTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
                     </Box>
                 )
             }
