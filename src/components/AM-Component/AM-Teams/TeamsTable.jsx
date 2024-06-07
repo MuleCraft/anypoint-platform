@@ -84,7 +84,7 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
       }
     });
     setFilteredRows(filteredData);
-    console.log('filtered teams rows:',filteredData);
+    // console.log('filtered teams rows:',filteredData);
   }, [tableData, applyCondition, clickedRowId]);
 
   const handleDeleteOpen = () => {

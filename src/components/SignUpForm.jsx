@@ -19,6 +19,8 @@ import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
 import createNewBusinessGroup from "../Utils/BusinessGroupCreate";
+import createNewTeams from "../Utils/TeamsCreate";
+import { v4 as uuidv4 } from "uuid";
 
 export default function SimpleCard() {
   const [isCheckedBox, setIsCheckedBox] = useState(false);
@@ -38,6 +40,9 @@ export default function SimpleCard() {
   const [recaptchaError, setRecaptchaError] = useState("");
   const [checkboxError, setCheckboxError] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState(null);
+
+  const [organizationId, setOrganizationId] = useState("");
+
   const handleCheckboxChange = () => {
     setIsCheckedBox(!isCheckedBox);
 
@@ -248,6 +253,21 @@ export default function SimpleCard() {
           currentUserName: username,
           currentUserEmail: email,
           currentOrganization: company,
+          parentGroupId:''
+        };
+
+        const teamId = uuidv4();
+
+        const teamsCreateParams = {
+          teamid: teamId,
+          teamname: `Everyone at ${company}`,
+          teamtype: 'internal',
+          parentTeam: '',
+          ancestor_group_ids: [],
+          ancestors: [],
+          organizationId: '',
+          userName: username,
+          membershiptype: 'maintainer'
         };
 
         if (error) {
@@ -256,6 +276,7 @@ export default function SimpleCard() {
           console.log("User created:", data.user);
           await insertAdditionalDetails(data.user.id);
           await createNewBusinessGroup(groupCreateParams);
+          await createNewTeams(teamsCreateParams);
           console.log("Signup successful!");
         } else {
           console.error("User object is missing 'id'.");
@@ -287,6 +308,7 @@ export default function SimpleCard() {
     if (error) {
       console.error("Error inserting additional details:", error.message);
     } else {
+      // setOrganizationId(data.organizationId);
       console.log("Additional details inserted:", data);
     }
   };

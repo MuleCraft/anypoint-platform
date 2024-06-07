@@ -64,10 +64,10 @@ export default async function createNewBusinessGroup(groupCreateParams) {
     console.log(error);
     return "Error occurred!";
   }
-
+console.log('parentGroupId:',groupCreateParams.parentGroupId);
   // if (data && groupCreateParams.parentGroupId) {
 
-  // if(groupCreateParams.parentGroupId){
+  if(groupCreateParams.parentGroupId !== ''){
   const { data: vcoreData, vcoreError } = await supabase
     .schema("mc_cap_develop")
     .from("businessgroup")
@@ -108,7 +108,7 @@ export default async function createNewBusinessGroup(groupCreateParams) {
     return "Error occurred!";
   }
   console.log('update result:', updateVcores);
-  // }
+  }
 
   // } 
   // else {
@@ -116,7 +116,7 @@ export default async function createNewBusinessGroup(groupCreateParams) {
   //   setDesignTotalReassignedVcores(0);
   // }
   console.log("New group created!", data);
-  return "New group created!";
+  return "New group created!",data;
 
   // } else {
   //   console.log(error);
