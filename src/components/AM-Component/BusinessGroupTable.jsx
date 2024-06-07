@@ -211,7 +211,7 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
               _hover={{ bgColor: "#ececec" }}
             >
               <Td style={rowValueStyle}>
-                <Box paddingLeft={dataValue.parentGroupID === "" ? 0 : 35}>
+                <Box paddingLeft={dataValue.parentGroupID === "" ? 0 : `${index * 55}px`}>
                   <IconButton
                     aria-label="Toggle Details"
                     icon={expandedRows.includes(dataValue.businessGroupId) ? <HiChevronDown /> : <HiChevronRight />}
@@ -227,7 +227,7 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
                     color={hoveredRows[index] ? "#0176d3" : "#444444"}
                   >
                     {dataValue.childGroups === false ? (
-                      <Box paddingLeft={55}>
+                      <Box paddingLeft={25}>
                         {dataValue.businessGroupName}
                       </Box>
                     ) : (
