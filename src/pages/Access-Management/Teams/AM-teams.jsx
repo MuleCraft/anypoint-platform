@@ -66,7 +66,6 @@ export default function AMTeams({ name }) {
     const fetchRows = async () => {
         const tableRowData = await fetchTeamsTableRows(currentOrganization);
         setTeamsTableData(tableRowData);
-        // console.log('teams table data:',teamsTableData);
     }
 
     if (userData && (teamsTableData.length === 0)) {

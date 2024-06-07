@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import {
     Box,
     Button,
@@ -6,10 +6,8 @@ import {
     FormControl,
     FormLabel,
     HStack,
-    IconButton,
     Input,
     InputGroup,
-    InputLeftElement,
     InputRightElement,
     Menu,
     MenuButton,
@@ -26,17 +24,16 @@ import {
     useToast
 } from "@chakra-ui/react";
 // import { useParams } from "react-router-dom";
-import { AuthContext } from "../../../Utils/AuthProvider";
 import { SlArrowDown } from "react-icons/sl";
 import createNewTeams from "../../../Utils/TeamsCreate";
+import { v4 as uuidv4 } from "uuid";
 
 const CreateTeams = ({filteredTeamsTableData,orgId}) => {
     // const { id } = useParams();
     // const [group, setGroup] = useState(null);
-    console.log('filteredTeamsTableData:', filteredTeamsTableData);
+    // console.log('filteredTeamsTableData:', filteredTeamsTableData);
     const toast = useToast();
 
-    const { userData } = useContext(AuthContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [teamName, setTeamName] = useState('');
@@ -44,41 +41,29 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
     const [parentTeamName, setParentTeamName] = useState('');
 
     const [searchInput, setSearchInput] = useState('');
-    const [selectedParentValue, setSelectedParentValue] = useState("");
+    // const [selectedParentValue, setSelectedParentValue] = useState("");
 
     const [filteredTeams, setFilteredTeams] = useState([]);
     const [isTeamsMenuOpen, setIsTeamsMenuOpen] = useState(false);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const openModal = () => setIsModalOpen(true);
+    // const openModal = () => setIsModalOpen(true);
 
-    // const filteredTableData = tableData.filter((data) =>
-    //     (data?.businessGroupId === id || data?.parentGroupID === id) &&
-    //     data?.organizationName === group?.organizationName || group?.parentGroupID === ""
-    // );
-
-    const columnTitleStyle = {
-        fontSize: 14,
-        color: "#444444",
-        fontWeight: 800,
-        textTransform: "capitalize",
-        padding: "10px",
-    };
-    const rowValueStyle = { fontSize: 14, padding: "10px" };
+    const teamId = uuidv4();
 
         const teamsCreateParams = {
+            teamid: teamId,
             teamname: teamName,
             teamtype: 'internal',
             organizationId: orgId,
-            parentTeam: parentTeamName
-            // ancestor_group_ids: '',
-            // ancestors: '',
+            parentTeam: parentTeamName,
+            members: []
         };
 
     async function invokeTeamsCreate() {
         try {
-            console.log(teamsCreateParams)
+            // console.log(teamsCreateParams);
             const response = await createNewTeams(teamsCreateParams);
             onClose();
 
@@ -102,9 +87,9 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
                 });
             }
 
-            setTimeout(() => {
-                window.location.reload();
-            }, 800);
+            // setTimeout(() => {
+            //     window.location.reload();
+            // }, 800);
         } catch (error) {
             console.error("Error occurred:", error);
         }
@@ -135,7 +120,7 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
         const value = e.target.value;
         setParentTeamName(value);
         setSearchInput(value);
-        setSelectedParentValue(value);
+        // setSelectedParentValue(value);
     
         const filtered = filteredTeamsTableData.filter((item) =>
             (typeof item.teamname === 'string' && item.teamname.toLowerCase().includes(value.toLowerCase()))
@@ -154,9 +139,9 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
       const handleTeamSelect = (team) => {
         setParentTeamName(team.teamname);
         setSearchInput(team.teamname);
-        setSelectedParentValue(team.teamname);
+        // setSelectedParentValue(team.teamname);
         setIsTeamsMenuOpen(false);
-        filterBusinessGroupId(filteredTeamsTableData, team.teamname);
+        // filterBusinessGroupId(filteredTeamsTableData, team.teamname);
       };
     
       const handleInputFocus = () => {
