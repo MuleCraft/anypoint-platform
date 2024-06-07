@@ -223,7 +223,7 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData, id })
                                         display={(dataValue.parentGroupID === "" || dataValue.childGroups === true) ? "inline-flex" : "none"}
                                     />
                                     <Link
-                                        href={`/ accounts / businessGroups / ${dataValue.businessGroupId}`}
+                                        href={`/accounts/businessGroups/${dataValue.businessGroupId}`}
                                         _hover={{ textDecoration: "underline" }}
                                         color={hoveredRows[index] ? "#0176d3" : "#444444"}
                                     >
