@@ -35,27 +35,27 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
   const [ownerData, setOwnerData] = useState([]);
   const toast = useToast();
 
-//   console.log('passed teams data:',tableData);
+  //   console.log('passed teams data:',tableData);
 
-//   useEffect(() => {
-//     const fetchBusinessGroups = async () => {
-//       const { data, error } = await supabase
-//         .schema("mc_cap_develop")
-//         .from("businessgroup")
-//         .select("*")
-//         .eq("businessGroupName", userData.company);
+  //   useEffect(() => {
+  //     const fetchBusinessGroups = async () => {
+  //       const { data, error } = await supabase
+  //         .schema("mc_cap_develop")
+  //         .from("businessgroup")
+  //         .select("*")
+  //         .eq("businessGroupName", userData.company);
 
-//       if (error) {
-//         console.error("Error fetching business groups:", error);
-//       } else {
-//         setOwnerData(data[0]);
-//       }
-//     };
+  //       if (error) {
+  //         console.error("Error fetching business groups:", error);
+  //       } else {
+  //         setOwnerData(data[0]);
+  //       }
+  //     };
 
-//     if (userData) {
-//       fetchBusinessGroups();
-//     }
-//   }, [userData.company]);
+  //     if (userData) {
+  //       fetchBusinessGroups();
+  //     }
+  //   }, [userData.company]);
 
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [deleteInputValue, setDeleteInputValue] = useState("");
@@ -84,7 +84,7 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
       }
     });
     setFilteredRows(filteredData);
-    console.log('filtered teams rows:',filteredData);
+    // console.log('filtered teams rows:',filteredData);
   }, [tableData, applyCondition, clickedRowId]);
 
   const handleDeleteOpen = () => {
@@ -157,7 +157,7 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
 
   async function invokeGroupDeleteFunction(selectedBusinessGroupId) {
     try {
-    //   const response = await deleteBusinessGroup(selectedBusinessGroupId);
+      //   const response = await deleteBusinessGroup(selectedBusinessGroupId);
       handleDeleteClose();
 
       if (response === "Error occurred!") {
@@ -247,7 +247,7 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
                     />
                     <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
                       <Tooltip label="This business group is not entitled to create child groups" placement="auto" fontSize="4xl" isDisabled={selectedBusinessGroupId?.canCreateChildGroup !== false}>
-                        <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId,dataValue.businessGroupName)} isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}>
+                        <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId, dataValue.businessGroupName)} isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}>
                           Create child group
                         </MenuItem>
                       </Tooltip>

@@ -9,7 +9,7 @@ export default async function fetchTeamsTableRows(currentOrganization) {
     .eq("organizationId", currentOrganization);
 
   if (data) {
-    console.log('Fetch table table rows.', data);
+    // console.log('Fetch teams table rows.', data);
     return data;
   } else {
     console.log(error);

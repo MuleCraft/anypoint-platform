@@ -138,7 +138,7 @@ const ChildTeams = () => {
                     <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
                         Child teams inherit permissions from their parents.
                     </Text>
-                </HStack>
+                </HStack >
                 <InputGroup maxW={"fit-content"} ml={0}>
                     <InputLeftElement
                         pointerEvents="none"
@@ -149,14 +149,16 @@ const ChildTeams = () => {
                         onChange={(e) => { setFilterValue(e.target.value) }}
                     />
                 </InputGroup>
-            </Stack>
-            {filteredTableData.length === 0 ? (
-                <EmptyRows message={'No data to show'} />
-            ) : (
-                <Box p={5}>
-                    <TeamsTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} />
-                </Box>
-            )}
+            </Stack >
+            {
+                filteredTableData.length === 0 ? (
+                    <EmptyRows message={'No data to show'} />
+                ) : (
+                    <Box p={5}>
+                        <TeamsTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} />
+                    </Box>
+                )
+            }
         </Box >
     );
 };
