@@ -21,12 +21,12 @@ import { useParams } from "react-router-dom";
 import supabase from "../../Utils/supabase";
 import FlexableTabs from "../FlexableTabs";
 import { FiSearch } from "react-icons/fi";
-import BusinessGroupTable from "./BusinessGroupTable";
 import fetchBgTableRows from "../../Utils/BgTableRows";
 import { AuthContext } from "../../Utils/AuthProvider";
 import EmptyRows from "./EmptyRows";
 import CreateBusinessGroup from "./CreateBusinessGroup";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
+import ChildGroupTable from "./AM-BusinessGroup/ChildGroupTable";
 
 const BGChildGroup = () => {
     const { id } = useParams();
@@ -101,12 +101,7 @@ const BGChildGroup = () => {
         fetchRows();
     }
 
-    const filteredTableData = tableData.filter((data) =>
 
-        (data.parentGroupID === id &&
-            group.parentGroupID === "") || (data.businessGroupId !== id && data.businessGroupId !== group.parentGroupID) && data.childGroups === false
-
-    );
 
     const filtered = tableData.filter((data) =>
 
@@ -115,7 +110,6 @@ const BGChildGroup = () => {
 
     );
 
-    console.log(filteredTableData)
 
     return (
 
@@ -205,11 +199,11 @@ const BGChildGroup = () => {
                     />
                 </InputGroup>
             </Stack>
-            {filteredTableData.length === 0 ? (
+            {tableData.length === 0 ? (
                 <EmptyRows message={'No data to show'} />
             ) : (
                 <Box m={7}>
-                    <BusinessGroupTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} />
+                    <ChildGroupTable tableData={tableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
                 </Box>
             )}
         </Box >
