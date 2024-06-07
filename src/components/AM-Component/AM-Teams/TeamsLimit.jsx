@@ -118,8 +118,8 @@ const TeamLimits = () => {
                 { name: 'Members', label: 'Members', path: `/accounts/teams/${id}/users` },
                 { name: 'Permissions', label: 'Permissions', path: `/accounts/teams/${id}/permissions` },
                 { name: 'ChildTeams', label: 'Child teams', path: `/accounts/teams/${id}/child_teams` },
-                { name: 'Settings', label: 'Settings', path: `/accounts/teams/${1}/settings` },
-                { name: 'Limits', label: 'Limits', path: `/accounts/teams/${1}/limits` },
+                { name: 'Settings', label: 'Settings', path: `/accounts/teams/${id}/settings` },
+                { name: 'Limits', label: 'Limits', path: `/accounts/teams/${id}/limits` },
 
             ],
         },

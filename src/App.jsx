@@ -75,7 +75,15 @@ export default function App() {
                 />
               }
             />
-
+            <Route
+              path="/accounts/teams/:id"
+              element={
+                <AMMenbers
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
             <Route
               path="/accounts/teams/:id/settings"
               element={

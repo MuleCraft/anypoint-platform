@@ -5,36 +5,12 @@ import sections from "../utils/AM-sidebar";
 import {
     Box,
     Flex, Link,
-    Button,
-    Divider,
-    FormControl,
-    FormLabel,
     HStack,
-    IconButton,
     Input,
     InputGroup,
     InputLeftElement,
-    InputRightElement,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
     Stack,
-    Table,
-    TableContainer,
-    Tbody,
-    Td,
     Text,
-    Th,
-    Thead,
-    Tr,
-    useDisclosure,
 } from "@chakra-ui/react";
 import CreateTeams from "../../../components/AM-Component/AM-Teams/CreateTeams";
 import TeamsTable from "../../../components/AM-Component/AM-Teams/TeamsTable";
@@ -57,7 +33,7 @@ export default function AMTeams({ name }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+
 
     if (userData && (currentUserName === '')) {
         setCurrentUserEmail(userData.email);
@@ -82,6 +58,7 @@ export default function AMTeams({ name }) {
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
+
     return (
         <>
             <div className="home">
