@@ -133,3 +133,7 @@
   font-weight: 500;
   color: #444444;
 }
+
+.chakra-switch__track {
+  padding: 5px !important;
+}

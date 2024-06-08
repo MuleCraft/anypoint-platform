@@ -134,6 +134,19 @@ export default async function createNewTeams(teamsCreateParams) {
             return;
         }
 
+        const { data:isChildData, isChilderror } = await supabase
+            .schema('mc_cap_develop')
+            .from('teams')
+            .update({
+                childTeams: 'true'
+            })
+            .eq('teamid', parentTeamId);
+
+        if (isChilderror) {
+            console.error('Error updating team data:', isChilderror);
+            return "Error occurred!";
+        }
+
         const { ancestorIds, ancestors } = await fetchAncestors(parentTeamId);
 
         const { data, error } = await supabase

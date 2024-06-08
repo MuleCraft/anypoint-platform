@@ -21,33 +21,56 @@ import {
     ModalOverlay,
     Text,
     useDisclosure,
-    useToast
+    useToast,
+    Step,
+    StepDescription,
+    StepIcon,
+    StepIndicator,
+    StepNumber,
+    StepSeparator,
+    StepStatus,
+    StepTitle,
+    Stepper,
+    useSteps,
 } from "@chakra-ui/react";
 // import { useParams } from "react-router-dom";
 import { SlArrowDown } from "react-icons/sl";
 import createNewTeams from "../../../Utils/TeamsCreate";
 import { v4 as uuidv4 } from "uuid";
 
-const CreateTeams = ({filteredTeamsTableData,orgId}) => {
+const steps = [
+    { title: 'Select Permissions', description: 'Contact Info' },
+    { title: 'Select Business Groups', description: 'Date & Time' },
+    { title: 'Review', description: 'Select Rooms' },
+  ]
 
-    console.log('filteredTeamsTableData:', filteredTeamsTableData);
+const CreatePermissions = ({filteredTeamsTableData,orgId}) => {
+    // const { id } = useParams();
+    // const [group, setGroup] = useState(null);
+    // console.log('filteredTeamsTableData:', filteredTeamsTableData);
     const toast = useToast();
+    const { activeStep } = useSteps({
+        index: 1,
+        count: steps.length,
+      })
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [teamName, setTeamName] = useState('');
     const [teamNameError, setTeamNameError] = useState('');
-    const [parentTeamName, setParentTeamName] = useState('');
-
-    if(filteredTeamsTableData.length  > 0 && parentTeamName === ''){
-        setParentTeamName(filteredTeamsTableData[filteredTeamsTableData.length-1].teamname);
-    }
+    // const [parentTeamName, setParentTeamName] = useState(filteredTeamsTableData[filteredTeamsTableData.length-1].teamname);
 
     const [searchInput, setSearchInput] = useState('');
+    // const [selectedParentValue, setSelectedParentValue] = useState("");
+
     const [filteredTeams, setFilteredTeams] = useState([]);
     const [isTeamsMenuOpen, setIsTeamsMenuOpen] = useState(false);
 
-    const isCreateTeamsButtonDisabled = !teamName || !parentTeamName || teamNameError;
+    // const isCreateTeamsButtonDisabled = !teamName || !parentTeamName || teamNameError;
+
+    // const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // const openModal = () => setIsModalOpen(true);
 
     const teamId = uuidv4();
 
@@ -56,7 +79,7 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
             teamname: teamName,
             teamtype: 'internal',
             organizationId: orgId,
-            parentTeam: parentTeamName,
+            // parentTeam: parentTeamName,
             members: []
         };
 
@@ -100,6 +123,12 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
         if (value.trim() === '') {
             setTeamNameError(`Required. Team name must only contain alphanumeric characters, spaces, and the following symbols: _ -`);
         }
+        // else if (value.length < 2 && !isValid) {
+        //     setTeamNameError(`Name must only contain alphanumeric characters, spaces, and the following symbols: ' , . _ - Name must be between 2 and 255 characters.`);
+        // } 
+        // else if (value.length < 2) {
+        //     setTeamNameError('Name must be between 2 and 255 characters.');
+        // }
         else if(!isValid){
             setTeamNameError(`Team name must only contain alphanumeric characters, spaces, and the following symbols: _ -`);
         } 
@@ -110,8 +139,9 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
 
     const handleParentTeamChange = (e) => {
         const value = e.target.value;
-        setParentTeamName(value);
+        // setParentTeamName(value);
         setSearchInput(value);
+        // setSelectedParentValue(value);
     
         const filtered = filteredTeamsTableData.filter((item) =>
             (typeof item.teamname === 'string' && item.teamname.toLowerCase().includes(value.toLowerCase()))
@@ -121,14 +151,14 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
         setIsTeamsMenuOpen(true);
       };
 
-    //   const filterBusinessGroupId = (data, groupName) => {
-    //     const result = data.filter(item => item.businessGroupName === groupName);
-    //     console.log('result:',result[0].businessGroupId);
-    //     setSelectedGroupParentId(result[0].businessGroupId);
-    //   };
+      const filterBusinessGroupId = (data, groupName) => {
+        const result = data.filter(item => item.businessGroupName === groupName);
+        console.log('result:',result[0].businessGroupId);
+        setSelectedGroupParentId(result[0].businessGroupId);
+      };
 
       const handleTeamSelect = (team) => {
-        setParentTeamName(team.teamname);
+        // setParentTeamName(team.teamname);
         setSearchInput(team.teamname);
         // setSelectedParentValue(team.teamname);
         setIsTeamsMenuOpen(false);
@@ -144,18 +174,38 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
 
         <>
             <Button variant="formButtons" onClick={onOpen} >
-                Create Team
+                Add Permissions
             </Button>
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
                 <ModalOverlay />
                         <ModalContent>
                                 <ModalHeader bg={'#f3f3f3'} fontSize={20} fontWeight={800} color={'#444444'}
                                     borderTopRadius={15} borderBottom={'0.5px solid #e5e5e5'} p={6}>
-                                    Create Team
+                                    Add Permissions
                                 </ModalHeader>
                             <Divider />
                             <ModalBody>
                                 <FormControl id="email" p={4}>
+                                <Stepper index={activeStep} orientation='vertical' height='auto' gap='5'>
+      {steps.map((step, index) => (
+        <Step key={index}>
+          <StepIndicator>
+            <StepStatus
+              complete={<StepIcon />}
+              incomplete={<StepNumber />}
+              active={<StepNumber />}
+            />
+          </StepIndicator>
+
+          {/* <Box flexShrink='0'> */}
+            <StepTitle>{step.title}</StepTitle>
+            {/* <StepDescription>{step.description}</StepDescription> */}
+          {/* </Box> */}
+
+          <StepSeparator />
+        </Step>
+      ))}
+    </Stepper>
                                     <FormLabel fontWeight={500} fontSize={14} color={'#444444'} >Name</FormLabel>
                                     <Text pb={1} maxW="450px" color={'#747474'} fontSize={14} fontWeight={500}>
                                         You can use alphanumeric characters, hyphens, and spaces.
@@ -200,7 +250,7 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
                                         // /placeholder="Select..."
                                         autoComplete="off"
                                         fontSize={14} color={'#747474'}
-                                        value={parentTeamName}
+                                        // value={parentTeamName}
                                         onChange={handleParentTeamChange}
                                         onFocus={handleInputFocus}
                                         />
@@ -236,7 +286,7 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
                                 </Button>
                                 <Button onClick={invokeTeamsCreate}
                                     variant={'formButtons'}
-                                    isDisabled={isCreateTeamsButtonDisabled}
+                                    // isDisabled={isCreateTeamsButtonDisabled}
                                     _hover={{ bgColor: 'navy' }}>
                                     Create
                                 </Button>
@@ -247,4 +297,4 @@ const CreateTeams = ({filteredTeamsTableData,orgId}) => {
     );
 };
 
-export default CreateTeams;
+export default CreatePermissions;
