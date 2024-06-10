@@ -31,7 +31,7 @@ import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons
 import supabase from "../../../Utils/supabase";
 // import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
 
-const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
+const PermissionsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
   const [ownerData, setOwnerData] = useState([]);
   const toast = useToast();
 
@@ -192,7 +192,8 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
       <Table variant="simple" size="md">
         <Thead borderBottomWidth="3px">
           <Tr>
-            <Th style={columnTitleStyle}>Name</Th>
+            <Th style={columnTitleStyle}>Business Groups</Th>
+            <Th style={columnTitleStyle}>Permissions</Th>
             <Th style={columnTitleStyle} w={"80px"}></Th>
           </Tr>
         </Thead>
@@ -214,12 +215,13 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
                       icon={openRow === index ? <HiChevronDown /> : <HiChevronRight />}
                       size=""
                       variant="ghost"
-                      onClick={() => handleRowClick(index, dataValue.teamid)} // Pass the ID here
+                      onClick={() => handleRowClick(index, dataValue.teamid)}
                       mr={2}
                       display={(dataValue.ancestor_group_ids === '' || dataValue.childTeams === true) ? "inline-flex" : "none"}
                     />
 
-                    <Link href={`/accounts/teams/${dataValue.teamid}`}
+                    <Link 
+                    href={`/accounts/teams/${dataValue.teamid}`}
                       _hover={{ textDecoration: "underline" }}
                       color={hoveredRows[index] ? "#0176d3" : "#444444"}
                     >
@@ -233,6 +235,9 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
 
                     </Link>
                   </Box>
+                </Td>
+                <Td style={rowValueStyle}>
+                    {dataValue.teamname}
                 </Td>
                 <Td style={rowValueStyle}>
                   <Menu>
@@ -266,40 +271,12 @@ const TeamsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
                   </Menu>
                 </Td>
               </Tr>
-
             </>
-          ))}
+           ))}
         </Tbody>
       </Table>
-      <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
-        <ModalOverlay />
-        <ModalContent minW={"600px"} >
-          <ModalHeader bg={"#f3f3f3"} fontSize={20} fontWeight={800} color={"#444444"}
-            borderTopRadius={15} borderBottom={"1px solid #e5e5e5"}>
-            Are you sure?
-          </ModalHeader>
-          <ModalBody p={"32px 32px"}>
-            <VStack spacing={4}>
-              <VStack spacing={0} fontSize={14} align={"flex-start"}>
-                <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
-                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
-                <Input placeholder="Business Group name" mt={1} fontSize={14} fontWeight={500}
-                  value={deleteInputValue}
-                  onChange={handleDeleteInputChange}
-                />
-              </VStack>
-            </VStack>
-          </ModalBody>
-          <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
-            <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>Cancel</Button>
-            <Button onClick={() => invokeGroupDeleteFunction(selectedBusinessGroupId)}
-              variant={"formButtons"}
-              isDisabled={isDeleteButtonDisabled} _hover={{ bgColor: 'navy' }}>Delete</Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </TableContainer>
   )
 }
 
-export default TeamsTable;
+export default PermissionsTable;

@@ -221,7 +221,6 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
                     position: "top-right",
                 });
             }
-
             setTimeout(() => {
                 window.location.reload();
             }, 800);
