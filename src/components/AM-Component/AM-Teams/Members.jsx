@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
     Box,
     Breadcrumb,
@@ -37,6 +37,7 @@ import {
     InputLeftElement,
     Radio,
     FormErrorMessage,
+    InputRightElement,
 } from "@chakra-ui/react";
 import { Link, useParams } from "react-router-dom";
 import supabase from "../../../Utils/supabase";
@@ -44,41 +45,76 @@ import FlexableTabs from "../../FlexableTabs";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import { AuthContext } from "../../../Utils/AuthProvider";
 
 const Members = () => {
     const { id } = useParams();
-    const [group, setGroup] = useState(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
+    const { userData } = useContext(AuthContext);
+    const [group, setGroup] = useState(null);
+    const [members, setMembers] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
 
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchGroupData = async () => {
             try {
                 const { data, error } = await supabase
                     .schema("mc_cap_develop")
-                    .from("businessgroup")
+                    .from("teams")
                     .select("*")
-                    .eq("businessGroupId", id);
+                    .eq("teamid", id)
+                    .single();
 
                 if (error) {
-                    console.error("Error fetching user data:", error.message);
+                    console.error("Error fetching group data:", error.message);
                 } else {
-                    setGroup(data[0]);
+                    setGroup(data);
+                    setMembers(data.members || []);
                 }
             } catch (error) {
-                console.error("Error fetching user data:", error);
+                console.error("Error fetching group data:", error);
             }
         };
 
-        fetchUserData();
+        fetchGroupData();
     }, [id]);
 
+    useEffect(() => {
+        const orgId = userData?.organizationId;
+
+        if (orgId) {
+            const fetchUsers = async () => {
+                try {
+                    const { data, error } = await supabase
+                        .schema("mc_cap_develop")
+                        .from("users")
+                        .select("*")
+                        .eq("organizationId", orgId);
+                    if (error) {
+                        console.error("Error fetching user data:", error.message);
+                    } else {
+                        setAllUsers(data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data:", error);
+                }
+            };
+
+            fetchUsers();
+        }
+    }, [userData]);
+
     const [user, setUser] = useState('');
+    const [userSelectId, setUserId] = useState('');
     const [role, setRole] = useState('');
     const [isUserInvalid, setIsUserInvalid] = useState(false);
     const [isRoleInvalid, setIsRoleInvalid] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [filteredUsers, setFilteredUsers] = useState([]);
 
-    const handleCreate = () => {
+
+    const handleCreate = async () => {
         let isValid = true;
 
         if (!user) {
@@ -92,12 +128,60 @@ const Members = () => {
         }
 
         if (isValid) {
-            // Handle create action here
-            console.log('User:', user);
-            console.log('Role:', role);
-            // After handling, you might want to close the modal
+            const selectedUser = allUsers.find((u) => u.id === userSelectId);
+            const newMember = {
+                memberid: selectedUser.id,
+                memberfullname: selectedUser.full_name,
+                memberusername: selectedUser.display_name,
+                memberemail: selectedUser.email,
+                membership_type: role
+            };
+            const groupArray = Array.isArray(group) ? group : [group];
+
+            const updatedMembers = groupArray.map((data) => {
+                if (data.id === userSelectId) {
+                    return {
+                        ...data,
+                        members: [...data.members, newMember]
+                    };
+                }
+                return data;
+            });
+
+            const UpdateValue = updatedMembers.members;
+
+
+
+
+            console.log("UpdateValue", UpdateValue)
+            console.log()
+
+            const { error } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .update({ members: UpdateValue })
+                .eq("teamid", id);
+
+            if (error) {
+                console.error("Error updating environment:", error);
+            } else {
+                toast({
+                    title: "Environment Updated",
+                    description: "",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+
             onClose();
         }
+
+
     };
 
     const handleUserBlur = () => {
@@ -116,9 +200,28 @@ const Members = () => {
         }
     };
 
-    const handleMenuItemClick = (value) => {
+    const handleMenuItemClick = (display_name, id) => {
+        const selectedUser = allUsers.find((u) => u.display_name === display_name);
+        if (selectedUser) {
+            setUser(selectedUser.display_name);
+            setUserId(selectedUser.id);
+            setIsUserInvalid(false);
+            setIsMenuOpen(false);
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
         setUser(value);
-        setIsUserInvalid(false);
+        if (value.length > 0) {
+            const filtered = allUsers.filter((u) =>
+                u.display_name && u.display_name.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredUsers(filtered);
+            setIsMenuOpen(true);
+        } else {
+            setIsMenuOpen(false);
+        }
     };
 
     const [activeItem, setActiveItem] = useState("Members");
@@ -138,6 +241,7 @@ const Members = () => {
             ],
         },
     ];
+
     const columnTitleStyle = {
         fontSize: 14,
         color: "#444444",
@@ -149,33 +253,34 @@ const Members = () => {
 
     return (
         <Box h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
-            <Flex alignItems="center" justify="space-between" >
-                <Breadcrumb >
+            <Flex alignItems="center" justify="space-between">
+                <Breadcrumb>
                     <BreadcrumbItem>
-                        <BreadcrumbLink fontSize="lg" href="/accounts/teams/">
+                        <BreadcrumbLink fontSize="lg" href="/accounts/teams">
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentGroupID === "" ? (
+                    {group?.parentteamId === null ? (
                         ""
                     ) : (
                         <BreadcrumbItem>
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/businessGroups/${group?.businessGroupId}`}
+                                href={`/accounts/teams/${group?.teamid}`}
                             >
-                                {group?.organizationName}
+                                {group?.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                     )}
+
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
                             fontWeight="600"
-                            href={`/accounts/businessGroups/${id}`}
+                            href={`/accounts/teams/${id}/settings`}
                         >
-                            {group?.businessGroupName}
+                            {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
@@ -197,6 +302,7 @@ const Members = () => {
                         </MenuItem>
                     </MenuList>
                 </Menu>
+
             </Flex>
             <Box pt={7}>
                 <FlexableTabs
@@ -224,24 +330,32 @@ const Members = () => {
                                     <FormLabel fontSize="base">Users</FormLabel>
                                     <Flex gap={5} alignItems="center" justifyContent="center">
                                         <InputGroup>
-                                            <InputLeftElement
+                                            <InputRightElement
                                                 pointerEvents="none"
                                                 children={<FiSearch />}
                                                 color="gray.500"
                                             />
-
-                                            <Input as={Input}
+                                            <Input
                                                 type="text"
                                                 value={user}
-                                                onChange={(e) => setUser(e.target.value)}
+                                                onChange={handleInputChange}
                                                 onBlur={handleUserBlur}
                                                 placeholder="Select..."
                                                 borderColor={isUserInvalid ? 'red.500' : 'inherit'}
                                             />
-
                                         </InputGroup>
-                                        {isUserInvalid && <FormErrorMessage>required.</FormErrorMessage>}
+                                        <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} size="300px">
+                                            <MenuButton as="div" width="100%" height="0" visibility="hidden" />
+                                            <MenuList position="absolute" width='432px' right={5} top={'20px'}>
+                                                {filteredUsers.map((filteredUser) => (
+                                                    <MenuItem key={filteredUser.id} onClick={() => handleMenuItemClick(filteredUser.display_name, filteredUser.id)}>
+                                                        {filteredUser.display_name}
+                                                    </MenuItem>
+                                                ))}
+                                            </MenuList>
+                                        </Menu>
                                     </Flex>
+                                    {isUserInvalid && <FormErrorMessage>required.</FormErrorMessage>}
                                 </FormControl>
 
                                 <FormControl pl={4} isInvalid={isRoleInvalid}>
@@ -320,48 +434,60 @@ const Members = () => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }}>
-                            <Td style={rowValueStyle}><Box display="flex" alignItems="center" gap={3}><Text>Kavi kasi</Text><Text fontSize="12" fontWeight="500" color="gray">This is you</Text></Box></Td>
-                            <Td style={rowValueStyle}>kaizee1</Td>
-                            <Td style={rowValueStyle}>kaviyarasumaran@gmail.com</Td>
-                            <Td style={rowValueStyle}>
-                                <Menu>
-                                    <MenuButton as={Link} variant="" rightIcon={<ChevronDownIcon />}>
-                                        Actions
-                                    </MenuButton>
-                                    <MenuList>
-                                        <MenuItem>Download</MenuItem>
-                                        <MenuItem>Create a Copy</MenuItem>
-                                        <MenuItem>Mark as Draft</MenuItem>
-                                        <MenuItem>Delete</MenuItem>
-                                        <MenuItem>Attend a Workshop</MenuItem>
-                                    </MenuList>
-                                </Menu>
-                            </Td>
-                            <Td style={rowValueStyle}>
-                                <Menu>
-                                    <MenuButton
-                                        as={IconButton}
-                                        aria-label="Options"
-                                        icon={<HiEllipsisHorizontal width="10px" />}
-                                        variant="outline"
-                                        h={"30px"}
-                                        color="gray.500"
-                                        border={"1px solid #5c5c5c"}
-                                        right={30}
-                                    />
-                                    <MenuList borderRadius={0}>
-                                        <MenuItem fontSize="base" color="white" onClick="" bgColor="delete">
-                                            Delete team...
-                                        </MenuItem>
-                                    </MenuList>
-                                </Menu>
-                            </Td>
-                        </Tr>
+                        {members.length > 0 && members.map((dataValue, index) => (
+                            <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }} key={index}>
+                                <Td style={rowValueStyle}>
+                                    {userData?.id === dataValue?.memberid ? (
+                                        <Box display="flex" alignItems="center" gap={3}>
+                                            <Text>{dataValue.memberfullname}</Text>
+                                            <Text fontSize="12" fontWeight="500" color="gray">This is you</Text>
+                                        </Box>) : (
+                                        <Box display="flex" alignItems="center" gap={3}>
+                                            <Text>{dataValue.memberfullname}</Text>
+                                        </Box>
+                                    )}
+                                </Td>
+                                <Td style={rowValueStyle}>{dataValue.memberusername}</Td>
+                                <Td style={rowValueStyle}>{dataValue.memberemail}</Td>
+                                <Td style={rowValueStyle}>
+                                    <Menu>
+                                        <MenuButton as={Link} variant="" rightIcon={<ChevronDownIcon />}>
+                                            Actions
+                                        </MenuButton>
+                                        <MenuList>
+                                            <MenuItem>Download</MenuItem>
+                                            <MenuItem>Create a Copy</MenuItem>
+                                            <MenuItem>Mark as Draft</MenuItem>
+                                            <MenuItem>Delete</MenuItem>
+                                            <MenuItem>Attend a Workshop</MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                </Td>
+                                <Td style={rowValueStyle}>
+                                    <Menu>
+                                        <MenuButton
+                                            as={IconButton}
+                                            aria-label="Options"
+                                            icon={<HiEllipsisHorizontal width="10px" />}
+                                            variant="outline"
+                                            h={"30px"}
+                                            color="gray.500"
+                                            border={"1px solid #5c5c5c"}
+                                            right={30}
+                                        />
+                                        <MenuList borderRadius={0}>
+                                            <MenuItem fontSize="base" color="white" onClick="" bgColor="delete">
+                                                Delete team...
+                                            </MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                </Td>
+                            </Tr>
+                        ))}
                     </Tbody>
                 </Table>
             </TableContainer>
-        </Box>
+        </Box >
     );
 };
 

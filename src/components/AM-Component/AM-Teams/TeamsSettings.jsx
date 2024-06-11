@@ -29,6 +29,7 @@ import { SlArrowDown } from "react-icons/sl";
 const TeamSetting = () => {
     const { id } = useParams();
     const [group, setGroup] = useState(null);
+    const [ancestors, setAncestors] = useState(null);
     const [editedGroup, setEditedGroup] = useState(null);
     const [changesMade, setChangesMade] = useState(false);
     const toast = useToast();
@@ -38,15 +39,15 @@ const TeamSetting = () => {
             try {
                 const { data, error } = await supabase
                     .schema("mc_cap_develop")
-                    .from("businessgroup")
+                    .from("teams")
                     .select("*")
-                    .eq("businessGroupId", id);
+                    .eq("teamid", id);
 
                 if (error) {
                     console.error("Error fetching user data:", error.message);
                 } else {
                     setGroup(data[0]);
-                    setEditedGroup(data[0]);
+                    setAncestors(data[0].ancestors)
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -55,7 +56,8 @@ const TeamSetting = () => {
 
         fetchUserData();
     }, []);
-
+    console.log("group", group)
+    console.log("anc", ancestors)
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditedGroup((prevGroup) => ({
@@ -140,28 +142,29 @@ const TeamSetting = () => {
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentGroupID === "" ? (
+                    {group?.parentteamId === null ? (
                         ""
                     ) : (
                         <BreadcrumbItem>
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/teams/${group?.businessGroupId}`}
+                                href={`/accounts/teams/${group?.teamid}`}
                             >
-                                {group?.organizationName}
+                                {group?.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                     )
 
                     }
+
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
                             fontWeight="600"
-                            href={`/accounts/teams/${id}`}
+                            href={`/accounts/teams/${id}/settings`}
                         >
-                            {group?.businessGroupName}
+                            {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
@@ -194,24 +197,30 @@ const TeamSetting = () => {
             </Box>
 
             <Stack gap={50} mt={7} mb={7} ml={7}>
-                <HStack justify="space-between" >
-                    <Box w="full" h="40px" display="flex" flexDirection="column" gap={2}>
-                        <Text fontSize="xs" fontWeight="500">Name</Text>
-                        <Text fontSize="xs" w="85%" color="gray">A unique name. You can use alphanumeric characters, hyphens, and spaces.</Text>
-                    </Box>
-                    <Box w="100%" h="40px">
-                        <Input
-                            fontSize="xs"
-                            name="businessGroupName"
-                            value={editedGroup?.businessGroupName || ""}
-                            onChange={(e) => handleInputChange(e)}
-                            size="sm"
-                            width="100%"
-                            height={10}
-                        />
-                    </Box>
-                    <Box w="full" h="40px"></Box>
-                </HStack>
+                {group?.parentteamId === null ? (
+                    ""
+                ) : (
+                    <HStack justify="space-between" >
+                        <Box w="full" h="40px" display="flex" flexDirection="column" gap={2}>
+                            <Text fontSize="xs" fontWeight="500">Name</Text>
+                            <Text fontSize="xs" w="85%" color="gray">A unique name. You can use alphanumeric characters, hyphens, and spaces.</Text>
+                        </Box>
+                        <Box w="100%" h="40px">
+
+                            <Input
+                                fontSize="xs"
+                                name="businessGroupName"
+                                value={editedGroup?.businessGroupName || ""}
+                                onChange={(e) => handleInputChange(e)}
+                                size="sm"
+                                width="100%"
+                                height={10}
+                            />
+
+                        </Box>
+                        <Box w="full" h="40px"></Box>
+                    </HStack>
+                )}
                 <HStack justify="space-between" mt={5}>
                     <Box w="full" h="40px" display="flex" flexDirection="column" gap={2}>
                         <Text fontSize="xs" fontWeight="500">Parent Team</Text>
@@ -227,8 +236,11 @@ const TeamSetting = () => {
                         <Input
                             placeholder="Select..."
                             autoComplete="off"
-                            fontSize={14} color={'#747474'}
-                        // value={parentGroupName}
+                            fontSize={14} color={'#000000'}
+                            value={group?.teamname}
+                            isDisabled={group?.parentteamId === null}
+
+
                         // onChange={handleGroupChange}
                         // onFocus={handleInputFocus}
                         />

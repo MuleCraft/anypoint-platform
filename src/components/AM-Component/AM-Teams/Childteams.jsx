@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
     Box,
     Breadcrumb,
@@ -26,6 +26,7 @@ import fetchTeamsTableRows from "../../../Utils/TeamsTableRows";
 import { AuthContext } from "../../../Utils/AuthProvider";
 import CreateTeams from "./CreateTeams";
 import ChildTeamsTable from "./ChildTeamsTable";
+import supabase from "../../../Utils/supabase";
 const ChildTeams = () => {
     const { id } = useParams();
     const { userData } = useContext(AuthContext);
@@ -37,6 +38,32 @@ const ChildTeams = () => {
     const [currentOrganization, setCurrentOrganization] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
+    const [group, setGroup] = useState(null);
+
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const { data, error } = await supabase
+                    .schema("mc_cap_develop")
+                    .from("teams")
+                    .select("*")
+                    .eq("teamid", id);
+
+                if (error) {
+                    console.error("Error fetching user data:", error.message);
+                } else {
+                    setGroup(data[0]);
+
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
     if (userData && (currentUserName === '')) {
         setCurrentUserEmail(userData.email);
         setCurrentUserName(userData.display_name);
@@ -58,9 +85,6 @@ const ChildTeams = () => {
 
     );
 
-    const filteredTeams = teamsTableData.filter((data) => data.teamid === id);
-
-    const teams = filteredTeams[0]
 
     const userId = [
         {
@@ -86,18 +110,33 @@ const ChildTeams = () => {
             <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>
-                        <BreadcrumbLink fontSize="lg" href="/accounts/teams/">
+                        <BreadcrumbLink fontSize="lg" href="/accounts/teams">
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+                    {group?.parentteamId === null ? (
+                        ""
+                    ) : (
+                        <BreadcrumbItem>
+                            <BreadcrumbLink
+                                fontSize="lg"
+                                fontWeight="400"
+                                href={`/accounts/teams/${group?.teamid}`}
+                            >
+                                {group?.teamname}
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                    )
+
+                    }
 
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
-                            fontWeight="400"
-                            href={`/accounts/teams/${teams?.teamid}/child_teams`}
+                            fontWeight="600"
+                            href={`/accounts/teams/${id}/settings`}
                         >
-                            {teams?.teamname}
+                            {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>

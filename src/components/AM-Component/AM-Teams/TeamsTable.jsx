@@ -129,7 +129,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
               _hover={{ bgColor: "#ececec" }}
             >
               <Td style={rowValueStyle}>
-                <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 25}px`}>
+                <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`}>
                   <IconButton
                     aria-label="Toggle Details"
                     icon={expandedRows.includes(dataValue.teamid) ? <HiChevronDown /> : <HiChevronRight />}
