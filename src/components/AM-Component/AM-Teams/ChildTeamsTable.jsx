@@ -15,19 +15,30 @@ import {
     IconButton,
     useToast,
     Box,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    Button,
+    Input,
+    VStack,
+    FormLabel
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
+import supabase from "../../../Utils/supabase";
 
-const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id }) => {
-
+const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData }) => {
     const [selectedTeamId, setSelectedTeamId] = useState(null);
     const [targetGroupName, setTargetGroupName] = useState("");
     const [expandedRows, setExpandedRows] = useState([]);
     const [isDeleteOpen, setDeleteOpen] = useState(false);
     const [deleteInputValue, setDeleteInputValue] = useState("");
-    const [isDeleteButtonDisabled, setDeleteButtonDisabled] = useState(true);
+    const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(true);
     const [filteredRows, setFilteredRows] = useState([]);
     const [hoveredRows, setHoveredRows] = useState([]);
+    const toast = useToast();
 
     useEffect(() => {
         if (selectedTeamId) {
@@ -35,28 +46,19 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id }) => {
         }
     }, [selectedTeamId]);
 
-
     useEffect(() => {
         const filteredData = tableData.filter(dataValue => {
-
             return dataValue.parentteamId === id || expandedRows.includes(dataValue.parentteamId);
         });
 
         filteredData.sort((a, b) => {
-            // Convert empty strings to -1 for sorting
             const idA = a.id === "" ? -1 : parseInt(a.id, 10);
             const idB = b.id === "" ? -1 : parseInt(b.id, 10);
             return idA - idB || a.id - b.id;
         });
 
         setFilteredRows(filteredData);
-    }, [tableData, expandedRows]);
-
-
-    console.log("filteredRows", filteredRows);
-
-    console.log(expandedRows);
-
+    }, [tableData, expandedRows, id]);
 
     const handleRowHover = (index) => {
         setHoveredRows((prevHoveredRows) => {
@@ -82,6 +84,101 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id }) => {
         }
     };
 
+    const handleMenuOpen = (team) => {
+        setSelectedTeamId(team);
+        setDeleteOpen(true);
+    };
+
+    const handleDeleteClose = () => {
+        setDeleteOpen(false);
+        setDeleteInputValue("");
+        setIsDeleteButtonDisabled(true);
+    };
+
+    const handleDeleteInputChange = (e) => {
+        const value = e.target.value;
+        setDeleteInputValue(value);
+        setIsDeleteButtonDisabled(value.toLowerCase() !== selectedTeamId?.teamname?.toLowerCase());
+    };
+
+    const handleDeleteTeam = async () => {
+        const teamId = selectedTeamId.teamid;
+        try {
+            const { data: childTeams, error: childTeamsError } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .select("*")
+                .eq("parentteamId", teamId);
+
+            if (childTeamsError) {
+                console.error("Error fetching child teams:", childTeamsError.message);
+                toast({
+                    title: "Error",
+                    description: "An error occurred while fetching the child teams.",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                return;
+            }
+
+            const deletePromises = childTeams.map(async (childTeam) => {
+                const { error } = await supabase
+                    .schema("mc_cap_develop")
+                    .from("teams")
+                    .delete()
+                    .eq("teamid", childTeam.teamid);
+
+                if (error) {
+                    console.error(`Error deleting child team ${childTeam.teamid}:`, error.message);
+                    throw new Error(`Error deleting child team ${childTeam.teamid}`);
+                }
+            });
+
+            await Promise.all(deletePromises);
+
+            const { error: deleteError } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .delete()
+                .eq("teamid", teamId);
+
+            if (deleteError) {
+                console.error("Error deleting team:", deleteError.message);
+                toast({
+                    title: "Error Deleting Team",
+                    description: deleteError.message,
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+            } else {
+                toast({
+                    title: "Team Deleted",
+                    description: "The team and its child teams have been deleted successfully.",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                handleDeleteClose();
+                fetchTableData(); // Refetch the table data
+            }
+        } catch (error) {
+            console.error("Error deleting team:", error);
+            toast({
+                title: "Error",
+                description: "An error occurred while deleting the team.",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+                position: "top-right"
+            });
+        }
+    };
+
     const columnTitleStyle = {
         fontSize: 14,
         color: "#444444",
@@ -90,12 +187,6 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id }) => {
         padding: "10px",
     };
     const rowValueStyle = { fontSize: 14, padding: "10px" };
-
-    const handleMenuOpen = (businessGroupId) => {
-        setSelectedBusinessGroupId(businessGroupId);
-    };
-
-
 
     return (
         <TableContainer>
@@ -151,12 +242,11 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id }) => {
                                         h={"28px"}
                                         color="gray.500"
                                         border={"1px solid #5c5c5c"}
-                                        onClick={() => handleMenuOpen(dataValue)}
                                     />
                                     <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
                                         <MenuItem
                                             fontSize={14}
-                                            onClick={() => onOpenCreateChildteam(dataValue.teamid, dataValue.teamname)}
+                                            onClick={() => onOpenCreateChildGroup(dataValue.teamid, dataValue.teamname)}
                                         >
                                             Create child team
                                         </MenuItem>
@@ -165,7 +255,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id }) => {
                                         ) : (
                                             <MenuItem
                                                 fontSize={14}
-                                                onClick={() => setDeleteOpen(true)}
+                                                onClick={() => handleMenuOpen(dataValue)}
                                                 color={"red.600"}
                                                 _hover={{
                                                     color: "#000",
@@ -183,6 +273,52 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id }) => {
                 </Tbody>
             </Table>
 
+            <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
+                <ModalOverlay />
+                <ModalContent minW={"600px"}>
+                    <ModalHeader
+                        bg={"#f3f3f3"}
+                        fontSize={20}
+                        fontWeight={800}
+                        color={"#444444"}
+                        borderTopRadius={15}
+                        borderBottom={"1px solid #e5e5e5"}
+                    >
+                        Are you sure?
+                    </ModalHeader>
+                    <ModalBody p={"32px 32px"}>
+                        <VStack spacing={4}>
+                            <VStack spacing={0} fontSize={14} align={"flex-start"}>
+                                <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
+                                    <b>This action cannot be undone.</b> This will delete the <b>{selectedTeamId?.teamname}</b> team and all of its associated information.
+                                    Please type the name of the team to confirm.
+                                </FormLabel>
+                                <Input
+                                    placeholder="Team name"
+                                    mt={1}
+                                    fontSize={14}
+                                    fontWeight={500}
+                                    value={deleteInputValue}
+                                    onChange={handleDeleteInputChange}
+                                />
+                            </VStack>
+                        </VStack>
+                    </ModalBody>
+                    <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
+                        <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleDeleteTeam}
+                            variant={"formButtons"}
+                            isDisabled={isDeleteButtonDisabled}
+                            _hover={{ bgColor: "navy" }}
+                        >
+                            Delete
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </TableContainer>
     );
 };

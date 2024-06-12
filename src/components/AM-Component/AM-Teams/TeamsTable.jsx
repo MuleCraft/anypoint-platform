@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Table,
   Thead,
@@ -24,10 +24,13 @@ import {
   Button,
   ModalContent,
   Box,
+  useToast
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
+import supabase from "../../../Utils/supabase";
+import { AuthContext } from "../../../Utils/AuthProvider";
 
-const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
+const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) => {
   const [selectedTeamId, setSelectedTeamId] = useState(null);
   const [targetGroupName, setTargetGroupName] = useState("");
   const [expandedRows, setExpandedRows] = useState([]);
@@ -36,6 +39,8 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
   const [isDeleteButtonDisabled, setDeleteButtonDisabled] = useState(true);
   const [filteredRows, setFilteredRows] = useState([]);
   const [hoveredRows, setHoveredRows] = useState([]);
+  const toast = useToast();
+  const { userData } = useContext(AuthContext);
 
   useEffect(() => {
     if (selectedTeamId) {
@@ -49,7 +54,6 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
         expandedRows.includes(dataValue.teamId) ||
         expandedRows.includes(dataValue.parentteamId);
     });
-
 
     filteredData.sort((a, b) => {
       const idA = a.id === "" ? -1 : parseInt(a.id, 10);
@@ -99,6 +103,116 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
     const value = e.target.value;
     setDeleteInputValue(value);
     setDeleteButtonDisabled(value.toLowerCase() !== targetGroupName.toLowerCase());
+  };
+
+  const handleDeleteTeam = async () => {
+    try {
+      const teamId = selectedTeamId.teamid;
+      const { data: teamData, error: fetchError } = await supabase
+        .schema("mc_cap_develop")
+        .from("teams")
+        .select("*")
+        .eq("teamid", teamId)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching team data:", fetchError.message);
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching the team data.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          position: "top-right"
+        });
+        return;
+      }
+
+      if (teamData.organizationId !== userData.organizationId) {
+        toast({
+          title: "Error",
+          description: "You do not have permission to delete this team.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          position: "top-right"
+        });
+        return;
+      }
+
+      const { data: childTeams, error: childTeamsError } = await supabase
+        .schema("mc_cap_develop")
+        .from("teams")
+        .select("*")
+        .eq("parentteamId", teamId);
+
+      if (childTeamsError) {
+        console.error("Error fetching child teams:", childTeamsError.message);
+        toast({
+          title: "Error",
+          description: "An error occurred while fetching the child teams.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          position: "top-right"
+        });
+        return;
+      }
+
+      const deletePromises = childTeams.map(async (childTeam) => {
+        const { error } = await supabase
+          .schema("mc_cap_develop")
+          .from("teams")
+          .delete()
+          .eq("teamid", childTeam.teamid);
+
+        if (error) {
+          console.error(`Error deleting child team ${childTeam.teamid}:`, error.message);
+          throw new Error(`Error deleting child team ${childTeam.teamid}`);
+        }
+      });
+
+      await Promise.all(deletePromises);
+
+      const { error: deleteError } = await supabase
+        .schema("mc_cap_develop")
+        .from("teams")
+        .delete()
+        .eq("teamid", teamId);
+
+      if (deleteError) {
+        console.error("Error deleting team:", deleteError.message);
+        toast({
+          title: "Error Deleting Team",
+          description: deleteError.message,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+          position: "top-right"
+        });
+      } else {
+        toast({
+          title: "Team Deleted",
+          description: "The team and its child teams have been deleted successfully.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+          position: "top-right"
+        });
+        handleDeleteClose();
+        refetchTableData(); // Call the refetch function after successful deletion
+      }
+    } catch (error) {
+      console.error("Error deleting team:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while deleting the team.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+        position: "top-right"
+      });
+    }
   };
 
   const columnTitleStyle = {
@@ -231,7 +345,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
               Cancel
             </Button>
             <Button
-              // onClick={() => invokeGroupDeleteFunction(selectedTeamId)}
+              onClick={handleDeleteTeam}
               variant={"formButtons"}
               isDisabled={isDeleteButtonDisabled}
               _hover={{ bgColor: "navy" }}

@@ -61,7 +61,7 @@ const Members = () => {
     const [selectedMemberId, setSelectedMemberId] = useState(null);
     const [selectedMemberName, setSelectedMemberName] = useState('');
     const [teamName, setTeamName] = useState('');
-    const [selectedEnv, setSelectedEnv] = useState(null); // New state to hold the selected environment or team for deletion
+    const [selectedEnv, setSelectedEnv] = useState(null);
     const [user, setUser] = useState('');
     const [userSelectId, setUserId] = useState('');
     const [role, setRole] = useState('');
@@ -166,7 +166,7 @@ const Members = () => {
                     });
                     setGroup(updatedGroup);
                     onClose();
-                    fetchGroupData(); // Refetch the team data
+                    fetchGroupData();
                 }
             } catch (error) {
                 console.error("Error updating environment:", error);
@@ -241,7 +241,7 @@ const Members = () => {
                         position: "top-right"
                     });
                     setGroup({ ...group, members: updatedMembers });
-                    fetchGroupData(); // Refetch the team data
+                    fetchGroupData();
                 }
             } catch (error) {
                 console.error("Error updating membership type:", error);
@@ -271,8 +271,8 @@ const Members = () => {
                     position: "top-right"
                 });
                 setGroup({ ...group, members: updatedMembers });
-                fetchGroupData(); // Refetch the team data
-                onDeleteClose(); // Close the delete modal
+                fetchGroupData();
+                onDeleteClose();
             }
         } catch (error) {
             console.error("Error deleting member:", error);
@@ -292,7 +292,7 @@ const Members = () => {
 
     const handleDeleteTeam = async () => {
         try {
-            // Step 1: Retrieve the team data
+
             const { data: teamData, error: fetchError } = await supabase
                 .schema("mc_cap_develop")
                 .from("teams")
@@ -313,7 +313,7 @@ const Members = () => {
                 return;
             }
 
-            // Step 2: Check if the organization's ID matches
+
             if (teamData.organizationId !== userData.organizationId) {
                 toast({
                     title: "Error",
@@ -326,7 +326,7 @@ const Members = () => {
                 return;
             }
 
-            // Step 3: Retrieve teams with parentteamId matching the current team's teamid
+
             const { data: childTeams, error: childTeamsError } = await supabase
                 .schema("mc_cap_develop")
                 .from("teams")
@@ -346,7 +346,7 @@ const Members = () => {
                 return;
             }
 
-            // Step 4: Delete the child teams
+
             const deletePromises = childTeams.map(async (childTeam) => {
                 const { error } = await supabase
                     .schema("mc_cap_develop")
@@ -360,10 +360,10 @@ const Members = () => {
                 }
             });
 
-            // Wait for all delete operations to complete
+
             await Promise.all(deletePromises);
 
-            // Step 5: Delete the parent team
+
             const { error: deleteError } = await supabase
                 .schema("mc_cap_develop")
                 .from("teams")

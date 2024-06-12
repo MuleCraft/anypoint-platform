@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
     Box,
     Breadcrumb,
@@ -19,21 +19,36 @@ import {
     IconButton,
     MenuList,
     MenuItem,
+    ModalFooter,
+    ModalBody,
+    VStack,
+    FormLabel,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
 } from "@chakra-ui/react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import supabase from "../../../Utils/supabase";
 import FlexableTabs from "../../FlexableTabs";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { SlArrowDown } from "react-icons/sl";
+import { AuthContext } from "../../../Utils/AuthProvider";
 
 const TeamSetting = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [group, setGroup] = useState(null);
     const [ancestors, setAncestors] = useState(null);
     const [editedGroup, setEditedGroup] = useState(null);
     const [changesMade, setChangesMade] = useState(false);
     const toast = useToast();
+    const { userData } = useContext(AuthContext);
     const [isGroupMenuOpen, setIsGroupMenuOpen] = useState(false);
+    const [isDeleteOpen, setDeleteOpen] = useState(false);
+    const [deleteInputValue, setDeleteInputValue] = useState("");
+    const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(true);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -47,7 +62,8 @@ const TeamSetting = () => {
                     console.error("Error fetching user data:", error.message);
                 } else {
                     setGroup(data[0]);
-                    setAncestors(data[0].ancestors)
+                    setAncestors(data[0].ancestors);
+                    setEditedGroup(data[0]);  // Initialize editedGroup with the fetched data
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -55,9 +71,8 @@ const TeamSetting = () => {
         };
 
         fetchUserData();
-    }, []);
-    console.log("group", group)
-    console.log("anc", ancestors)
+    }, [id]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setEditedGroup((prevGroup) => ({
@@ -69,25 +84,22 @@ const TeamSetting = () => {
 
     const handleSaveChanges = async () => {
         try {
-            const { data: supabaseData, error: supabaseError } = await supabase
+            const { error: supabaseError } = await supabase
                 .schema("mc_cap_develop")
-                .from("businessgroup")
+                .from("teams")
                 .update({
-                    businessGroupName: editedGroup.businessGroupName,
-                    groupOwner: editedGroup.groupOwner,
-                    orgDomain: editedGroup.orgDomain,
-                    sessionTimeout: editedGroup.sessionTimeout
+                    teamname: editedGroup.teamname,
+                    parentteamId: editedGroup.parentteamId,
                 })
-                .eq("businessGroupId", id);
+                .eq("teamid", id);
 
             if (supabaseError) {
                 console.error("Error updating data in Supabase:", supabaseError.message);
                 throw new Error(supabaseError.message);
             }
 
-            console.log("Saving changes:", editedGroup);
             toast({
-                title: "update successfully",
+                title: "Update successful",
                 description: "Settings updated successfully.",
                 status: "success",
                 duration: 5000,
@@ -98,8 +110,7 @@ const TeamSetting = () => {
         } catch (error) {
             toast({
                 title: "Update Failed",
-                description:
-                    "Setting update failed",
+                description: "Setting update failed",
                 status: "error",
                 duration: 5000,
                 isClosable: true,
@@ -109,7 +120,126 @@ const TeamSetting = () => {
         }
     };
 
+    const handleDeleteClose = () => {
+        setDeleteOpen(false);
+        setDeleteInputValue("");
+        setIsDeleteButtonDisabled(true);
+    };
 
+    const handleDeleteInputChange = (e) => {
+        const value = e.target.value;
+        setDeleteInputValue(value);
+        setIsDeleteButtonDisabled(value.toLowerCase() !== group?.teamname?.toLowerCase());
+    };
+
+    const handleDeleteTeam = async () => {
+        try {
+            const { data: teamData, error: fetchError } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .select("*")
+                .eq("teamid", id)
+                .single();
+
+            if (fetchError) {
+                console.error("Error fetching team data:", fetchError.message);
+                toast({
+                    title: "Error",
+                    description: "An error occurred while fetching the team data.",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                return;
+            }
+
+            if (teamData.organizationId !== userData.organizationId) {
+                toast({
+                    title: "Error",
+                    description: "You do not have permission to delete this team.",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                return;
+            }
+
+            const { data: childTeams, error: childTeamsError } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .select("*")
+                .eq("parentteamId", id);
+
+            if (childTeamsError) {
+                console.error("Error fetching child teams:", childTeamsError.message);
+                toast({
+                    title: "Error",
+                    description: "An error occurred while fetching the child teams.",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                return;
+            }
+
+            const deletePromises = childTeams.map(async (childTeam) => {
+                const { error } = await supabase
+                    .schema("mc_cap_develop")
+                    .from("teams")
+                    .delete()
+                    .eq("teamid", childTeam.teamid);
+
+                if (error) {
+                    console.error(`Error deleting child team ${childTeam.teamid}:`, error.message);
+                    throw new Error(`Error deleting child team ${childTeam.teamid}`);
+                }
+            });
+
+            await Promise.all(deletePromises);
+
+            const { error: deleteError } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .delete()
+                .eq("teamid", id);
+
+            if (deleteError) {
+                console.error("Error deleting team:", deleteError.message);
+                toast({
+                    title: "Error Deleting Team",
+                    description: deleteError.message,
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+            } else {
+                toast({
+                    title: "Team Deleted",
+                    description: "The team and its child teams have been deleted successfully.",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                handleDeleteClose();
+                navigate("/accounts/teams");
+            }
+        } catch (error) {
+            console.error("Error deleting team:", error);
+            toast({
+                title: "Error",
+                description: "An error occurred while deleting the team.",
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+                position: "top-right"
+            });
+        }
+    };
 
     const [activeItem, setActiveItem] = useState("Settings");
     const handleItemSelect = (itemName) => {
@@ -125,13 +255,9 @@ const TeamSetting = () => {
                 { name: 'ChildTeams', label: 'Child teams', path: `/accounts/teams/${id}/child_teams` },
                 { name: 'Settings', label: 'Settings', path: `/accounts/teams/${id}/settings` },
                 { name: 'Limits', label: 'Limits', path: `/accounts/teams/${id}/limits` },
-
-
             ],
         },
-
     ];
-
 
     return (
         <Box h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
@@ -149,15 +275,12 @@ const TeamSetting = () => {
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/teams/${group?.teamid}`}
+                                href={`/accounts/teams/${group?.parentteamId}`}
                             >
                                 {group?.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )
-
-                    }
-
+                    )}
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
@@ -169,24 +292,24 @@ const TeamSetting = () => {
                     </BreadcrumbItem>
                 </Breadcrumb>
 
-                <Menu>
-                    <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<HiEllipsisHorizontal width="10px" />}
-                        variant="outline"
-                        h={"30px"}
-                        color="gray.500"
-                        border={"1px solid #5c5c5c"}
-                        right={30}
-                    />
-                    <MenuList borderRadius={0}>
-                        <MenuItem fontSize="base" color="white" onClick="" bgColor="delete" >
-                            Delete team...
-                        </MenuItem>
-                    </MenuList>
-                </Menu>
-
+                {group?.parentteamId === null ? ("") : (
+                    <Menu>
+                        <MenuButton
+                            as={IconButton}
+                            aria-label='Options'
+                            icon={<HiEllipsisHorizontal />}
+                            variant='outline'
+                            h={'28px'} color="gray.500"
+                            border={'1px solid #5c5c5c'}
+                        />
+                        <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
+                            <MenuItem fontSize={14} onClick={() => setDeleteOpen(true)} color={'white'}
+                                bgColor='red.600'>
+                                Delete Team...
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
+                )}
             </Flex>
             <Box pt={7}>
                 <FlexableTabs
@@ -206,17 +329,15 @@ const TeamSetting = () => {
                             <Text fontSize="xs" w="85%" color="gray">A unique name. You can use alphanumeric characters, hyphens, and spaces.</Text>
                         </Box>
                         <Box w="100%" h="40px">
-
                             <Input
                                 fontSize="xs"
-                                name="businessGroupName"
-                                value={editedGroup?.businessGroupName || ""}
-                                onChange={(e) => handleInputChange(e)}
+                                name="teamname"
+                                value={editedGroup?.teamname || ""}
+                                onChange={handleInputChange}
                                 size="sm"
                                 width="100%"
                                 height={10}
                             />
-
                         </Box>
                         <Box w="full" h="40px"></Box>
                     </HStack>
@@ -239,17 +360,11 @@ const TeamSetting = () => {
                             fontSize={14} color={'#000000'}
                             value={group?.teamname}
                             isDisabled={group?.parentteamId === null}
-
-
-                        // onChange={handleGroupChange}
-                        // onFocus={handleInputFocus}
                         />
-
                         <Box>
                             <Menu isOpen={isGroupMenuOpen}>
                                 <MenuButton as="div" width="100%" height="0" visibility="hidden" />
                                 <MenuList position="absolute" width='384px' right={0} top={'35px'}>
-
                                     <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontWeight={500}>
                                         No results found
                                     </MenuItem>
@@ -259,10 +374,8 @@ const TeamSetting = () => {
                     </InputGroup>
                     <Box w="full" h="40px"></Box>
                 </HStack>
-
                 <Divider />
             </Stack>
-
 
             <Stack
                 direction="row"
@@ -295,6 +408,52 @@ const TeamSetting = () => {
                     Save Changes
                 </Button>
             </Stack>
+            <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
+                <ModalOverlay />
+                <ModalContent minW={"600px"}>
+                    <ModalHeader
+                        bg={"#f3f3f3"}
+                        fontSize={20}
+                        fontWeight={800}
+                        color={"#444444"}
+                        borderTopRadius={15}
+                        borderBottom={"1px solid #e5e5e5"}
+                    >
+                        Are you sure?
+                    </ModalHeader>
+                    <ModalBody p={"32px 32px"}>
+                        <VStack spacing={4}>
+                            <VStack spacing={0} fontSize={14} align={"flex-start"}>
+                                <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
+                                    <b>This action cannot be undone.</b> This will delete the <b>{group?.teamname}</b> team and all of its associated information.
+                                    Please type the name of the team to confirm.
+                                </FormLabel>
+                                <Input
+                                    placeholder="Team name"
+                                    mt={1}
+                                    fontSize={14}
+                                    fontWeight={500}
+                                    value={deleteInputValue}
+                                    onChange={handleDeleteInputChange}
+                                />
+                            </VStack>
+                        </VStack>
+                    </ModalBody>
+                    <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
+                        <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleDeleteTeam}
+                            variant={"formButtons"}
+                            isDisabled={isDeleteButtonDisabled}
+                            _hover={{ bgColor: "navy" }}
+                        >
+                            Delete
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
     );
 };
