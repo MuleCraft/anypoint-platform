@@ -40,7 +40,7 @@ import {
     InputRightElement,
     VStack,
 } from "@chakra-ui/react";
-import { Link, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import supabase from "../../../Utils/supabase";
 import FlexableTabs from "../../FlexableTabs";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
@@ -50,6 +50,7 @@ import { AuthContext } from "../../../Utils/AuthProvider";
 
 const Members = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const toast = useToast();
@@ -60,6 +61,15 @@ const Members = () => {
     const [selectedMemberId, setSelectedMemberId] = useState(null);
     const [selectedMemberName, setSelectedMemberName] = useState('');
     const [teamName, setTeamName] = useState('');
+    const [selectedEnv, setSelectedEnv] = useState(null); // New state to hold the selected environment or team for deletion
+    const [user, setUser] = useState('');
+    const [userSelectId, setUserId] = useState('');
+    const [role, setRole] = useState('');
+    const [isUserInvalid, setIsUserInvalid] = useState(false);
+    const [isRoleInvalid, setIsRoleInvalid] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [activeItem, setActiveItem] = useState("Members");
 
     const fetchGroupData = async () => {
         try {
@@ -110,14 +120,6 @@ const Members = () => {
             fetchUsers();
         }
     }, [userData]);
-
-    const [user, setUser] = useState('');
-    const [userSelectId, setUserId] = useState('');
-    const [role, setRole] = useState('');
-    const [isUserInvalid, setIsUserInvalid] = useState(false);
-    const [isRoleInvalid, setIsRoleInvalid] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [filteredUsers, setFilteredUsers] = useState([]);
 
     const handleCreate = async () => {
         let isValid = true;
@@ -283,62 +285,26 @@ const Members = () => {
         onDeleteOpen();
     };
 
-    // const handleDeleteTeam = async () => {
-    //     try {
-    //         const { error } = await supabase
-    //             .schema("mc_cap_develop")
-    //             .from("teams")
-    //             .delete()
-    //             .eq("teamid", id);
-
-    //         if (error) {
-    //             console.error("Error deleting team:", error.message);
-    //             toast({
-    //                 title: "Error Deleting Team",
-    //                 description: error.message,
-    //                 status: "error",
-    //                 duration: 2000,
-    //                 isClosable: true,
-    //                 position: "top-right"
-    //             });
-    //         } else {
-    //             toast({
-    //                 title: "Team Deleted",
-    //                 description: "The team has been deleted successfully.",
-    //                 status: "success",
-    //                 duration: 2000,
-    //                 isClosable: true,
-    //                 position: "top-right"
-    //             });
-    //             history.push("/accounts/teams");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error deleting team:", error);
-    //         toast({
-    //             title: "Error",
-    //             description: "An error occurred while deleting the team.",
-    //             status: "error",
-    //             duration: 2000,
-    //             isClosable: true,
-    //             position: "top-right"
-    //         });
-    //     }
-    // };
+    const handleDeleteOpen = (env) => {
+        setSelectedEnv(env);
+        onDeleteOpen();
+    };
 
     const handleDeleteTeam = async () => {
         try {
-            // Fetch teams where the id is present in ancestor_group_ids
-            const { data, error } = await supabase
+            // Step 1: Retrieve the team data
+            const { data: teamData, error: fetchError } = await supabase
                 .schema("mc_cap_develop")
                 .from("teams")
-                .select("teamid")
-                .contains("ancestor_group_ids", [id]);
+                .select("*")
+                .eq("teamid", id)
+                .single();
 
-            if (error) {
-                console.error("Error checking ancestor_group_ids:", error.message);
+            if (fetchError) {
+                console.error("Error fetching team data:", fetchError.message);
                 toast({
                     title: "Error",
-                    description: error.message,
+                    description: "An error occurred while fetching the team data.",
                     status: "error",
                     duration: 2000,
                     isClosable: true,
@@ -347,47 +313,83 @@ const Members = () => {
                 return;
             }
 
-            if (data.length > 0) {
-                // Extract teamid of matched teams
-                const teamIdsToDelete = data.map(team => team.teamid);
-
-                // Delete the teams with matching teamid
-                const { deleteError } = await supabase
-                    .schema("mc_cap_develop")
-                    .from("teams")
-                    .delete()
-                    .in("teamid", teamIdsToDelete);
-
-                if (deleteError) {
-                    console.error("Error deleting teams:", deleteError.message);
-                    toast({
-                        title: "Error Deleting Teams",
-                        description: deleteError.message,
-                        status: "error",
-                        duration: 2000,
-                        isClosable: true,
-                        position: "top-right"
-                    });
-                } else {
-                    toast({
-                        title: "Teams Deleted",
-                        description: "The selected teams have been deleted successfully.",
-                        status: "success",
-                        duration: 2000,
-                        isClosable: true,
-                        position: "top-right"
-                    });
-                    history.push("/accounts/teams");
-                }
-            } else {
+            // Step 2: Check if the organization's ID matches
+            if (teamData.organizationId !== userData.organizationId) {
                 toast({
-                    title: "No Teams Found",
-                    description: "No teams found with the specified ancestor_group_ids.",
-                    status: "info",
+                    title: "Error",
+                    description: "You do not have permission to delete this team.",
+                    status: "error",
                     duration: 2000,
                     isClosable: true,
                     position: "top-right"
                 });
+                return;
+            }
+
+            // Step 3: Retrieve teams with parentteamId matching the current team's teamid
+            const { data: childTeams, error: childTeamsError } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .select("*")
+                .eq("parentteamId", id);
+
+            if (childTeamsError) {
+                console.error("Error fetching child teams:", childTeamsError.message);
+                toast({
+                    title: "Error",
+                    description: "An error occurred while fetching the child teams.",
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                return;
+            }
+
+            // Step 4: Delete the child teams
+            const deletePromises = childTeams.map(async (childTeam) => {
+                const { error } = await supabase
+                    .schema("mc_cap_develop")
+                    .from("teams")
+                    .delete()
+                    .eq("teamid", childTeam.teamid);
+
+                if (error) {
+                    console.error(`Error deleting child team ${childTeam.teamid}:`, error.message);
+                    throw new Error(`Error deleting child team ${childTeam.teamid}`);
+                }
+            });
+
+            // Wait for all delete operations to complete
+            await Promise.all(deletePromises);
+
+            // Step 5: Delete the parent team
+            const { error: deleteError } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .delete()
+                .eq("teamid", id);
+
+            if (deleteError) {
+                console.error("Error deleting team:", deleteError.message);
+                toast({
+                    title: "Error Deleting Team",
+                    description: deleteError.message,
+                    status: "error",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+            } else {
+                toast({
+                    title: "Team Deleted",
+                    description: "The team and its child teams have been deleted successfully.",
+                    status: "success",
+                    duration: 2000,
+                    isClosable: true,
+                    position: "top-right"
+                });
+                navigate("/accounts/teams");
             }
         } catch (error) {
             console.error("Error deleting team:", error);
@@ -402,7 +404,6 @@ const Members = () => {
         }
     };
 
-    const [activeItem, setActiveItem] = useState("Members");
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
@@ -466,22 +467,20 @@ const Members = () => {
                     <Menu>
                         <MenuButton
                             as={IconButton}
-                            aria-label="Options"
-                            icon={<HiEllipsisHorizontal width="10px" />}
-                            variant="outline"
-                            h={"30px"}
-                            color="gray.500"
-                            border={"1px solid #5c5c5c"}
-                            right={30}
+                            aria-label='Options'
+                            icon={<HiEllipsisHorizontal />}
+                            variant='outline'
+                            h={'28px'} color="gray.500"
+                            border={'1px solid #5c5c5c'}
                         />
-                        <MenuList borderRadius={0}>
-                            <MenuItem fontSize="base" color="white" bgColor="delete" onClick={handleDeleteTeam} >
-                                Delete team...
+                        <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
+                            <MenuItem fontSize={14} onClick={() => handleDeleteOpen(group)} color={'white'}
+                                bgColor='red.600' >
+                                Delete Team...
                             </MenuItem>
                         </MenuList>
                     </Menu>
                 )}
-
             </Flex>
             <Box pt={7}>
                 <FlexableTabs
@@ -635,7 +634,6 @@ const Members = () => {
                                     <Menu>
                                         <MenuButton as={Box} display="flex" alignItems="center" cursor="pointer" flexDir="row">
                                             <Text mr={2}>{dataValue.membership_type}  <ChevronDownIcon w={10} h={5} /></Text>
-
                                         </MenuButton>
                                         <MenuList position="absolute" width='50px' right={-120} top={'10px'}>
                                             <MenuItem onClick={() => handleType(dataValue.memberid, 'member')}>
@@ -678,7 +676,6 @@ const Members = () => {
                                         </Menu>
                                     </Td>
                                 )}
-
                             </Tr>
                         ))}
                     </Tbody>
@@ -720,7 +717,42 @@ const Members = () => {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-        </Box >
+            <Modal onClose={onDeleteClose} isOpen={isDeleteOpen} isCentered>
+                <ModalOverlay />
+                <ModalContent minW={"600px"}>
+                    <ModalHeader
+                        bg={"#f3f3f3"}
+                        fontSize={20}
+                        fontWeight={800}
+                        color={"#444444"}
+                        borderTopRadius={15}
+                        borderBottom={"1px solid #e5e5e5"}
+                    >
+                        Are you sure?
+                    </ModalHeader>
+                    <ModalBody p={"32px 32px"}>
+                        <VStack spacing={4}>
+                            <VStack spacing={0} fontSize={14} align={"flex-start"}>
+                                <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
+                                    <b>This action cannot be undone.</b> This will remove the team <b>{selectedEnv?.teamname}</b> and all its data.
+                                </FormLabel>
+                            </VStack>
+                        </VStack>
+                    </ModalBody>
+                    <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
+                        <Button onClick={onDeleteClose} variant={"outline"} fontSize={14}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleDeleteTeam}
+                            variant={"formButtons"}
+                        >
+                            Delete
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </Box>
     );
 };
 

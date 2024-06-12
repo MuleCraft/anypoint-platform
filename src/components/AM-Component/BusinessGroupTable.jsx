@@ -89,9 +89,6 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
     setFilteredRows(filteredData);
   }, [tableData, expandedRows]);
 
-  console.log(filteredRows)
-
-  console.log(expandedRows)
   const handleDeleteOpen = () => {
     setDeleteOpen(true);
     setTargetGroupName(selectedBusinessGroupId.businessGroupName);
