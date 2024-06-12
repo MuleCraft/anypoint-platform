@@ -52,8 +52,8 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam }) => {
 
 
     filteredData.sort((a, b) => {
-      const idA = a.teamid === "" ? -1 : parseInt(a.teamid, 10);
-      const idB = b.teamid === "" ? -1 : parseInt(b.teamid, 10);
+      const idA = a.id === "" ? -1 : parseInt(a.id, 10);
+      const idB = b.id === "" ? -1 : parseInt(b.id, 10);
       return idA - idB;
     });
 
