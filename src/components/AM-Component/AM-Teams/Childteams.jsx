@@ -272,23 +272,27 @@ const ChildTeams = () => {
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-                <Menu>
-                    <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<HiEllipsisHorizontal width="10px" />}
-                        variant="outline"
-                        h={"30px"}
-                        color="gray.500"
-                        border={"1px solid #5c5c5c"}
-                        right={30}
-                    />
-                    <MenuList borderRadius={0}>
-                        <MenuItem fontSize="base" color="white" onClick={() => setDeleteOpen(true)} bgColor="delete">
-                            Delete team...
-                        </MenuItem>
-                    </MenuList>
-                </Menu>
+
+
+                {group?.parentteamId === null ? ("") : (
+                    <Menu>
+                        <MenuButton
+                            as={IconButton}
+                            aria-label="Options"
+                            icon={<HiEllipsisHorizontal width="10px" />}
+                            variant="outline"
+                            h={"30px"}
+                            color="gray.500"
+                            border={"1px solid #5c5c5c"}
+                            right={30}
+                        />
+                        <MenuList borderRadius={0}>
+                            <MenuItem fontSize="base" color="white" onClick={() => setDeleteOpen(true)} bgColor="delete">
+                                Delete team...
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
+                )}
             </Flex>
             <Box pt={7}>
                 <FlexableTabs
