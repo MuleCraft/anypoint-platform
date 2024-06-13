@@ -154,7 +154,8 @@ export default async function createNewTeams(teamsCreateParams) {
             .from('teams')
             .update({
                 ancestor_group_ids: ancestorIds,
-                ancestors: ancestors
+                ancestors: ancestors,
+                parentteamId: parentTeamId
             })
             .eq('teamid', teamId);
 
