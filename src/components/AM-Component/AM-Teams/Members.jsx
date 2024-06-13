@@ -47,6 +47,7 @@ import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { AuthContext } from "../../../Utils/AuthProvider";
+import EmptyRows from "../EmptyRows";
 
 const Members = () => {
     const { id } = useParams();
@@ -71,7 +72,9 @@ const Members = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [activeItem, setActiveItem] = useState("Members");
-
+    const [filterValue, setFilterValue] = useState('');
+    const [ancestors, setAncestors] = useState('');
+    console.log(group)
     const fetchGroupData = async () => {
         try {
             const { data, error } = await supabase
@@ -87,6 +90,7 @@ const Members = () => {
                 setGroup(data);
                 setMembers(data.members || []);
                 setTeamName(data.teamname);
+                setAncestors(data.ancestors)
             }
         } catch (error) {
             console.error("Error fetching group data:", error);
@@ -409,6 +413,10 @@ const Members = () => {
         setActiveItem(itemName);
     };
 
+    const filteredMembers = members.filter(member =>
+        member.memberfullname.toLowerCase().includes(filterValue.toLowerCase())
+    );
+
     const userId = [
         {
             heading: 'Access Management',
@@ -440,30 +448,30 @@ const Members = () => {
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentteamId === null ? (
-                        ""
-                    ) : (
-                        <BreadcrumbItem>
+                    {ancestors && ancestors.map((ancestor) => (
+                        <BreadcrumbItem key={ancestor.teamid}>
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/teams/${group?.teamid}`}
+                                href={`/accounts/teams/${ancestor.teamid}`}
                             >
-                                {group?.teamname}
+                                {ancestor.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )}
+                    ))}
 
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
-                            fontWeight="600"
-                            href={`/accounts/teams/${id}/settings`}
+                            fontWeight="400"
+                            href={`/accounts/teams/${group?.teamid}`}
                         >
                             {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+
                 </Breadcrumb>
+
                 {group?.parentteamId === null ? ("") : (
                     <Menu>
                         <MenuButton
@@ -495,6 +503,9 @@ const Members = () => {
                     <Button colorScheme="blue" onClick={onOpen} fontSize="xs" isDisabled={group?.parentteamId === null}>
                         Add members
                     </Button>
+                    <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
+                        This default team contains all users. Use it to set permissions that apply to everyone in your organization.
+                    </Text>
                     <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
                         <ModalOverlay />
                         <ModalContent>
@@ -596,7 +607,10 @@ const Members = () => {
                         children={<FiSearch />}
                         color="gray.500"
                     />
-                    <Input placeholder="Filter Teams" fontSize={14} fontWeight={500}
+                    <Input
+                        placeholder="Filter users"
+                        fontSize={14}
+                        fontWeight={500}
                         onChange={(e) => { setFilterValue(e.target.value) }}
                     />
                 </InputGroup>
@@ -616,70 +630,83 @@ const Members = () => {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {members.length > 0 && members.map((dataValue, index) => (
-                            <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }} key={index}>
-                                <Td style={rowValueStyle}>
-                                    {userData?.id === dataValue?.memberid ? (
-                                        <Box display="flex" alignItems="center" gap={3}>
-                                            <Text>{dataValue.memberfullname}</Text>
-                                            <Text fontSize="12" fontWeight="500" color="gray">This is you</Text>
-                                        </Box>) : (
-                                        <Box display="flex" alignItems="center" gap={3}>
-                                            <Text>{dataValue.memberfullname}</Text>
-                                        </Box>
-                                    )}
-                                </Td>
-                                <Td style={rowValueStyle}>{dataValue.memberusername}</Td>
-                                <Td style={rowValueStyle}>{dataValue.memberemail}</Td>
-                                <Td style={rowValueStyle}>
-                                    <Menu>
-                                        <MenuButton as={Box} display="flex" alignItems="center" cursor="pointer" flexDir="row">
-                                            <Text mr={2}>{dataValue.membership_type}  <ChevronDownIcon w={10} h={5} /></Text>
-                                        </MenuButton>
-                                        <MenuList position="absolute" width='50px' right={-120} top={'10px'}>
-                                            <MenuItem onClick={() => handleType(dataValue.memberid, 'member')}>
-                                                <Flex flexDir="column" gap={1}>
-                                                    <Text fontWeight="bold">Member</Text>
-                                                    <Text fontSize="base" color="gray">Inherits permissions from this</Text>
-                                                    <Text fontSize="base" color="gray">team and its parents.</Text>
-                                                </Flex>
-                                            </MenuItem>
-                                            <MenuItem onClick={() => handleType(dataValue.memberid, 'maintainer')}>
-                                                <Box>
-                                                    <Text fontWeight="bold">Maintainer</Text>
-                                                    <Text fontSize="base" color="gray">Also manages team</Text>
-                                                    <Text fontSize="base" color="gray">membership and child teams.</Text>
-                                                </Box>
-                                            </MenuItem>
-                                        </MenuList>
-                                    </Menu>
-                                </Td>
-                                {group?.parentteamId === null ? (
-                                    ""
-                                ) : (
+                        {filteredMembers.length > 0 ? (
+                            filteredMembers.map((dataValue, index) => (
+                                <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }} key={index}>
+                                    <Td style={rowValueStyle}>
+                                        {userData?.id === dataValue?.memberid ? (
+                                            <Box display="flex" alignItems="center" gap={3}>
+                                                <Text>{dataValue.memberfullname}</Text>
+                                                <Text fontSize="12" fontWeight="500" color="gray">This is you</Text>
+                                            </Box>) : (
+                                            <Box display="flex" alignItems="center" gap={3}>
+                                                <Text>{dataValue.memberfullname}</Text>
+                                            </Box>
+                                        )}
+                                    </Td>
+                                    <Td style={rowValueStyle}>{dataValue.memberusername}</Td>
+                                    <Td style={rowValueStyle}>{dataValue.memberemail}</Td>
                                     <Td style={rowValueStyle}>
                                         <Menu>
-                                            <MenuButton
-                                                as={IconButton}
-                                                aria-label="Options"
-                                                icon={<HiEllipsisHorizontal width="10px" />}
-                                                variant="outline"
-                                                h={"30px"}
-                                                color="gray.500"
-                                                border={"1px solid #5c5c5c"}
-                                                right={30}
-                                            />
-                                            <MenuList borderRadius={0}>
-                                                <MenuItem fontSize="base" color="white" bgColor="delete" onClick={() => handleRemoveClick(dataValue.memberid, dataValue.memberfullname)}>
-                                                    Remove...
+                                            <MenuButton as={Box} display="flex" alignItems="center" cursor="pointer" flexDir="row">
+                                                <Text mr={2}>{dataValue.membership_type}  <ChevronDownIcon w={10} h={5} /></Text>
+                                            </MenuButton>
+                                            <MenuList position="absolute" width='50px' right={-120} top={'10px'}>
+                                                <MenuItem onClick={() => handleType(dataValue.memberid, 'Member')}>
+                                                    <Flex flexDir="column" gap={1}>
+                                                        <Text fontWeight="bold">Member</Text>
+                                                        <Text fontSize="base" color="gray">Inherits permissions from this</Text>
+                                                        <Text fontSize="base" color="gray">team and its parents.</Text>
+                                                    </Flex>
+                                                </MenuItem>
+                                                <MenuItem onClick={() => handleType(dataValue.memberid, 'Maintainer')}>
+                                                    <Box>
+                                                        <Text fontWeight="bold">Maintainer</Text>
+                                                        <Text fontSize="base" color="gray">Also manages team</Text>
+                                                        <Text fontSize="base" color="gray">membership and child teams.</Text>
+                                                    </Box>
                                                 </MenuItem>
                                             </MenuList>
                                         </Menu>
                                     </Td>
-                                )}
+                                    {group?.parentteamId === null ? (
+                                        ""
+                                    ) : (
+                                        <Td style={rowValueStyle}>
+                                            <Menu>
+                                                <MenuButton
+                                                    as={IconButton}
+                                                    aria-label="Options"
+                                                    icon={<HiEllipsisHorizontal width="10px" />}
+                                                    variant="outline"
+                                                    h={"30px"}
+                                                    color="gray.500"
+                                                    border={"1px solid #5c5c5c"}
+                                                    right={30}
+                                                />
+                                                <MenuList borderRadius={0}>
+                                                    <MenuItem fontSize="base" color="white" bgColor="delete" onClick={() => handleRemoveClick(dataValue.memberid, dataValue.memberfullname)}>
+                                                        Remove...
+                                                    </MenuItem>
+                                                </MenuList>
+                                            </Menu>
+                                        </Td>
+                                    )}
+                                </Tr>
+                            ))
+                        ) : (
+                            <Tr>
+                                <Td colSpan={5} style={{ height: "600px" }}>
+                                    <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" height="100%">
+                                        <EmptyRows />
+                                        <Text mt={2} fontSize="xs" color="gray.500">No users found</Text>
+                                    </Box>
+                                </Td>
                             </Tr>
-                        ))}
+                        )}
                     </Tbody>
+
+
                 </Table>
             </TableContainer>
             <Modal onClose={onDeleteCloseMember} isOpen={isDeleteOpenMember} isCentered>

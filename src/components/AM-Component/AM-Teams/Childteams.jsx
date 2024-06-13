@@ -55,6 +55,7 @@ const ChildTeams = () => {
     const openModal = () => setIsModalOpen(true);
     const [group, setGroup] = useState(null);
     const toast = useToast();
+    const [ancestors, setAncestors] = useState('');
 
     const fetchTableData = async () => {
         const tableRowData = await fetchTeamsTableRows(currentOrganization);
@@ -74,6 +75,7 @@ const ChildTeams = () => {
                     console.error("Error fetching user data:", error.message);
                 } else {
                     setGroup(data[0]);
+                    setAncestors(data[0].ancestors)
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -249,31 +251,29 @@ const ChildTeams = () => {
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentteamId === null ? (
-                        ""
-                    ) : (
-                        <BreadcrumbItem>
+                    {ancestors && ancestors.map((ancestor) => (
+                        <BreadcrumbItem key={ancestor.teamid}>
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/teams/${group?.teamid}`}
+                                href={`/accounts/teams/${ancestor.teamid}`}
                             >
-                                {group?.teamname}
+                                {ancestor.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )}
+                    ))}
+
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
-                            fontWeight="600"
-                            href={`/accounts/teams/${id}/settings`}
+                            fontWeight="400"
+                            href={`/accounts/teams/${group?.teamid}`}
                         >
                             {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+
                 </Breadcrumb>
-
-
                 {group?.parentteamId === null ? ("") : (
                     <Menu>
                         <MenuButton

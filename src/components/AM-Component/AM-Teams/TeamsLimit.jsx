@@ -224,28 +224,28 @@ const TeamLimits = () => {
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentteamId === null ? (
-                        ""
-                    ) : (
-                        <BreadcrumbItem>
+                    {ancestors && ancestors.map((ancestor) => (
+                        <BreadcrumbItem key={ancestor.teamid}>
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/teams/${group?.teamid}`}
+                                href={`/accounts/teams/${ancestor.teamid}`}
                             >
-                                {group?.teamname}
+                                {ancestor.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )}
+                    ))}
+
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
-                            fontWeight="600"
-                            href={`/accounts/teams/${id}/settings`}
+                            fontWeight="400"
+                            href={`/accounts/teams/${group?.teamid}`}
                         >
                             {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+
                 </Breadcrumb>
                 {group?.parentteamId === null ? ("") : (
                     <Menu>

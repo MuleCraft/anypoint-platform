@@ -24,7 +24,8 @@ import {
   Button,
   ModalContent,
   Box,
-  useToast
+  useToast,
+  Text
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
 import supabase from "../../../Utils/supabase";
@@ -243,7 +244,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
               _hover={{ bgColor: "#ececec" }}
             >
               <Td style={rowValueStyle}>
-                <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`}>
+                <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`} display="flex">
                   <IconButton
                     aria-label="Toggle Details"
                     icon={expandedRows.includes(dataValue.teamid) ? <HiChevronDown /> : <HiChevronRight />}
@@ -263,8 +264,15 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
                         {dataValue.teamname}
                       </Box>
                     ) : (
-                      dataValue.teamname
+                      <Box display="flex" gap={4}>
+                        {dataValue.teamname}
+                        {dataValue.members.map((dataValue, index) => (
+                          <Text key={index} fontSize="base" color="gray">You’re a {dataValue.membership_type}</Text>
+                        ))}
+
+                      </Box>
                     )}
+
                   </Link>
                 </Box>
               </Td>

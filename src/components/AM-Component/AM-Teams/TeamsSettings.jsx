@@ -49,27 +49,27 @@ const TeamSetting = () => {
     const [deleteInputValue, setDeleteInputValue] = useState("");
     const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(true);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const { data, error } = await supabase
-                    .schema("mc_cap_develop")
-                    .from("teams")
-                    .select("*")
-                    .eq("teamid", id);
+    const fetchUserData = async () => {
+        try {
+            const { data, error } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .select("*")
+                .eq("teamid", id);
 
-                if (error) {
-                    console.error("Error fetching user data:", error.message);
-                } else {
-                    setGroup(data[0]);
-                    setAncestors(data[0].ancestors);
-                    setEditedGroup(data[0]);  // Initialize editedGroup with the fetched data
-                }
-            } catch (error) {
-                console.error("Error fetching user data:", error);
+            if (error) {
+                console.error("Error fetching user data:", error.message);
+            } else {
+                setGroup(data[0]);
+                setAncestors(data[0].ancestors);
+                setEditedGroup(data[0]);  // Initialize editedGroup with the fetched data
             }
-        };
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    };
 
+    useEffect(() => {
         fetchUserData();
     }, [id]);
 
@@ -107,6 +107,7 @@ const TeamSetting = () => {
                 position: "top-right",
             });
             setChangesMade(false);
+            fetchUserData();
         } catch (error) {
             toast({
                 title: "Update Failed",
@@ -268,30 +269,29 @@ const TeamSetting = () => {
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentteamId === null ? (
-                        ""
-                    ) : (
-                        <BreadcrumbItem>
+                    {ancestors && ancestors.map((ancestor) => (
+                        <BreadcrumbItem key={ancestor.teamid}>
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/teams/${group?.parentteamId}`}
+                                href={`/accounts/teams/${ancestor.teamid}`}
                             >
-                                {group?.teamname}
+                                {ancestor.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )}
+                    ))}
+
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
-                            fontWeight="600"
-                            href={`/accounts/teams/${id}/settings`}
+                            fontWeight="400"
+                            href={`/accounts/teams/${group?.teamid}`}
                         >
                             {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                </Breadcrumb>
 
+                </Breadcrumb>
                 {group?.parentteamId === null ? ("") : (
                     <Menu>
                         <MenuButton
@@ -345,35 +345,52 @@ const TeamSetting = () => {
                 <HStack justify="space-between" mt={5}>
                     <Box w="full" h="40px" display="flex" flexDirection="column" gap={2}>
                         <Text fontSize="xs" fontWeight="500">Parent Team</Text>
-                        <Text fontSize="xs" w="85%" color="gray">Maintainers can move this team into another team they maintain. Any child teams will also be moved..</Text>
+                        <Text fontSize="xs" w="85%" color="gray">Maintainers can move this team into another team they maintain. Any child teams will also be moved.</Text>
                     </Box>
-
-                    <InputGroup mt={1} zIndex={3}>
-                        <InputRightElement
-                            pointerEvents="none"
-                            children={<SlArrowDown />}
-                            color="gray.500"
-                        />
-                        <Input
-                            placeholder="Select..."
-                            autoComplete="off"
-                            fontSize={14} color={'#000000'}
-                            value={group?.teamname}
-                            isDisabled={group?.parentteamId === null}
-                        />
-                        <Box>
-                            <Menu isOpen={isGroupMenuOpen}>
-                                <MenuButton as="div" width="100%" height="0" visibility="hidden" />
-                                <MenuList position="absolute" width='384px' right={0} top={'35px'}>
-                                    <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontWeight={500}>
-                                        No results found
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
-                        </Box>
-                    </InputGroup>
+                    {ancestors !== null && (
+                        <InputGroup>
+                            <Input
+                                id="parentteam"
+                                name="parentteam"
+                                value={ancestors.find(ancestor => ancestor.teamid === editedGroup?.parentteamId)?.teamname || ''}
+                                placeholder="Select parent team"
+                                isReadOnly
+                            />
+                            <InputRightElement>
+                                <IconButton
+                                    aria-label="Select parent team"
+                                    icon={<SlArrowDown />}
+                                    onClick={() => setIsGroupMenuOpen(!isGroupMenuOpen)}
+                                    variant="signin"
+                                    position="absolute"
+                                    right="8px"
+                                    top="50%"
+                                    transform="translateY(-50%)"
+                                />
+                                <Menu isOpen={isGroupMenuOpen} onClose={() => setIsGroupMenuOpen(false)}>
+                                    <MenuList position="absolute" width='515px' right={-10} top={'50px'}>
+                                        {ancestors.map((ancestor) => (
+                                            <MenuItem
+                                                key={ancestor.teamid}
+                                                onClick={() => {
+                                                    setEditedGroup((prevGroup) => ({
+                                                        ...prevGroup,
+                                                        parentteamId: ancestor.teamid,
+                                                    }));
+                                                    setIsGroupMenuOpen(false);
+                                                }}
+                                            >
+                                                {ancestor.teamname}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </Menu>
+                            </InputRightElement>
+                        </InputGroup>
+                    )}
                     <Box w="full" h="40px"></Box>
                 </HStack>
+
                 <Divider />
             </Stack>
 
