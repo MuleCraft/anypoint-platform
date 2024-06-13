@@ -29,11 +29,11 @@ const AccessOverview = () => {
     const { id } = useParams();
     const [group, setGroup] = useState(null);
     const [editedGroup, setEditedGroup] = useState(null);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
                 const { data, error } = await supabase
-                    .schema("mc_cap_develop")
                     .from("businessgroup")
                     .select("*")
                     .eq("businessGroupId", id);
@@ -133,90 +133,94 @@ const AccessOverview = () => {
             </Box>
             <Stack mt={"25px"} direction={"row"} spacing={4} align={'center'} justify={'space-between'} px={5}>
                 <HStack spacing={2} alignItems="center">
-                    <Text fontSize={14} color={"#747474"} fontWeight={500} minW={70}>
-                        Showing all
-                    </Text>
-                    <InputGroup mt={1} zIndex={3}>
-                        <InputRightElement
-                            pointerEvents="none"
-                            children={<SlArrowDown />}
-                            color="gray.500"
-                        />
-                        <Input
-                            placeholder="Select..."
-                            autoComplete="off"
-                            fontSize={14}
-                            color={'#000000'}
-                            value={group?.teamname}
-                            isDisabled={group?.parentteamId === null}
-                        />
-                        <Box>
-                            <Menu>
-                                <MenuButton as="div" width="100%" height="0" visibility="hidden" />
-                                <MenuList position="absolute" width='384px' right={0} top={'35px'}>
-                                    <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontWeight={500}>
-                                        No results found
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box width={20}>
+                            <Text fontSize="base" color={"#747474"} fontWeight={500}>
+                                Showing all
+                            </Text>
                         </Box>
-                    </InputGroup>
-                    <Text fontSize={14} color={"#747474"} fontWeight={500} minW={20}>
-                        with
-                    </Text>
-                    <InputGroup mt={1} zIndex={3}>
-                        <InputRightElement
-                            pointerEvents="none"
-                            children={<SlArrowDown />}
-                            color="gray.500"
-                        />
-                        <Input
-                            placeholder="Select..."
-                            autoComplete="off"
-                            fontSize={14}
-                            color={'#000000'}
-                            value={group?.teamname}
-                            isDisabled={group?.parentteamId === null}
-                        />
-                        <Box>
-                            <Menu>
-                                <MenuButton as="div" width="100%" height="0" visibility="hidden" />
-                                <MenuList position="absolute" width='384px' right={0} top={'35px'}>
-                                    <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontWeight={500}>
-                                        No results found
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
+                        <InputGroup width={220}>
+                            <InputRightElement
+                                // eslint-disable-next-line react/no-children-prop
+                                children={
+                                    <Menu>
+                                        <MenuButton as={IconButton} icon={<SlArrowDown />} variant="signin" />
+                                        <MenuList position="absolute" width='220px' right={-42} top={'5px'} borderRadius={4}>
+                                            <MenuItem>Users</MenuItem>
+                                            <MenuItem>Teams</MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                }
+                                color="gray.500"
+                            />
+                            <Input
+                                placeholder="Select..."
+                                autoComplete="off"
+                                fontSize={14}
+                                color={'#000000'}
+                                value={group?.teamname}
+                                isDisabled={group?.parentteamId === null}
+                            />
+                        </InputGroup>
+                    </Box>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" pr={2}>
+                        <Box width={20}>
+                            <Text fontSize={14} color={"#747474"} fontWeight={500} pl={3} pr={3}>
+                                with
+                            </Text>
                         </Box>
-                    </InputGroup>
-                    <Text fontSize={14} color={"#747474"} fontWeight={500} width={180} minW={80}>
-                        permission in
-                    </Text>
-                    <InputGroup mt={1} zIndex={3}>
-                        <InputRightElement
-                            pointerEvents="none"
-                            children={<SlArrowDown />}
-                            color="gray.500"
-                        />
-                        <Input
-                            placeholder="Select..."
-                            autoComplete="off"
-                            fontSize={14}
-                            color={'#000000'}
-                            value={group?.teamname}
-                            isDisabled={group?.parentteamId === null}
-                        />
-                        <Box>
-                            <Menu>
-                                <MenuButton as="div" width="100%" height="0" visibility="hidden" />
-                                <MenuList position="absolute" width='384px' right={0} top={'35px'}>
-                                    <MenuItem disabled fontStyle={'italic'} color={'gray.500'} fontWeight={500}>
-                                        No results found
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
+                        <InputGroup mt={1} zIndex={3} width={220}>
+                            <InputRightElement
+                                // eslint-disable-next-line react/no-children-prop
+                                children={
+                                    <Menu>
+                                        <MenuButton as={IconButton} icon={<SlArrowDown />} variant="signin" />
+                                        <MenuList position="absolute" width='360px' left="-180px" top={'5px'} borderRadius={4}>
+                                            <MenuItem>No results found</MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                }
+                                color="gray.500"
+                            />
+                            <Input
+                                placeholder="Select..."
+                                autoComplete="off"
+                                fontSize={14}
+                                color={'#000000'}
+                                value={group?.teamname}
+                                isDisabled={group?.parentteamId === null}
+                            />
+                        </InputGroup>
+                    </Box>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box width={28}>
+                            <Text fontSize={14} color={"#747474"} fontWeight={500}>
+                                permission in
+                            </Text>
                         </Box>
-                    </InputGroup>
+                        <InputGroup width={220}>
+                            <InputRightElement
+                                // eslint-disable-next-line react/no-children-prop
+                                children={
+                                    <Menu>
+                                        <MenuButton as={IconButton} icon={<SlArrowDown />} variant="signin" />
+                                        <MenuList position="absolute" width='220px' right={-42} top={'5px'} borderRadius={4}>
+                                            <MenuItem>No results found</MenuItem>
+                                        </MenuList>
+                                    </Menu>
+                                }
+                                color="gray.500"
+                            />
+                            <Input
+                                placeholder="Select..."
+                                autoComplete="off"
+                                fontSize={14}
+                                color={'#000000'}
+                                value={group?.teamname}
+                                isDisabled={group?.parentteamId === null}
+                            />
+                        </InputGroup>
+                    </Box>
                 </HStack>
                 <InputGroup maxW={"fit-content"} ml={0}>
                     <InputLeftElement

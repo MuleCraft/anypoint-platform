@@ -336,7 +336,7 @@ const TeamLimits = () => {
                         </Button>
                         <Button
                             onClick={handleDeleteTeam}
-                            variant={"formButtons"}
+                            variant={"DeleteButtonFilled"}
                             isDisabled={isDeleteButtonDisabled}
                             _hover={{ bgColor: "navy" }}
                         >

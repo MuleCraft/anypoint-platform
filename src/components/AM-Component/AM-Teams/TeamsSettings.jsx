@@ -262,7 +262,7 @@ const TeamSetting = () => {
 
     return (
         <Box h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
-            <Flex alignItems="center" justify="space-between">
+            <Flex alignItems="center" justify="space-between" pr={4}>
                 <Breadcrumb>
                     <BreadcrumbItem>
                         <BreadcrumbLink fontSize="lg" href="/accounts/teams">
@@ -462,7 +462,7 @@ const TeamSetting = () => {
                         </Button>
                         <Button
                             onClick={handleDeleteTeam}
-                            variant={"formButtons"}
+                            variant={"DeleteButtonFilled"}
                             isDisabled={isDeleteButtonDisabled}
                             _hover={{ bgColor: "navy" }}
                         >

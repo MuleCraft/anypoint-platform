@@ -738,7 +738,7 @@ const Members = () => {
                         </Button>
                         <Button
                             onClick={handleDeleteMember}
-                            variant={"formButtons"}
+                            variant={"DeleteButtonFilled"}
                         >
                             Remove
                         </Button>
@@ -773,7 +773,7 @@ const Members = () => {
                         </Button>
                         <Button
                             onClick={handleDeleteTeam}
-                            variant={"formButtons"}
+                            variant={"DeleteButtonFilled"}
                         >
                             Delete
                         </Button>

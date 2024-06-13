@@ -338,7 +338,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
                   Please type the name of the team to confirm.
                 </FormLabel>
                 <Input
-                  placeholder="Team name"
+                  placeholder="team name"
                   mt={1}
                   fontSize={14}
                   fontWeight={500}
@@ -353,10 +353,11 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
               Cancel
             </Button>
             <Button
+
               onClick={handleDeleteTeam}
-              variant={"formButtons"}
+              variant={"DeleteButtonFilled"}
               isDisabled={isDeleteButtonDisabled}
-              _hover={{ bgColor: "navy" }}
+
             >
               Delete
             </Button>
