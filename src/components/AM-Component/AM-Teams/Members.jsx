@@ -53,6 +53,7 @@ const Members = () => {
     const navigate = useNavigate();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+    const { isOpen: isDeleteOpenMember, onOpen: onDeleteOpenMember, onClose: onDeleteCloseMember } = useDisclosure();
     const toast = useToast();
     const { userData } = useContext(AuthContext);
     const [group, setGroup] = useState(null);
@@ -272,7 +273,7 @@ const Members = () => {
                 });
                 setGroup({ ...group, members: updatedMembers });
                 fetchGroupData();
-                onDeleteClose();
+                onDeleteCloseMember();
             }
         } catch (error) {
             console.error("Error deleting member:", error);
@@ -282,7 +283,7 @@ const Members = () => {
     const handleRemoveClick = (memberId, memberName) => {
         setSelectedMemberId(memberId);
         setSelectedMemberName(memberName);
-        onDeleteOpen();
+        onDeleteOpenMember();
     };
 
     const handleDeleteOpen = (env) => {
@@ -432,7 +433,7 @@ const Members = () => {
 
     return (
         <Box h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
-            <Flex alignItems="center" justify="space-between">
+            <Flex alignItems="center" justify="space-between" pr={4}>
                 <Breadcrumb>
                     <BreadcrumbItem>
                         <BreadcrumbLink fontSize="lg" href="/accounts/teams">
@@ -681,7 +682,7 @@ const Members = () => {
                     </Tbody>
                 </Table>
             </TableContainer>
-            <Modal onClose={onDeleteClose} isOpen={isDeleteOpen} isCentered>
+            <Modal onClose={onDeleteCloseMember} isOpen={isDeleteOpenMember} isCentered>
                 <ModalOverlay />
                 <ModalContent minW={"600px"}>
                     <ModalHeader
@@ -705,7 +706,7 @@ const Members = () => {
                         </VStack>
                     </ModalBody>
                     <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
-                        <Button onClick={onDeleteClose} variant={"outline"} fontSize={14}>
+                        <Button onClick={onDeleteCloseMember} variant={"outline"} fontSize={14}>
                             Cancel
                         </Button>
                         <Button

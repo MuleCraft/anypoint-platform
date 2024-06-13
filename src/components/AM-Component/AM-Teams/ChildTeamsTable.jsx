@@ -157,7 +157,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
             } else {
                 toast({
                     title: "Team Deleted",
-                    description: "The team and its child teams have been deleted successfully.",
+                    description: "",
                     status: "success",
                     duration: 2000,
                     isClosable: true,
