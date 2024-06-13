@@ -29,7 +29,6 @@ const AccessOverview = () => {
     const { id } = useParams();
     const [group, setGroup] = useState(null);
     const [editedGroup, setEditedGroup] = useState(null);
-
     useEffect(() => {
         const fetchUserData = async () => {
             try {

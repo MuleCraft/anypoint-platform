@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
     Box,
     Breadcrumb,
@@ -22,6 +22,14 @@ import {
     IconButton,
     MenuList,
     MenuItem,
+    Tooltip,
+    Modal,
+  ModalOverlay,
+  ModalHeader,
+  ModalBody,
+  FormLabel,
+  ModalFooter,
+  ModalContent,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import supabase from "../../Utils/supabase";
@@ -29,13 +37,46 @@ import FlexableTabs from "../FlexableTabs";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { FiSearch } from "react-icons/fi";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
+import { AuthContext } from "../../Utils/AuthProvider";
+import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
 
 const BGSettingsBreadcrumb = () => {
     const { id } = useParams();
     const [group, setGroup] = useState(null);
     const [editedGroup, setEditedGroup] = useState(null);
     const [changesMade, setChangesMade] = useState(false);
+    const [ownerData, setOwnerData] = useState([]);
     const toast = useToast();
+    const [isDeleteOpen, setDeleteOpen] = useState(false);
+    const [deleteInputValue, setDeleteInputValue] = useState("");
+    const [isDeleteButtonDisabled, setDeleteButtonDisabled] = useState(true);
+    const [targetGroupName, setTargetGroupName] = useState("");
+    const { userData } = useContext(AuthContext);
+
+    const [selectedBusinessGroupId, setSelectedBusinessGroupId] = useState(null);
+
+    useEffect(() => {
+        const fetchBusinessGroups = async () => {
+          const { data, error } = await supabase
+            .schema("mc_cap_develop")
+            .from("businessgroup")
+            .select("*")
+            .eq("organizationName", userData.company);
+    
+          if (error) {
+            console.error("Error fetching business groups:", error);
+          } else {
+            setOwnerData(data);
+            // console.log("owner data:",ownerData);
+            // console.log("user data:",userData);
+          }
+        };
+    
+        if (userData) {
+          fetchBusinessGroups();
+        }
+      }, [userData]);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -49,6 +90,7 @@ const BGSettingsBreadcrumb = () => {
                     console.error("Error fetching user data:", error.message);
                 } else {
                     setGroup(data[0]);
+                    // console.log("group:",group);
                     setEditedGroup(data[0]);
                 }
             } catch (error) {
@@ -58,6 +100,37 @@ const BGSettingsBreadcrumb = () => {
 
         fetchUserData();
     }, []);
+
+    const handleMenuOpen = (businessGroupId) => {
+        setSelectedBusinessGroupId(businessGroupId);
+    };
+
+    useEffect(() => {
+        // console.log('Selected group ID:', selectedBusinessGroupId);
+      }, [selectedBusinessGroupId]);
+
+      const handleDeleteOpen = () => {
+        setDeleteOpen(true);
+        setTargetGroupName(selectedBusinessGroupId.businessGroupName);
+      };
+    
+      const handleDeleteClose = () => {
+        setDeleteOpen(false);
+        setDeleteInputValue("");
+        setDeleteButtonDisabled(true);
+        setTargetGroupName(selectedBusinessGroupId.businessGroupName);
+      };
+
+      const handleDeleteInputChange = (e) => {
+        const value = e.target.value;
+        setDeleteInputValue(value);
+        const matchingGroup = ownerData.find(
+          (group) =>
+            group.businessGroupName.toLowerCase() === value.toLowerCase() &&
+            group.organizationName.toLowerCase() === selectedBusinessGroupId.organizationName.toLowerCase()
+        );
+        setDeleteButtonDisabled(!matchingGroup);
+      };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -110,6 +183,37 @@ const BGSettingsBreadcrumb = () => {
         }
     };
 
+    async function invokeGroupDeleteFunction(selectedBusinessGroupId) {
+        try {
+          const response = await deleteBusinessGroup(selectedBusinessGroupId);
+          handleDeleteClose();
+    
+          if (response === "Error occurred!") {
+            toast({
+              title: "Error",
+              description: "Error occurred.",
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+              position: "top-right",
+            });
+          } else {
+            toast({
+              description: "Business group successfully deleted.",
+              status: "success",
+              duration: 5000,
+              isClosable: true,
+              position: "top-right",
+            });
+          }
+    
+          setTimeout(() => {
+            window.location.reload();
+          }, 800);
+        } catch (error) {
+          console.error("Error occurred:", error);
+        }
+      }
 
 
     const [activeItem, setActiveItem] = useState("Settings");
@@ -132,9 +236,8 @@ const BGSettingsBreadcrumb = () => {
 
     ];
 
-
-
     return (
+        <>
         <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
             <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
@@ -181,11 +284,16 @@ const BGSettingsBreadcrumb = () => {
                             color="gray.500"
                             border={"1px solid #5c5c5c"}
                             right={30}
+                            onClick={() => handleMenuOpen(group)}
                         />
                         <MenuList borderRadius={0}>
-                            <MenuItem fontSize="sm" color="red" onClick="">
-                                Delete business group...
-                            </MenuItem>
+                                <Tooltip label="Cannot delete a Business Group with children" placement="auto" fontSize="4xl" 
+                                    isDisabled={selectedBusinessGroupId?.childGroups === false||selectedBusinessGroupId?.parentGroupID === ''}>
+                                <MenuItem fontSize={14} onClick={handleDeleteOpen} color={"red.600"} isDisabled={selectedBusinessGroupId?.childGroups !== false||selectedBusinessGroupId?.parentGroupID === ''}
+                                    _hover={{ color: selectedBusinessGroupId?.childGroups !== false ? '#000' : "white", bgColor: selectedBusinessGroupId?.childGroups !== false ? '' : 'red.600' }}>
+                                    Delete business group...
+                                </MenuItem>
+                                </Tooltip>
                         </MenuList>
                     </Menu>
                 )}
@@ -432,6 +540,35 @@ const BGSettingsBreadcrumb = () => {
                 </HStack>
             </Stack>
         </Box>
+        <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
+        <ModalOverlay />
+        <ModalContent minW={"600px"} >
+          <ModalHeader bg={"#f3f3f3"} fontSize={20} fontWeight={800} color={"#444444"}
+            borderTopRadius={15} borderBottom={"1px solid #e5e5e5"}>
+            Are you sure?
+          </ModalHeader>
+          <ModalBody p={"32px 32px"}>
+            <VStack spacing={4}>
+              <VStack spacing={0} fontSize={14} align={"flex-start"}>
+                <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
+                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
+                <Input placeholder="Business Group name" mt={1} fontSize={14} fontWeight={500}
+                  value={deleteInputValue}
+                  onChange={handleDeleteInputChange}
+                />
+              </VStack>
+            </VStack>
+          </ModalBody>
+          <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
+            <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>Cancel</Button>
+            <Button onClick={() => invokeGroupDeleteFunction(selectedBusinessGroupId)}
+              variant={"formButtons"}
+              isDisabled={isDeleteButtonDisabled} 
+              _hover={{ bgColor: 'navy' }}>Delete</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      </>
     );
 };
 

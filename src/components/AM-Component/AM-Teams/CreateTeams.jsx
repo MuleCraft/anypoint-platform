@@ -29,9 +29,8 @@ import createNewTeams from "../../../Utils/TeamsCreate";
 import { v4 as uuidv4 } from "uuid";
 
 const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
-    // const { id } = useParams();
-    // const [group, setGroup] = useState(null);
-    // console.log('filteredTeamsTableData:', filteredTeamsTableData);
+
+    console.log('filteredTeamsTableData:', filteredTeamsTableData);
     const toast = useToast();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -40,15 +39,15 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
     const [teamNameError, setTeamNameError] = useState('');
     const [parentTeamName, setParentTeamName] = useState('');
 
-    const [searchInput, setSearchInput] = useState('');
-    // const [selectedParentValue, setSelectedParentValue] = useState("");
+    if (filteredTeamsTableData.length > 0 && parentTeamName === '') {
+        setParentTeamName(filteredTeamsTableData[filteredTeamsTableData.length - 1].teamname);
+    }
 
+    const [searchInput, setSearchInput] = useState('');
     const [filteredTeams, setFilteredTeams] = useState([]);
     const [isTeamsMenuOpen, setIsTeamsMenuOpen] = useState(false);
 
-    // const [isModalOpen, setIsModalOpen] = useState(false);
-
-    // const openModal = () => setIsModalOpen(true);
+    const isCreateTeamsButtonDisabled = !teamName || !parentTeamName || teamNameError;
 
     const teamId = uuidv4();
 
@@ -63,7 +62,6 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
 
     async function invokeTeamsCreate() {
         try {
-            // console.log(teamsCreateParams);
             const response = await createNewTeams(teamsCreateParams);
             onClose();
 
@@ -87,9 +85,9 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
                 });
             }
 
-            // setTimeout(() => {
-            //     window.location.reload();
-            // }, 800);
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
         } catch (error) {
             console.error("Error occurred:", error);
         }
@@ -102,12 +100,6 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
         if (value.trim() === '') {
             setTeamNameError(`Required. Team name must only contain alphanumeric characters, spaces, and the following symbols: _ -`);
         }
-        // else if (value.length < 2 && !isValid) {
-        //     setTeamNameError(`Name must only contain alphanumeric characters, spaces, and the following symbols: ' , . _ - Name must be between 2 and 255 characters.`);
-        // } 
-        // else if (value.length < 2) {
-        //     setTeamNameError('Name must be between 2 and 255 characters.');
-        // }
         else if (!isValid) {
             setTeamNameError(`Team name must only contain alphanumeric characters, spaces, and the following symbols: _ -`);
         }
@@ -120,7 +112,6 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
         const value = e.target.value;
         setParentTeamName(value);
         setSearchInput(value);
-        // setSelectedParentValue(value);
 
         const filtered = filteredTeamsTableData.filter((item) =>
             (typeof item.teamname === 'string' && item.teamname.toLowerCase().includes(value.toLowerCase()))
@@ -130,11 +121,11 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
         setIsTeamsMenuOpen(true);
     };
 
-    const filterBusinessGroupId = (data, groupName) => {
-        const result = data.filter(item => item.businessGroupName === groupName);
-        console.log('result:', result[0].businessGroupId);
-        setSelectedGroupParentId(result[0].businessGroupId);
-    };
+    //   const filterBusinessGroupId = (data, groupName) => {
+    //     const result = data.filter(item => item.businessGroupName === groupName);
+    //     console.log('result:',result[0].businessGroupId);
+    //     setSelectedGroupParentId(result[0].businessGroupId);
+    //   };
 
     const handleTeamSelect = (team) => {
         setParentTeamName(team.teamname);
@@ -206,7 +197,7 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
                                     color="gray.500"
                                 />
                                 <Input
-                                    placeholder="Select..."
+                                    // /placeholder="Select..."
                                     autoComplete="off"
                                     fontSize={14} color={'#747474'}
                                     value={parentTeamName}
@@ -243,7 +234,10 @@ const CreateTeams = ({ filteredTeamsTableData, orgId }) => {
                         <Button variant="homePageButtons" onClick={onClose} fontSize="base">
                             Cancel
                         </Button>
-                        <Button onClick={invokeTeamsCreate} colorScheme="blue" fontSize="base">
+                        <Button onClick={invokeTeamsCreate}
+                            variant={'formButtons'}
+                            isDisabled={isCreateTeamsButtonDisabled}
+                            _hover={{ bgColor: 'navy' }}>
                             Create
                         </Button>
                     </ModalFooter>

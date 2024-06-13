@@ -1,16 +1,40 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import Nav from "../../../components/NavbarHome";
 import Sidebar from "../../../components/sidebar";
 import sections from "../utils/AM-sidebar";
 import {
     Box,
     Flex, Link,
+    Button,
+    Divider,
+    FormControl,
+    FormLabel,
     HStack,
+    IconButton,
     Input,
     InputGroup,
     InputLeftElement,
+    InputRightElement,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
+    Modal,
+    ModalBody,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
     Stack,
+    Table,
+    TableContainer,
+    Tbody,
+    Td,
     Text,
+    Th,
+    Thead,
+    Tr,
+    useDisclosure,
 } from "@chakra-ui/react";
 import CreateTeams from "../../../components/AM-Component/AM-Teams/CreateTeams";
 import TeamsTable from "../../../components/AM-Component/AM-Teams/TeamsTable";
@@ -24,32 +48,30 @@ export default function AMTeams({ name }) {
     const [activeItem, setActiveItem] = useState('teams');
     const [teamsTableData, setTeamsTableData] = useState([]);
     const [filterValue, setFilterValue] = useState("");
+
     const [currentUserName, setCurrentUserName] = useState('');
     const [currentUserEmail, setCurrentUserEmail] = useState('');
     const [currentOrganization, setCurrentOrganization] = useState('');
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
-    useEffect(() => {
-        if (userData && currentUserName === '') {
-            setCurrentUserEmail(userData.email);
-            setCurrentUserName(userData.display_name);
-            setCurrentOrganization(userData.organizationId);
-        }
-    }, [userData, currentUserName]);
+    if (userData && (currentUserName === '')) {
+        setCurrentUserEmail(userData.email);
+        setCurrentUserName(userData.display_name);
+        setCurrentOrganization(userData.organizationId);
+    }
 
     const fetchRows = async () => {
         const tableRowData = await fetchTeamsTableRows(currentOrganization);
         setTeamsTableData(tableRowData);
-    };
+    }
 
-    useEffect(() => {
-        if (userData && teamsTableData.length === 0) {
-            fetchRows();
-        }
-    }, [userData, teamsTableData.length]);
+    if (userData && (teamsTableData.length === 0)) {
+        fetchRows();
+    }
 
     const filteredTableData = teamsTableData.filter((data) =>
         data.teamname.toLowerCase().includes(filterValue.toLowerCase())
@@ -58,7 +80,6 @@ export default function AMTeams({ name }) {
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
-
     return (
         <>
             <div className="home">
@@ -105,7 +126,7 @@ export default function AMTeams({ name }) {
                             {filteredTableData.length === 0 ? (
                                 <EmptyRows message={'No data to show'} />
                             ) : (
-                                <TeamsTable tableData={filteredTableData} onOpenCreateChildteam={openModal} refetchTableData={fetchRows} />
+                                <TeamsTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} />
                             )}
                         </Flex>
                     </Flex>
