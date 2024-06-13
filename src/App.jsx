@@ -131,6 +131,69 @@ export default function App() {
               }
             />
             <Route
+              path="/accounts/teams/:id"
+              element={
+                <AMMenbers
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/settings"
+              element={
+                <AMTeamsSettings
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/"
+              element={
+                <AMTeams
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/limits"
+              element={
+                <AMTeamsLimits
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/child_teams"
+              element={
+                <AMChildTeams
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/users"
+              element={
+                <AMMenbers
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/permissions"
+              element={
+                <AMPermissions
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
               path="accounts/businessGroups"
               element={
                 <AMBusinessGroup

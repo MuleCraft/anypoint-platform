@@ -24,7 +24,7 @@ export default async function createNewTeams(teamsCreateParams) {
         }
     }
 
-    if(teamsCreateParams.parentTeam !== ''){
+    if (teamsCreateParams.parentTeam !== '') {
         const { data: parentId, error: parentIderror } = await supabase
             .schema('mc_cap_develop')
             .from('teams')
@@ -40,7 +40,7 @@ export default async function createNewTeams(teamsCreateParams) {
         }
     }
 
-    
+
     const { data, error } = await supabase
         .schema('mc_cap_develop')
         .from('teams')
@@ -70,13 +70,13 @@ export default async function createNewTeams(teamsCreateParams) {
                     "removeRoles"
                 ],
                 members: userdata[0] ? [{
-                        // teamid: teamsCreateParams.teamid,
-                        memberid: userdata[0].id || '',
-                        memberfullname: userdata[0].full_name || '',
-                        memberusername: userdata[0].display_name || '',
-                        memberemail: userdata[0].email || '',
-                        membership_type: teamsCreateParams.membershiptype || 'member'
-                    }] : teamsCreateParams.members
+                    // teamid: teamsCreateParams.teamid,
+                    memberid: userdata[0].id || '',
+                    memberfullname: userdata[0].full_name || '',
+                    memberusername: userdata[0].display_name || '',
+                    memberemail: userdata[0].email || '',
+                    membership_type: teamsCreateParams.membershiptype || 'member'
+                }] : teamsCreateParams.members
             },
         ])
         .select();
@@ -134,7 +134,7 @@ export default async function createNewTeams(teamsCreateParams) {
             return;
         }
 
-        const { data:isChildData, isChilderror } = await supabase
+        const { data: isChildData, isChilderror } = await supabase
             .schema('mc_cap_develop')
             .from('teams')
             .update({
@@ -154,7 +154,8 @@ export default async function createNewTeams(teamsCreateParams) {
             .from('teams')
             .update({
                 ancestor_group_ids: ancestorIds,
-                ancestors: ancestors
+                ancestors: ancestors,
+                parentteamId: parentTeamId
             })
             .eq('teamid', teamId);
 
@@ -167,7 +168,7 @@ export default async function createNewTeams(teamsCreateParams) {
     }
 
     const teamIdToUpdate = teamsCreateParams.teamid;
-    if(parentTeamIdValue !==''){
+    if (parentTeamIdValue !== '') {
         await updateTeamWithAncestors(teamIdToUpdate);
     }
 }

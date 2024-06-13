@@ -131,8 +131,8 @@ const Permissions = () => {
                 { name: 'Members', label: 'Members', path: `/accounts/teams/${id}/users` },
                 { name: 'Permissions', label: 'Permissions', path: `/accounts/teams/${id}/permissions` },
                 { name: 'ChildTeams', label: 'Child teams', path: `/accounts/teams/${id}/child_teams` },
-                { name: 'Settings', label: 'Settings', path: `/accounts/teams/${1}/settings` },
-                { name: 'Limits', label: 'Limits', path: `/accounts/teams/${1}/limits` },
+                { name: 'Settings', label: 'Settings', path: `/accounts/teams/${id}/settings` },
+                { name: 'Limits', label: 'Limits', path: `/accounts/teams/${id}/limits` },
 
 
 
@@ -197,77 +197,77 @@ const Permissions = () => {
 
             </Flex>
             <Flex direction={'column'}>
-            <Box pt={7}>
-                <FlexableTabs
-                    sections={userId}
-                    activeItem={activeItem}
-                    onItemSelect={handleItemSelect}
-                />
-            </Box>
-            <Flex direction="column" mt="70" p={"20px 25px"} gap={8} w={'-webkit-fill-available'}>
-                        <Stack mt={"-60px"} direction={"row"} spacing={6} align={'center'} justifyContent={'space-between'}>
-                            <HStack spacing={5} >
-                            <CreatePermissions 
-                                // filteredTeamsTableData={filteredTableData}
-                                // orgId={currentOrganization}
+                <Box pt={7}>
+                    <FlexableTabs
+                        sections={userId}
+                        activeItem={activeItem}
+                        onItemSelect={handleItemSelect}
+                    />
+                </Box>
+                <Flex direction="column" mt="70" p={"20px 25px"} gap={8} w={'-webkit-fill-available'}>
+                    <Stack mt={"-60px"} direction={"row"} spacing={6} align={'center'} justifyContent={'space-between'}>
+                        <HStack spacing={5} >
+                            <CreatePermissions
+                            // filteredTeamsTableData={filteredTableData}
+                            // orgId={currentOrganization}
                             />
                             <HStack>
-                             <Flex align="center">
-                             <Box
-                                    position="relative"
-                                    display="inline-block"
-                                    width="40px"
-                                    height="20px"
-                                    mr="-35px"
-                                    zIndex={1}
-                                    pointerEvents="none"
-                                >
-                                    {isChecked && (
+                                <Flex align="center">
                                     <Box
-                                        position="absolute"
-                                        top="50%"
-                                        left="50%"
-                                        transform="translate(-50%, -50%)"
-                                        color="white"
+                                        position="relative"
+                                        display="inline-block"
+                                        width="40px"
+                                        height="20px"
+                                        mr="-35px"
+                                        zIndex={1}
+                                        pointerEvents="none"
                                     >
-                                        <FaCheck fontSize={10}/>
+                                        {isChecked && (
+                                            <Box
+                                                position="absolute"
+                                                top="50%"
+                                                left="50%"
+                                                transform="translate(-50%, -50%)"
+                                                color="white"
+                                            >
+                                                <FaCheck fontSize={10} />
+                                            </Box>
+                                        )}
                                     </Box>
-                                    )}
-                                </Box>
-                                <Switch size="lg" isChecked={isChecked} onChange={handleToggle}/>
-                            </Flex>
-                            
-                            <Text fontSize={14} color={"#444444"} fontWeight={500} >
-                                Show inherited permissions
-                            </Text>
-                            <Tooltip label={'Inherited permissions come from parents of this team'}
-                                bg={'#5c5c5c'}
-                                fontSize={12} noOfLines={1} py={2} minW={'335px'}>
-                                <Icon fontSize={20} mt={1}><IoInformationCircleOutline/></Icon>
-                            </Tooltip>
+                                    <Switch size="lg" isChecked={isChecked} onChange={handleToggle} />
+                                </Flex>
+
+                                <Text fontSize={14} color={"#444444"} fontWeight={500} >
+                                    Show inherited permissions
+                                </Text>
+                                <Tooltip label={'Inherited permissions come from parents of this team'}
+                                    bg={'#5c5c5c'}
+                                    fontSize={12} noOfLines={1} py={2} minW={'335px'}>
+                                    <Icon fontSize={20} mt={1}><IoInformationCircleOutline /></Icon>
+                                </Tooltip>
                             </HStack>
-                            </HStack>
-                            <InputGroup maxW={"fit-content"}>
-                                <InputLeftElement
-                                    pointerEvents="none"
-                                    children={<FiSearch />}
-                                    color="gray.500"
-                                />
-                                <Input placeholder="Filter permissions" fontSize={14} fontWeight={500}
-                                    // onChange={(e) => { setFilterValue(e.target.value) }}
-                                />
-                            </InputGroup>
-                        </Stack>
-                        {/* {filteredTableData.length === 0 ? (
+                        </HStack>
+                        <InputGroup maxW={"fit-content"}>
+                            <InputLeftElement
+                                pointerEvents="none"
+                                children={<FiSearch />}
+                                color="gray.500"
+                            />
+                            <Input placeholder="Filter permissions" fontSize={14} fontWeight={500}
+                            // onChange={(e) => { setFilterValue(e.target.value) }}
+                            />
+                        </InputGroup>
+                    </Stack>
+                    {/* {filteredTableData.length === 0 ? (
                             <EmptyRows message={'No data to show'} />
                         ) : ( */}
-                            {/* <PermissionsTable 
+                    {/* <PermissionsTable 
                                 tableData={filteredTableData}
                                 onOpenCreateChildGroup={openModal}
                                 userData={userData}
                             /> */}
-                        {/* )} */}
-                        </Flex>
+                    {/* )} */}
+                </Flex>
             </Flex>
 
         </Box >

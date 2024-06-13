@@ -202,6 +202,7 @@ const UserTable = () => {
     }
   };
   console.log(submissionStatus);
+
   const cancelInvitation = async (id) => {
     const role = userData?.role;
 

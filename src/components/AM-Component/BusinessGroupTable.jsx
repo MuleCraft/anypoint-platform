@@ -26,6 +26,7 @@ import {
   useToast,
   Tooltip,
   Box,
+  Flex,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
 import supabase from "../../Utils/supabase";
@@ -61,9 +62,7 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
 
   const [selectedBusinessGroupId, setSelectedBusinessGroupId] = useState(null);
   const [targetGroupName, setTargetGroupName] = useState("");
-  const [openRow, setOpenRow] = useState(null); // State to track the open row
-  const [applyCondition, setApplyCondition] = useState(false); // State to apply condition
-  const [clickedRowId, setClickedRowId] = useState(null); // State to store clicked row ID
+  const [expandedRows, setExpandedRows] = useState([]);
 
   useEffect(() => {
     if (selectedBusinessGroupId) {
@@ -75,14 +74,20 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
 
   useEffect(() => {
     const filteredData = tableData.filter(dataValue => {
-      if (applyCondition) {
-        return dataValue.parentGroupID === clickedRowId || dataValue.parentGroupID === "";
-      } else {
-        return dataValue.parentGroupID === "";
-      }
+      return dataValue.parentGroupID === "" ||
+        expandedRows.includes(dataValue.businessGroupId) ||
+        expandedRows.includes(dataValue.parentGroupID);
     });
+
+
+    filteredData.sort((a, b) => {
+      const idA = a.id === "" ? -1 : parseInt(a.id, 10);
+      const idB = b.id === "" ? -1 : parseInt(b.id, 10);
+      return idA - idB || a.id - b.id;
+    });
+
     setFilteredRows(filteredData);
-  }, [tableData, applyCondition, clickedRowId]);
+  }, [tableData, expandedRows]);
 
   const handleDeleteOpen = () => {
     setDeleteOpen(true);
@@ -99,6 +104,7 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
   const handleDeleteInputChange = (e) => {
     const value = e.target.value;
     setDeleteInputValue(value);
+
     const matchingGroup = tableData.find(
       (group) =>
         group.businessGroupName.toLowerCase() === value.toLowerCase() &&
@@ -126,16 +132,10 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
   };
 
   const handleRowClick = (index, id) => {
-    if (openRow === index) {
-      // If the clicked row is already open, close it
-      setOpenRow(null);
-      setApplyCondition(false);
-      setClickedRowId(null);
+    if (expandedRows.includes(id)) {
+      setExpandedRows(expandedRows.filter(rowId => rowId !== id));
     } else {
-      // If the clicked row is not open, open it
-      setOpenRow(index);
-      setApplyCondition(true);
-      setClickedRowId(id);
+      setExpandedRows([...expandedRows, id]);
     }
   };
 
@@ -201,91 +201,121 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
         </Thead>
         <Tbody>
           {filteredRows.map((dataValue, index) => (
-            <>
-              <Tr
-                key={index}
-                fontWeight={500}
-                onMouseOver={() => handleRowHover(index)}
-                onMouseLeave={() => handleRowNotHover(index)}
-                _hover={{ bgColor: "#ececec" }}
-              >
-                <Td style={rowValueStyle}>
-                  <Box paddingLeft={dataValue.parentGroupID === "" ? 0 : 35}>
-
-                    <IconButton
-                      aria-label="Toggle Details"
-                      icon={openRow === index ? <HiChevronDown /> : <HiChevronRight />}
-                      size=""
-                      variant="ghost"
-                      onClick={() => handleRowClick(index, dataValue.businessGroupId)} // Pass the ID here
-                      mr={2}
-                      display={(dataValue.parentGroupID === "" || dataValue.childGroups === true) ? "inline-flex" : "none"}
-                    />
-
-                    <Link href={`/accounts/businessGroups/${dataValue.businessGroupId}`}
-                      _hover={{ textDecoration: "underline" }}
-                      color={hoveredRows[index] ? "#0176d3" : "#444444"}
+            <Tr
+              key={index}
+              fontWeight={500}
+              onMouseOver={() => handleRowHover(index)}
+              onMouseLeave={() => handleRowNotHover(index)}
+              _hover={{ bgColor: "#ececec" }}
+            >
+              <Td style={rowValueStyle}>
+                <Flex paddingLeft={dataValue.parentGroupID === "" ? 0 : `${index * 55}px`}>
+                  <IconButton
+                    aria-label="Toggle Details"
+                    icon={expandedRows.includes(dataValue.businessGroupId) ? <HiChevronDown /> : <HiChevronRight />}
+                    size=""
+                    variant="ghost"
+                    onClick={() => handleRowClick(index, dataValue.businessGroupId)}
+                    mr={2}
+                    display={(dataValue.parentGroupID === "" || dataValue.childGroups === true) ? "inline-flex" : "none"}
+                  />
+                  <Link
+                    href={`/accounts/businessGroups/${dataValue.businessGroupId}`}
+                    _hover={{ textDecoration: "underline" }}
+                    color={hoveredRows[index] ? "#0176d3" : "#444444"}
+                  >
+                    {dataValue.childGroups === false ? (
+                      <Box >
+                        {dataValue.businessGroupName}
+                      </Box>
+                    ) : (
+                      dataValue.businessGroupName
+                    )}
+                  </Link>
+                </Flex>
+              </Td>
+              <Td style={rowValueStyle}>{dataValue.environments.length}</Td>
+              <Td style={rowValueStyle}>{dataValue.totalVcores}</Td>
+              <Td style={rowValueStyle}>
+                <Menu>
+                  <MenuButton
+                    as={IconButton}
+                    aria-label="Options"
+                    icon={<HiEllipsisHorizontal />}
+                    variant="outline"
+                    h={"28px"}
+                    color="gray.500"
+                    border={"1px solid #5c5c5c"}
+                    onClick={() => handleMenuOpen(dataValue)}
+                  />
+                  <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
+                    <Tooltip
+                      label="This business group is not entitled to create child groups"
+                      placement="auto"
+                      fontSize="4xl"
+                      isDisabled={selectedBusinessGroupId?.canCreateChildGroup !== false}
                     >
-                      {dataValue.childGroups === false ? (
-                        <Box paddingLeft={55}>
-                          {dataValue.businessGroupName}
-                        </Box>
-                      ) : (
-                        dataValue.businessGroupName
-                      )}
-
-                    </Link>
-                  </Box>
-                </Td>
-                <Td style={rowValueStyle}>{dataValue.environments.length}</Td>
-                <Td style={rowValueStyle}>{dataValue.totalVcores}</Td>
-                <Td style={rowValueStyle}>
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      aria-label="Options"
-                      icon={<HiEllipsisHorizontal />}
-                      variant="outline"
-                      h={"28px"} color="gray.500"
-                      border={"1px solid #5c5c5c"}
-                      onClick={() => handleMenuOpen(dataValue)}
-                    />
-                    <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
-                      <Tooltip label="This business group is not entitled to create child groups" placement="auto" fontSize="4xl" isDisabled={selectedBusinessGroupId?.canCreateChildGroup !== false}>
-                        <MenuItem fontSize={14} onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId,dataValue.businessGroupName)} isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}>
-                          Create child group
+                      <MenuItem
+                        fontSize={14}
+                        onClick={() => onOpenCreateChildGroup(dataValue.businessGroupId, dataValue.businessGroupName)}
+                        isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}
+                      >
+                        Create child group
+                      </MenuItem>
+                    </Tooltip>
+                    {ownerData.id !== selectedBusinessGroupId?.id && (
+                      <Tooltip
+                        label="Cannot delete a Business Group with children"
+                        placement="auto"
+                        fontSize="4xl"
+                        isDisabled={selectedBusinessGroupId?.childGroups === false}
+                      >
+                        <MenuItem
+                          fontSize={14}
+                          onClick={handleDeleteOpen}
+                          color={"red.600"}
+                          isDisabled={selectedBusinessGroupId?.childGroups !== false}
+                          _hover={{
+                            color: selectedBusinessGroupId?.childGroups !== false ? "#000" : "white",
+                            bgColor: selectedBusinessGroupId?.childGroups !== false ? "" : "red.600",
+                          }}
+                        >
+                          Delete business group...
                         </MenuItem>
                       </Tooltip>
-                      {ownerData.id !== selectedBusinessGroupId?.id &&
-                        <Tooltip label="Cannot delete a Business Group with children" placement="auto" fontSize="4xl" isDisabled={selectedBusinessGroupId?.childGroups === false}>
-                          <MenuItem fontSize={14} onClick={handleDeleteOpen} color={"red.600"} isDisabled={selectedBusinessGroupId?.childGroups !== false}
-                            _hover={{ color: selectedBusinessGroupId?.childGroups !== false ? '#000' : "white", bgColor: selectedBusinessGroupId?.childGroups !== false ? '' : 'red.600' }}>
-                            Delete business group...
-                          </MenuItem>
-                        </Tooltip>
-                      }
-                    </MenuList>
-                  </Menu>
-                </Td>
-              </Tr>
-
-            </>
+                    )}
+                  </MenuList>
+                </Menu>
+              </Td>
+            </Tr>
           ))}
         </Tbody>
       </Table>
       <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
         <ModalOverlay />
-        <ModalContent minW={"600px"} >
-          <ModalHeader bg={"#f3f3f3"} fontSize={20} fontWeight={800} color={"#444444"}
-            borderTopRadius={15} borderBottom={"1px solid #e5e5e5"}>
+        <ModalContent minW={"600px"}>
+          <ModalHeader
+            bg={"#f3f3f3"}
+            fontSize={20}
+            fontWeight={800}
+            color={"#444444"}
+            borderTopRadius={15}
+            borderBottom={"1px solid #e5e5e5"}
+          >
             Are you sure?
           </ModalHeader>
           <ModalBody p={"32px 32px"}>
             <VStack spacing={4}>
               <VStack spacing={0} fontSize={14} align={"flex-start"}>
                 <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
-                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
-                <Input placeholder="Business Group name" mt={1} fontSize={14} fontWeight={500}
+                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> business group and all of its associated information.
+                  Please type the name of the business group to confirm.
+                </FormLabel>
+                <Input
+                  placeholder="Business Group name"
+                  mt={1}
+                  fontSize={14}
+                  fontWeight={500}
                   value={deleteInputValue}
                   onChange={handleDeleteInputChange}
                 />
@@ -293,15 +323,22 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
             </VStack>
           </ModalBody>
           <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
-            <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>Cancel</Button>
-            <Button onClick={() => invokeGroupDeleteFunction(selectedBusinessGroupId)}
+            <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => invokeGroupDeleteFunction(selectedBusinessGroupId)}
               variant={"formButtons"}
-              isDisabled={isDeleteButtonDisabled} _hover={{ bgColor: 'navy' }}>Delete</Button>
+              isDisabled={isDeleteButtonDisabled}
+              _hover={{ bgColor: "navy" }}
+            >
+              Delete
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
     </TableContainer>
-  )
-}
+  );
+};
 
 export default BusinessGroupTable;
