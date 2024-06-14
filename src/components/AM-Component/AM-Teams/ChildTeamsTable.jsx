@@ -24,27 +24,23 @@ import {
     Button,
     Input,
     VStack,
-    FormLabel
+    FormLabel,
+    HStack,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
 import supabase from "../../../Utils/supabase";
 
-const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData }) => {
-    const [selectedTeamId, setSelectedTeamId] = useState(null);
-    const [targetGroupName, setTargetGroupName] = useState("");
+const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) => {
+    const [selectedTeam, setSelectedTeam] = useState(null);
     const [expandedRows, setExpandedRows] = useState([]);
     const [isDeleteOpen, setDeleteOpen] = useState(false);
     const [deleteInputValue, setDeleteInputValue] = useState("");
     const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(true);
     const [filteredRows, setFilteredRows] = useState([]);
     const [hoveredRows, setHoveredRows] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10); // Number of items per page
     const toast = useToast();
-
-    useEffect(() => {
-        if (selectedTeamId) {
-            setTargetGroupName(selectedTeamId.teamname);
-        }
-    }, [selectedTeamId]);
 
     useEffect(() => {
         const filteredData = tableData.filter(dataValue => {
@@ -76,16 +72,16 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
         });
     };
 
-    const handleRowClick = (index, id) => {
-        if (expandedRows.includes(id)) {
-            setExpandedRows(expandedRows.filter(rowId => rowId !== id));
+    const handleRowClick = (team) => {
+        if (selectedTeam === team) {
+            setSelectedTeam(null); // Toggle close if already selected
         } else {
-            setExpandedRows([...expandedRows, id]);
+            setSelectedTeam(team); // Open details for the selected team
         }
     };
 
     const handleMenuOpen = (team) => {
-        setSelectedTeamId(team);
+        setSelectedTeam(team);
         setDeleteOpen(true);
     };
 
@@ -98,11 +94,11 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
     const handleDeleteInputChange = (e) => {
         const value = e.target.value;
         setDeleteInputValue(value);
-        setIsDeleteButtonDisabled(value.toLowerCase() !== selectedTeamId?.teamname?.toLowerCase());
+        setIsDeleteButtonDisabled(value.toLowerCase() !== selectedTeam?.teamname?.toLowerCase());
     };
 
     const handleDeleteTeam = async () => {
-        const teamId = selectedTeamId.teamid;
+        const teamId = selectedTeam.teamid;
         try {
             const { data: childTeams, error: childTeamsError } = await supabase
                 .schema("mc_cap_develop")
@@ -164,7 +160,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
                     position: "top-right"
                 });
                 handleDeleteClose();
-                fetchTableData(); // Refetch the table data
+                fetchRows(); // Refetch the table data
             }
         } catch (error) {
             console.error("Error deleting team:", error);
@@ -188,6 +184,11 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
     };
     const rowValueStyle = { fontSize: 14, padding: "10px" };
 
+    // Pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredRows.slice(indexOfFirstItem, indexOfLastItem);
+
     return (
         <TableContainer>
             <Table variant="simple" size="md">
@@ -198,13 +199,15 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {filteredRows.map((dataValue, index) => (
+                    {currentItems.map((dataValue, index) => (
                         <Tr
                             key={index}
                             fontWeight={500}
                             onMouseOver={() => handleRowHover(index)}
                             onMouseLeave={() => handleRowNotHover(index)}
                             _hover={{ bgColor: "#ececec" }}
+                            onClick={() => handleRowClick(dataValue)}
+                            cursor="pointer"
                         >
                             <Td style={rowValueStyle}>
                                 <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`}>
@@ -213,7 +216,10 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
                                         icon={expandedRows.includes(dataValue.teamid) ? <HiChevronDown /> : <HiChevronRight />}
                                         size=""
                                         variant="ghost"
-                                        onClick={() => handleRowClick(index, dataValue.teamid)}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent row click event from triggering
+                                            handleRowClick(dataValue);
+                                        }}
                                         mr={2}
                                         display={(dataValue.ancestors.length === 0 || dataValue.childTeams === true) ? "inline-flex" : "none"}
                                     />
@@ -290,7 +296,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchTableData
                         <VStack spacing={4}>
                             <VStack spacing={0} fontSize={14} align={"flex-start"}>
                                 <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
-                                    <b>This action cannot be undone.</b> This will delete the <b>{selectedTeamId?.teamname}</b> team and all of its associated information.
+                                    <b>This action cannot be undone.</b> This will delete the <b>{selectedTeam?.teamname}</b> team and all of its associated information.
                                     Please type the name of the team to confirm.
                                 </FormLabel>
                                 <Input

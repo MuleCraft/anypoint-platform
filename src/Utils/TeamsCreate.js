@@ -1,7 +1,7 @@
 import supabase from "./supabase";
 // import { v4 as uuidv4 } from "uuid";
 
-export default async function createNewTeams(teamsCreateParams) {
+export default async function createNewTeams(teamsCreateParams, fetchTeamsCallback) {
     console.log("Teams create fn invoked!");
     let orgId = '';
     let parentTeamIdValue = '';
@@ -39,7 +39,6 @@ export default async function createNewTeams(teamsCreateParams) {
             parentTeamIdValue = parentId[0].teamid;
         }
     }
-
 
     const { data, error } = await supabase
         .schema('mc_cap_develop')
@@ -125,7 +124,6 @@ export default async function createNewTeams(teamsCreateParams) {
         return { ancestorIds, ancestors };
     }
 
-
     async function updateTeamWithAncestors(teamId) {
         const parentTeamId = parentTeamIdValue;
 
@@ -171,4 +169,11 @@ export default async function createNewTeams(teamsCreateParams) {
     if (parentTeamIdValue !== '') {
         await updateTeamWithAncestors(teamIdToUpdate);
     }
+
+    // Re-fetch teams after successful creation
+    if (fetchTeamsCallback) {
+        await fetchTeamsCallback();
+    }
+
+    return "Team created successfully!";
 }

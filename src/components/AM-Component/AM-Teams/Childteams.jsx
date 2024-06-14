@@ -25,7 +25,8 @@ import {
     ModalFooter,
     Button,
     FormLabel,
-    VStack
+    VStack,
+    useDisclosure,
 } from "@chakra-ui/react";
 import { useParams, useNavigate } from "react-router-dom";
 import FlexableTabs from "../../FlexableTabs";
@@ -42,25 +43,25 @@ const ChildTeams = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { userData } = useContext(AuthContext);
+    const { isOpen, onOpen, onClose } = useDisclosure(); // useDisclosure hook for modal control
     const [activeItem, setActiveItem] = useState("ChildTeams");
     const [teamsTableData, setTeamsTableData] = useState([]);
     const [filterValue, setFilterValue] = useState("");
     const [currentUserName, setCurrentUserName] = useState('');
     const [currentUserEmail, setCurrentUserEmail] = useState('');
     const [currentOrganization, setCurrentOrganization] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDeleteOpen, setDeleteOpen] = useState(false);
     const [deleteInputValue, setDeleteInputValue] = useState("");
     const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(true);
-    const openModal = () => setIsModalOpen(true);
     const [group, setGroup] = useState(null);
     const toast = useToast();
     const [ancestors, setAncestors] = useState('');
 
-    const fetchTableData = async () => {
+    const fetchRows = async () => {
         const tableRowData = await fetchTeamsTableRows(currentOrganization);
         setTeamsTableData(tableRowData);
     };
+    console.log(currentOrganization)
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -95,7 +96,7 @@ const ChildTeams = () => {
 
     useEffect(() => {
         if (userData && teamsTableData.length === 0) {
-            fetchTableData();
+            fetchRows();
         }
     }, [userData, teamsTableData.length]);
 
@@ -213,7 +214,7 @@ const ChildTeams = () => {
                     position: "top-right"
                 });
                 handleDeleteClose();
-                fetchTableData(); // Refetch the table data
+                fetchRows(); // Refetch the table data
                 navigate("/accounts/teams");
             }
         } catch (error) {
@@ -306,6 +307,10 @@ const ChildTeams = () => {
                     <CreateTeams
                         filteredTeamsTableData={filteredTableData}
                         orgId={currentOrganization}
+                        isOpen={isOpen}
+                        onOpen={onOpen}
+                        onClose={onClose}
+                        fetchTeams={fetchRows}
                     />
                     <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
                         Child teams inherit permissions from their parents.
@@ -327,7 +332,7 @@ const ChildTeams = () => {
                     <EmptyRows message={'No data to show'} />
                 ) : (
                     <Box p={5}>
-                        <ChildTeamsTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} fetchTableData={fetchTableData} />
+                        <ChildTeamsTable tableData={filteredTableData} onOpenCreateChildGroup={onOpen} userData={userData} id={id} fetchRows={fetchRows} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
                     </Box>
                 )
             }

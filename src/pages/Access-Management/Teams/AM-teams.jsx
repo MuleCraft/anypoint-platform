@@ -1,16 +1,18 @@
-import { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Nav from "../../../components/NavbarHome";
 import Sidebar from "../../../components/sidebar";
 import sections from "../utils/AM-sidebar";
 import {
     Box,
-    Flex, Link,
+    Flex,
+    Link,
     HStack,
     Input,
     InputGroup,
     InputLeftElement,
     Stack,
     Text,
+    useDisclosure,
 } from "@chakra-ui/react";
 import CreateTeams from "../../../components/AM-Component/AM-Teams/CreateTeams";
 import TeamsTable from "../../../components/AM-Component/AM-Teams/TeamsTable";
@@ -27,10 +29,7 @@ export default function AMTeams({ name }) {
     const [currentUserName, setCurrentUserName] = useState('');
     const [currentUserEmail, setCurrentUserEmail] = useState('');
     const [currentOrganization, setCurrentOrganization] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     useEffect(() => {
         if (userData && currentUserName === '') {
@@ -41,8 +40,12 @@ export default function AMTeams({ name }) {
     }, [userData, currentUserName]);
 
     const fetchRows = async () => {
-        const tableRowData = await fetchTeamsTableRows(currentOrganization);
-        setTeamsTableData(tableRowData);
+        try {
+            const tableRowData = await fetchTeamsTableRows(currentOrganization);
+            setTeamsTableData(tableRowData);
+        } catch (error) {
+            console.error("Error fetching teams table data:", error);
+        }
     };
 
     useEffect(() => {
@@ -78,6 +81,10 @@ export default function AMTeams({ name }) {
                                     <CreateTeams
                                         filteredTeamsTableData={filteredTableData}
                                         orgId={currentOrganization}
+                                        isOpen={isOpen}
+                                        onOpen={onOpen}
+                                        onClose={onClose}
+                                        fetchTeams={fetchRows}
                                     />
                                     <Text fontSize={14} color={"#747474"} fontWeight={500}>
                                         Teams are groups of users. Manage access more efficiently by organizing teams to reflect your company structure.{" "}
@@ -97,15 +104,24 @@ export default function AMTeams({ name }) {
                                         children={<FiSearch />}
                                         color="gray.500"
                                     />
-                                    <Input placeholder="Filter teams" fontSize={14} fontWeight={500}
-                                        onChange={(e) => { setFilterValue(e.target.value) }}
+                                    <Input
+                                        placeholder="Filter teams"
+                                        fontSize={14}
+                                        fontWeight={500}
+                                        onChange={(e) => setFilterValue(e.target.value)}
                                     />
                                 </InputGroup>
                             </Stack>
                             {filteredTableData.length === 0 ? (
                                 <EmptyRows message={'No data to show'} />
                             ) : (
-                                <TeamsTable tableData={filteredTableData} onOpenCreateChildteam={openModal} refetchTableData={fetchRows} />
+                                <TeamsTable
+                                    tableData={filteredTableData}
+                                    onOpenCreateChildteam={onOpen}
+                                    refetchTableData={fetchRows}
+                                    isOpen={isOpen}
+                                    onClose={onClose}
+                                />
                             )}
                         </Flex>
                     </Flex>

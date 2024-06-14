@@ -26,6 +26,7 @@ import AMChildTeams from "./pages/Access-Management/Teams/AM-childTeams";
 import AMMenbers from "./pages/Access-Management/Teams/AM-members";
 import AMPermissions from "./pages/Access-Management/Teams/AM-permissions";
 import AMAccessOverview from "./pages/Access-Management/Business-Group/AM-accessOverview";
+import EditPremissions from "./components/AM-Component/AM-Teams/EditPermissions";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -107,6 +108,15 @@ export default function App() {
               path="/accounts/teams/:id/child_teams"
               element={
                 <AMChildTeams
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="/accounts/teams/:id/edit"
+              element={
+                <EditPremissions
                   name={AccessManagement}
                   pathValue={AccessManagentPath}
                 />
