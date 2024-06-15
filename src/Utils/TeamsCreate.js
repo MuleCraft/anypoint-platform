@@ -7,6 +7,7 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
     let parentTeamIdValue = '';
     let userdata = [];
     // const teamId = uuidv4();
+    console.log("team create params:", teamsCreateParams);
 
     if (teamsCreateParams.organizationId === '') {
         const { data: groupData, error: grouperror } = await supabase
@@ -40,7 +41,7 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
         }
     }
 
-    const { data, error } = await supabase
+    const { data: insertdata, inserterror } = await supabase
         .schema('mc_cap_develop')
         .from('teams')
         .insert([
@@ -69,7 +70,6 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
                     "removeRoles"
                 ],
                 members: userdata[0] ? [{
-                    // teamid: teamsCreateParams.teamid,
                     memberid: userdata[0].id || '',
                     memberfullname: userdata[0].full_name || '',
                     memberusername: userdata[0].display_name || '',
@@ -80,8 +80,8 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
         ])
         .select();
 
-    if (error) {
-        console.error('Error inserting team data:', error);
+    if (inserterror) {
+        console.error('Error inserting team data:', inserterror);
         return "Error occurred!";
     }
 
@@ -93,7 +93,7 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
             const { data, error } = await supabase
                 .schema('mc_cap_develop')
                 .from('teams')
-                .select('teamid, teamname, teamtype, "organizationId", ancestor_group_ids')
+                .select('teamid, teamname, teamtype, organizationId, ancestor_group_ids')
                 .eq('teamid', currentTeamId)
                 .single();
 
@@ -103,24 +103,29 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
             }
 
             if (data) {
-                ancestorIds.push(data.teamid);
-                ancestors.push({
-                    teamid: data.teamid,
-                    teamname: data.teamname,
-                    teamtype: data.teamtype,
-                    organizationId: data.organizationId,
-                });
+                if (!ancestorIds.includes(data.teamid)) {
+                    ancestorIds.push(data.teamid);
+                    ancestors.push({
+                        teamid: data.teamid,
+                        teamname: data.teamname,
+                        teamtype: data.teamtype,
+                        organizationId: data.organizationId,
+                    });
 
-                if (data.ancestor_group_ids && data.ancestor_group_ids.length > 0) {
-                    for (const ancestorId of data.ancestor_group_ids) {
-                        await getAncestors(ancestorId);
+                    if (data.ancestor_group_ids && data.ancestor_group_ids.length > 0) {
+                        for (const ancestorId of data.ancestor_group_ids) {
+                            console.log("current team id loop:",data.ancestor_group_ids);
+                            console.log("current team id loop length:",data.ancestor_group_ids.length);
+                            await getAncestors(ancestorId);
+                        }
                     }
                 }
             }
         }
-
+        console.log("current team id:",teamId);
         await getAncestors(teamId);
-
+        console.log("ancestor ids:", ancestorIds);
+        console.log("ancestors:", ancestors);
         return { ancestorIds, ancestors };
     }
 
@@ -130,6 +135,23 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
         if (!parentTeamId) {
             console.error('Parent team ID is required');
             return;
+        }
+
+        const { ancestorIds, ancestors } = await fetchAncestors(parentTeamId);
+
+        const { data: updateChild, updatechilderror } = await supabase
+            .schema('mc_cap_develop')
+            .from('teams')
+            .update({
+                ancestor_group_ids: ancestorIds,
+                ancestors: ancestors,
+                parentteamId: parentTeamId
+            })
+            .eq('teamid', teamId);
+
+        if (updatechilderror) {
+            console.error('Error updating team data:', updatechilderror);
+            return "Error occurred!";
         }
 
         const { data: isChildData, isChilderror } = await supabase
@@ -145,24 +167,7 @@ export default async function createNewTeams(teamsCreateParams, fetchTeamsCallba
             return "Error occurred!";
         }
 
-        const { ancestorIds, ancestors } = await fetchAncestors(parentTeamId);
-
-        const { data, error } = await supabase
-            .schema('mc_cap_develop')
-            .from('teams')
-            .update({
-                ancestor_group_ids: ancestorIds,
-                ancestors: ancestors,
-                parentteamId: parentTeamId
-            })
-            .eq('teamid', teamId);
-
-        if (error) {
-            console.error('Error updating team data:', error);
-            return "Error occurred!";
-        }
-
-        console.log('Team updated with ancestor information:', data);
+        console.log('Team updated with ancestor information:', updateChild);
     }
 
     const teamIdToUpdate = teamsCreateParams.teamid;

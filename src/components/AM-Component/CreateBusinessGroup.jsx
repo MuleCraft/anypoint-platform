@@ -9,7 +9,7 @@ import { SlArrowDown } from "react-icons/sl";
 import { useState, useEffect } from "react";
 import createNewBusinessGroup from "../../Utils/BusinessGroupCreate";
 
-function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization, filteredTableData, isOpen, onOpen, onClose }) {
+function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganization, currentOrgId,filteredTableData, isOpen, onOpen, onClose }) {
     const toast = useToast();
     // console.log('filtered table data:',filteredTableData);
     const [sandboxSliderValue, setSandboxSliderValue] = useState(0);
@@ -194,6 +194,7 @@ function CreateBusinessGroup({ currentUserEmail, currentUserName, currentOrganiz
         currentUserName: currentUserName,
         currentUserEmail: currentUserEmail,
         currentOrganization: currentOrganization,
+        organizationId: currentOrgId,
         parentGroupId: selectedGroupParentId
     };
 

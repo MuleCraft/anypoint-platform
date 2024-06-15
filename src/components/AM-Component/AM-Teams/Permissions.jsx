@@ -1,22 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState, useContext } from "react";
 import {
     Box,
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     Flex,
-    useToast,
     Menu,
     MenuButton,
     IconButton,
     MenuList,
     MenuItem,
-    useDisclosure,
     Stack,
     HStack,
-    Link, InputGroup, InputLeftElement, Input, Text,
-    Icon, Tooltip, Switch
-
+    InputGroup,
+    InputLeftElement,
+    Input,
+    Text,
+    Icon,
+    Tooltip, 
+    Switch
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import supabase from "../../../Utils/supabase";
@@ -29,94 +31,106 @@ import CreatePermissions from "./CreatePermissions";
 import "../../../assets/Common.css";
 import PermissionsTable from "./PermissionTable";
 import EmptyRows from "../EmptyRows";
+import { AuthContext } from "../../../Utils/AuthProvider";
+import fetchPermissionsTableRows from "../../../Utils/PermissionsData";
+import fetchTeamsTableRows from "../../../Utils/TeamsTableRows";
 
 const Permissions = () => {
     const { id } = useParams();
     const [group, setGroup] = useState(null);
-    const [editedGroup, setEditedGroup] = useState(null);
-    const [changesMade, setChangesMade] = useState(false);
-    const toast = useToast();
+    const { userData } = useContext(AuthContext);
 
     const [isChecked, setIsChecked] = useState(false);
+    const [permissionsTableData, setPermissionsTableData] = useState([]);
+    const [businessGroups, setBusinessGroups] = useState([]);
+    const [permissionData, setPermissionData] = useState([]);
+    const [teamsData, setTeamsData] = useState([]);
+    const [permissions, setPermissions] = useState({});
 
     const handleToggle = () => {
         setIsChecked(!isChecked);
     };
-    // useEffect(() => {
-    //     const fetchUserData = async () => {
-    //         try {
-    //             const { data, error } = await supabase
-    //                 .schema("mc_cap_develop")
-    //                 .from("businessgroup")
-    //                 .select("*")
-    //                 .eq("businessGroupId", id);
 
-    //             if (error) {
-    //                 console.error("Error fetching user data:", error.message);
-    //             } else {
-    //                 setGroup(data[0]);
-    //                 setEditedGroup(data[0]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching user data:", error);
-    //         }
-    //     };
+    const fetchPermissions = async (roleIds) => {
+        const { data, error } = await supabase
+        .schema('mc_cap_develop')
+          .from('permissions')
+          .select('roleid, rolename')
+          .in('roleid', roleIds);
+        if (error) {
+          console.error('Error fetching permissions:', error);
+          return [];
+        }
+        return data;
+      };
 
-    //     fetchUserData();
-    // }, []);
+    const fetchRows = async () => {
+        const tableRowData = await fetchPermissionsTableRows(id);
+        setPermissionsTableData(tableRowData);
+        console.log("permissions data:",tableRowData);
+      
+            // const roleIds = tableRowData.flatMap(group => group.permissionsData?.map(permission => permission.roleid) || []);
+            // const uniqueRoleIds = [...new Set(roleIds)];
+            // console.log("unique role ids:",uniqueRoleIds);
+            // const permissionsData = await fetchPermissions(uniqueRoleIds);
+            // console.log("permissionsData:",permissionsData);
+            // const permissionsMap = permissionsData.reduce((acc, permission) => {
+            //   acc[permission.roleid] = permission.rolename;
+            //   return acc;
+            // }, {});
+            // setPermissions(permissionsMap);
+            // console.log("permissions map:",permissionsMap);
+    }
 
-    // const handleInputChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setEditedGroup((prevGroup) => ({
-    //         ...prevGroup,
-    //         [name]: value,
-    //     }));
-    //     setChangesMade(true);
-    // };
+    const fetchBgData = async () => {
+        const { data, error } = await supabase
+            .schema("mc_cap_develop")
+            .from("businessgroup")
+            .select()
+            .eq("organizationId", userData.organizationId);
 
-    // const handleSaveChanges = async () => {
-    //     try {
-    //         const { data: supabaseData, error: supabaseError } = await supabase
-    //             .schema("mc_cap_develop")
-    //             .from("businessgroup")
-    //             .update({
-    //                 businessGroupName: editedGroup.businessGroupName,
-    //                 groupOwner: editedGroup.groupOwner,
-    //                 orgDomain: editedGroup.orgDomain,
-    //                 sessionTimeout: editedGroup.sessionTimeout
-    //             })
-    //             .eq("businessGroupId", id);
+            if (error) {
+                console.error('Error fetching business group names:', error);
+                return [];
+              }
+              return data;
+    }
+    const fetchBgNames = async () => {
+        const bgNames = await fetchBgData();
+        setBusinessGroups(bgNames);
+        console.log("bg names:",bgNames);
+    }
 
-    //         if (supabaseError) {
-    //             console.error("Error updating data in Supabase:", supabaseError.message);
-    //             throw new Error(supabaseError.message);
-    //         }
+    const fetchPermissionData = async () => {
+        const { data, error } = await supabase
+            .schema("mc_cap_develop")
+            .from("permissions")
+            .select("*");
 
-    //         console.log("Saving changes:", editedGroup);
-    //         toast({
-    //             title: "update successfully",
-    //             description: "Settings updated successfully.",
-    //             status: "success",
-    //             duration: 5000,
-    //             isClosable: true,
-    //             position: "top-right",
-    //         });
-    //         setChangesMade(false);
-    //     } catch (error) {
-    //         toast({
-    //             title: "Update Failed",
-    //             description:
-    //                 "Setting update failed",
-    //             status: "error",
-    //             duration: 5000,
-    //             isClosable: true,
-    //             position: "top-right",
-    //         });
-    //         console.error("Error saving changes:", error);
-    //     }
-    // };
+            if (error) {
+                console.error('Error fetching permission names:', error);
+                return [];
+              }
+              return data;
+    }
+    const fetchPermissionNames = async () => {
+        const permissionDetails = await fetchPermissionData(id);
+        setPermissionData(permissionDetails);
+        console.log("permissions names:",permissionDetails);
+    }
 
+    const fetchTeamDetails = async () => {
+        const teamdetails = await fetchTeamsTableRows(userData.organizationId);
+        setTeamsData(teamdetails);
+        console.log("team details:",teamdetails);
+    }
 
+    if (userData && (permissionsTableData.length === 0)) {
+        fetchRows();
+        fetchBgNames();
+        fetchPermissionNames();
+        fetchTeamDetails();
+    }
 
     const [activeItem, setActiveItem] = useState("Permissions");
     const handleItemSelect = (itemName) => {
@@ -133,8 +147,6 @@ const Permissions = () => {
                 { name: 'ChildTeams', label: 'Child teams', path: `/accounts/teams/${id}/child_teams` },
                 { name: 'Settings', label: 'Settings', path: `/accounts/teams/${id}/settings` },
                 { name: 'Limits', label: 'Limits', path: `/accounts/teams/${id}/limits` },
-
-
 
             ],
         },
@@ -208,8 +220,9 @@ const Permissions = () => {
                     <Stack mt={"-60px"} direction={"row"} spacing={6} align={'center'} justifyContent={'space-between'}>
                         <HStack spacing={5} >
                             <CreatePermissions
-                            // filteredTeamsTableData={filteredTableData}
-                            // orgId={currentOrganization}
+                            permissionData={permissionData}
+                            bgNames={businessGroups}
+                            teamId={id}
                             />
                             <HStack>
                                 <Flex align="center">
@@ -246,28 +259,30 @@ const Permissions = () => {
                                     <Icon fontSize={20} mt={1}><IoInformationCircleOutline /></Icon>
                                 </Tooltip>
                             </HStack>
-                        </HStack>
-                        <InputGroup maxW={"fit-content"}>
-                            <InputLeftElement
-                                pointerEvents="none"
-                                children={<FiSearch />}
-                                color="gray.500"
-                            />
-                            <Input placeholder="Filter permissions" fontSize={14} fontWeight={500}
-                            // onChange={(e) => { setFilterValue(e.target.value) }}
-                            />
-                        </InputGroup>
-                    </Stack>
-                    {/* {filteredTableData.length === 0 ? (
+                            </HStack>
+                            <InputGroup maxW={"fit-content"}>
+                                <InputLeftElement
+                                    pointerEvents="none"
+                                    children={<FiSearch />}
+                                    color="gray.500"
+                                />
+                                <Input placeholder="Filter permissions" fontSize={14} fontWeight={500}
+                                    // onChange={(e) => { setFilterValue(e.target.value) }}
+                                />
+                            </InputGroup>
+                        </Stack>
+                        {permissionsTableData.length === 0 ? (
                             <EmptyRows message={'No data to show'} />
-                        ) : ( */}
-                    {/* <PermissionsTable 
-                                tableData={filteredTableData}
-                                onOpenCreateChildGroup={openModal}
+                        ) : (
+                            <PermissionsTable 
+                                tableData={teamsData}
+                                permissionData={permissionsTableData[0].permissions}
+                                bgNames={businessGroups}
+                                teamId={id}
                                 userData={userData}
-                            /> */}
-                    {/* )} */}
-                </Flex>
+                            />
+                        )}
+                        </Flex>
             </Flex>
 
         </Box >

@@ -43,6 +43,9 @@ const CustomAccordionItem = ({ sectionTitle, subtitles = [], onCheckboxChange })
                         borderTopWidth={1}
                         borderColor="gray.300"
                         onClick={handleToggle}
+                        _hover={{
+                            bgColor:"#eaeaea"
+                        }}
                     >
                         <Flex align="center" gap={3}>
                             {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
@@ -55,12 +58,12 @@ const CustomAccordionItem = ({ sectionTitle, subtitles = [], onCheckboxChange })
                     </AccordionButton>
                     <Box fontSize="xs" ml={530} mt={-30} zIndex={20} pb={2}>
                         <Link color="gray" fontSize="xs" onClick={handleSelectAll}>
-                            {isCheckedArray.every(isChecked => isChecked) ? "Deselect all" : "Select all"}
+                            {isCheckedArray.every((isChecked) => isChecked) ? "Select none" : "Select all"}
                         </Link>
                     </Box>
                 </h2>
                 <AccordionPanel pb={4} display={isOpen ? "block" : "none"} pt={4} maxHeight="200px" overflowY="auto">
-                    <Stack>
+                    <Stack justify={'center'}>
                         {subtitles.map((subTitle, index) => (
                             <Flex key={subTitle.id} alignItems="center" justifyContent="space-between" borderBottomWidth={1} borderColor="gray.300" p={1}>
                                 <Flex alignItems="center" fontSize="xs" gap={3}>
