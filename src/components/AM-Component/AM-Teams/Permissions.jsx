@@ -17,7 +17,7 @@ import {
     Input,
     Text,
     Icon,
-    Tooltip, 
+    Tooltip,
     Switch
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
@@ -46,40 +46,55 @@ const Permissions = () => {
     const [permissionData, setPermissionData] = useState([]);
     const [teamsData, setTeamsData] = useState([]);
     const [permissions, setPermissions] = useState({});
-
+    const [members, setMembers] = useState([]);
+    const [teamName, setTeamName] = useState('');
+    const [ancestors, setAncestors] = useState('');
     const handleToggle = () => {
         setIsChecked(!isChecked);
     };
+    const fetchGroupData = async () => {
+        try {
+            const { data, error } = await supabase
+                .schema("mc_cap_develop")
+                .from("teams")
+                .select("*")
+                .eq("teamid", id)
+                .single();
 
-    const fetchPermissions = async (roleIds) => {
-        const { data, error } = await supabase
-        .schema('mc_cap_develop')
-          .from('permissions')
-          .select('roleid, rolename')
-          .in('roleid', roleIds);
-        if (error) {
-          console.error('Error fetching permissions:', error);
-          return [];
+            if (error) {
+                console.error("Error fetching group data:", error.message);
+            } else {
+                setGroup(data);
+                setMembers(data.members || []);
+                setTeamName(data.teamname);
+                setAncestors(data.ancestors)
+            }
+        } catch (error) {
+            console.error("Error fetching group data:", error);
         }
-        return data;
-      };
+    };
+
+    useEffect(() => {
+        fetchGroupData();
+    }, [id]);
+
 
     const fetchRows = async () => {
         const tableRowData = await fetchPermissionsTableRows(id);
         setPermissionsTableData(tableRowData.permissions || []);
-        console.log("permissions data:",tableRowData);
-      
-            // const roleIds = tableRowData.flatMap(group => group.permissionsData?.map(permission => permission.roleid) || []);
-            // const uniqueRoleIds = [...new Set(roleIds)];
-            // console.log("unique role ids:",uniqueRoleIds);
-            // const permissionsData = await fetchPermissions(uniqueRoleIds);
-            // console.log("permissionsData:",permissionsData);
-            // const permissionsMap = permissionsData.reduce((acc, permission) => {
-            //   acc[permission.roleid] = permission.rolename;
-            //   return acc;
-            // }, {});
-            // setPermissions(permissionsMap);
-            // console.log("permissions map:",permissionsMap);
+        console.log("permissions data:", tableRowData);
+
+        // const roleIds = tableRowData.flatMap(group => group.permissionsData?.map(permission => permission.roleid) || []);
+        // const uniqueRoleIds = [...new Set(roleIds)];
+        // console.log("unique role ids:",uniqueRoleIds);
+        // const permissionsData = await fetchPermissions(uniqueRoleIds);
+        // console.log("permissionsData:",permissionsData);
+        // const permissionsMap = permissionsData.reduce((acc, permission) => {
+        //   acc[permission.roleid] = permission.rolename;
+        //   return acc;
+        // }, {});
+        // setPermissions(permissionsMap);
+        // console.log("permissions map:",permissionsMap);
     }
 
     const fetchBgData = async () => {
@@ -89,17 +104,17 @@ const Permissions = () => {
             .select()
             .eq("organizationId", userData.organizationId);
 
-            if (error) {
-                console.error('Error fetching business group names:', error);
-                return [];
-              }
-              return data;
+        if (error) {
+            console.error('Error fetching business group names:', error);
+            return [];
+        }
+        return data;
     }
     const fetchBgNames = async () => {
-        console.log("org id:",userData.organizationId);
+        console.log("org id:", userData.organizationId);
         const bgNames = await fetchBgData();
         setBusinessGroups(bgNames);
-        console.log("bg names:",bgNames);
+        console.log("bg names:", bgNames);
     }
 
     const fetchPermissionData = async () => {
@@ -108,11 +123,11 @@ const Permissions = () => {
             .from("permissions")
             .select("*");
 
-            if (error) {
-                console.error('Error fetching permission names:', error);
-                return [];
-              }
-              return data;
+        if (error) {
+            console.error('Error fetching permission names:', error);
+            return [];
+        }
+        return data;
     }
     const fetchPermissionNames = async () => {
         const permissionDetails = await fetchPermissionData(id);
@@ -123,9 +138,9 @@ const Permissions = () => {
     const fetchTeamDetails = async () => {
         const teamdetails = await fetchTeamsTableRows(userData.organizationId);
         setTeamsData(teamdetails);
-        console.log("team details:",teamdetails);
+        console.log("team details:", teamdetails);
     }
-    
+
     useEffect(() => {
         if (userData) {
             const fetchData = async () => {
@@ -134,7 +149,7 @@ const Permissions = () => {
                 await fetchPermissionNames();
                 await fetchTeamDetails();
             };
-            
+
             fetchData();
         }
     }, [userData]);
@@ -163,56 +178,55 @@ const Permissions = () => {
 
     return (
         <Box h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
-            <Flex alignItems="center" justify="space-between">
+            <Flex alignItems="center" justify="space-between" pr={4}>
                 <Breadcrumb>
                     <BreadcrumbItem>
-                        <BreadcrumbLink fontSize="lg" href="/accounts/teams/">
+                        <BreadcrumbLink fontSize="lg" href="/accounts/teams">
                             Teams
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentGroupID === "" ? (
-                        ""
-                    ) : (
-                        <BreadcrumbItem>
+                    {ancestors && ancestors.map((ancestor) => (
+                        <BreadcrumbItem key={ancestor.teamid}>
                             <BreadcrumbLink
                                 fontSize="lg"
                                 fontWeight="400"
-                                href={`/accounts/businessGroups/${group?.businessGroupId}`}
+                                href={`/accounts/teams/${ancestor.teamid}`}
                             >
-                                {group?.organizationName}
+                                {ancestor.teamname}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )
+                    ))}
 
-                    }
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
-                            fontWeight="600"
-                            href={`/accounts/businessGroups/${id}`}
+                            fontWeight="400"
+                            href={`/accounts/teams/${group?.teamid}`}
                         >
-                            {group?.businessGroupName}
+                            {group?.teamname}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
+
                 </Breadcrumb>
 
-                <Menu>
-                    <MenuButton
-                        as={IconButton}
-                        aria-label="Options"
-                        icon={<HiEllipsisHorizontal width="10px" />}
-                        variant="outline"
-                        h={"30px"}
-                        color="gray.500"
-                        border={"1px solid #5c5c5c"}
-                        right={30}
-                    />
-                    <MenuList borderRadius={0}>
-                        <MenuItem fontSize="base" color="white" onClick="" bgColor="delete" >
-                            Delete team...
-                        </MenuItem>
-                    </MenuList>
-                </Menu>
+                {group?.parentteamId === null ? ("") : (
+                    <Menu>
+                        <MenuButton
+                            as={IconButton}
+                            aria-label='Options'
+                            icon={<HiEllipsisHorizontal />}
+                            variant='outline'
+                            h={'28px'} color="gray.500"
+                            border={'1px solid #5c5c5c'}
+                        />
+                        <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
+                            <MenuItem fontSize={14} onClick={() => handleDeleteOpen(group)} color={'white'}
+                                bgColor='red.600' >
+                                Delete Team...
+                            </MenuItem>
+                        </MenuList>
+                    </Menu>
+                )}
 
             </Flex>
             <Flex direction={'column'}>
@@ -227,9 +241,9 @@ const Permissions = () => {
                     <Stack mt={"-60px"} direction={"row"} spacing={6} align={'center'} justifyContent={'space-between'}>
                         <HStack spacing={5} >
                             <CreatePermissions
-                            permissionData={permissionData}
-                            bgNames={businessGroups}
-                            teamId={id}
+                                permissionData={permissionData}
+                                bgNames={businessGroups}
+                                teamId={id}
                             />
                             <HStack>
                                 <Flex align="center">
@@ -266,30 +280,31 @@ const Permissions = () => {
                                     <Icon fontSize={20} mt={1}><IoInformationCircleOutline /></Icon>
                                 </Tooltip>
                             </HStack>
-                            </HStack>
-                            <InputGroup maxW={"fit-content"}>
-                                <InputLeftElement
-                                    pointerEvents="none"
-                                    children={<FiSearch />}
-                                    color="gray.500"
-                                />
-                                <Input placeholder="Filter permissions" fontSize={14} fontWeight={500}
-                                    // onChange={(e) => { setFilterValue(e.target.value) }}
-                                />
-                            </InputGroup>
-                        </Stack>
-                        {(permissionsTableData === null || permissionsTableData.length <1) ? (
-                            <EmptyRows message={'No data to show'} />
-                        ) : (
-                            <PermissionsTable 
-                                tableData={teamsData}
-                                permissionData={permissionsTableData}
-                                bgNames={businessGroups}
-                                teamId={id}
-                                userData={userData}
+                        </HStack>
+                        <InputGroup maxW={"fit-content"}>
+                            <InputLeftElement
+                                pointerEvents="none"
+                                children={<FiSearch />}
+                                color="gray.500"
                             />
-                        )}
-                        </Flex>
+                            <Input placeholder="Filter permissions" fontSize={14} fontWeight={500}
+                            // onChange={(e) => { setFilterValue(e.target.value) }}
+                            />
+                        </InputGroup>
+                    </Stack>
+                    {(permissionsTableData === null || permissionsTableData.length < 1) ? (
+                        <EmptyRows message={'No data to show'} />
+                    ) : (
+                        <PermissionsTable
+                            tableData={teamsData}
+                            permissionData={permissionsTableData}
+                            bgNames={businessGroups}
+                            id={id}
+                            userData={userData}
+                            fetchRows={fetchRows}
+                        />
+                    )}
+                </Flex>
             </Flex>
 
         </Box >

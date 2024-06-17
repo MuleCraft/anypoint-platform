@@ -74,7 +74,6 @@ const Members = () => {
     const [activeItem, setActiveItem] = useState("Members");
     const [filterValue, setFilterValue] = useState('');
     const [ancestors, setAncestors] = useState('');
-    console.log(group)
     const fetchGroupData = async () => {
         try {
             const { data, error } = await supabase
