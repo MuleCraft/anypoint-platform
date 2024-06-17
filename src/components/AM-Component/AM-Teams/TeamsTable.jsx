@@ -266,9 +266,11 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
                     ) : (
                       <Box display="flex" gap={4}>
                         {dataValue.teamname}
-                        {dataValue.members.map((dataValue, index) => (
-                          <Text key={index} fontSize="base" color="gray">You’re a {dataValue.membership_type}</Text>
-                        ))}
+
+                        <Text key={index} fontSize="base" color="gray">You’re a {dataValue.members[index].membership_type}</Text>
+
+
+
 
                       </Box>
                     )}

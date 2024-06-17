@@ -556,7 +556,7 @@ const Members = () => {
                                             size='lg'
                                             name='role'
                                             value='member'
-                                            isChecked={role === 'member'}
+                                            isChecked={role === 'Member'}
                                             onChange={(e) => setRole(e.target.value)}
                                             color='boxColor'
                                             alignItems="flex-end"
@@ -572,7 +572,7 @@ const Members = () => {
                                             size='lg'
                                             name='role'
                                             value='maintainer'
-                                            isChecked={role === 'maintainer'}
+                                            isChecked={role === 'Maintainer'}
                                             onChange={(e) => setRole(e.target.value)}
                                             color='boxColor'
                                             alignItems="flex-end"
