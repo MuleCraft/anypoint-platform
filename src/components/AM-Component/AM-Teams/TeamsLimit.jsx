@@ -286,12 +286,12 @@ const TeamLimits = () => {
                     </Thead>
                     <Tbody>
                         <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }}>
-                            <Td style={rowValueStyle}>inches</Td>
+                            <Td style={rowValueStyle}>Permissions per team</Td>
                             <Td style={rowValueStyle}>1</Td>
                             <Td style={rowValueStyle}>1000</Td>
                         </Tr>
                         <Tr borderBottomWidth={1.5} _hover={{ bgColor: "#ececec" }}>
-                            <Td style={rowValueStyle}>inches</Td>
+                            <Td style={rowValueStyle}>External group mappings per team</Td>
                             <Td style={rowValueStyle}>1</Td>
                             <Td style={rowValueStyle}>100</Td>
                         </Tr>

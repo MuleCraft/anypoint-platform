@@ -4,17 +4,12 @@ import { ChevronRightIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { IoIosInformationCircleOutline } from "react-icons/io";
 
 const CustomAccordionItem = ({ sectionTitle, subtitles = [], onCheckboxChange }) => {
-    const [isOpen, setIsOpen] = useState(false);
     const [isCheckedArray, setIsCheckedArray] = useState(new Array(subtitles.length).fill(false));
 
     useEffect(() => {
         const checkedArray = subtitles.map(subTitle => subTitle.isChecked);
         setIsCheckedArray(checkedArray);
     }, [subtitles]);
-
-    const handleToggle = () => {
-        setIsOpen(!isOpen);
-    };
 
     const handleSelectAll = () => {
         const areAllChecked = isCheckedArray.every(isChecked => isChecked);
@@ -33,7 +28,7 @@ const CustomAccordionItem = ({ sectionTitle, subtitles = [], onCheckboxChange })
     };
 
     return (
-        <Accordion allowMultiple>
+        <Accordion defaultIndex={[0]} allowMultiple>
             <AccordionItem>
                 <h2>
                     <AccordionButton
@@ -42,13 +37,12 @@ const CustomAccordionItem = ({ sectionTitle, subtitles = [], onCheckboxChange })
                         borderBottomWidth={1}
                         borderTopWidth={1}
                         borderColor="gray.300"
-                        onClick={handleToggle}
                         _hover={{
-                            bgColor:"#eaeaea"
+                            bgColor: "#eaeaea"
                         }}
                     >
                         <Flex align="center" gap={3}>
-                            {isOpen ? <ChevronDownIcon /> : <ChevronRightIcon />}
+                            <ChevronDownIcon />
                             <Flex alignItems="center" justifyContent="space-between" flex="1">
                                 <Box as='span' textAlign='left' fontSize="xs" flex="1">
                                     {sectionTitle}
@@ -62,7 +56,7 @@ const CustomAccordionItem = ({ sectionTitle, subtitles = [], onCheckboxChange })
                         </Link>
                     </Box>
                 </h2>
-                <AccordionPanel pb={4} display={isOpen ? "block" : "none"} pt={4} maxHeight="200px" overflowY="auto">
+                <AccordionPanel pb={4} pt={4} maxHeight="200px" overflowY="auto">
                     <Stack justify={'center'}>
                         {subtitles.map((subTitle, index) => (
                             <Flex key={subTitle.id} alignItems="center" justifyContent="space-between" borderBottomWidth={1} borderColor="gray.300" p={1}>
