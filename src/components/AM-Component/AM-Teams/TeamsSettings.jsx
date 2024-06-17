@@ -352,7 +352,7 @@ const TeamSetting = () => {
                             <Input
                                 id="parentteam"
                                 name="parentteam"
-                                value={ancestors.find(ancestor => ancestor.teamid === editedGroup?.parentteamId)?.teamname || ''}
+                                value={ancestors.find(ancestor => ancestor.teamid === editedGroup?.parentteamId)?.teamname || editedGroup?.teamname}
                                 placeholder="Select parent team"
                                 isReadOnly
                             />

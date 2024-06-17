@@ -30,6 +30,11 @@ import {
   Stack,
   HStack,
   FormLabel,
+  Checkbox,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
 } from "@chakra-ui/react";
 import { HiChevronRight, HiChevronDown } from "react-icons/hi2";
 import supabase from "../../../Utils/supabase";
@@ -104,12 +109,11 @@ const PermissionsTable = ({ tableData, permissionData, id, fetchRows }) => {
   };
 
   const filteredPermissions = permissions.filter((item) => {
-    if (item.targetmodule !== "Access Management") return false;
+    if (!["Access Management", "Anypoint Code Builder", "Anypoint Monitoring", "API Catalog", "API Governance", "API Manager", "Design Center", "Exchange", "Runtime Manager", "Usage", "Visualizer"].includes(item.targetmodule)) return false;
     if (showSelectedOnly && !selectedIds.includes(item.roleid)) return false;
     if (filterValue && !item.rolename.toLowerCase().includes(filterValue.toLowerCase())) return false;
     return true;
   });
-
 
   const subtitles = filteredPermissions.map((perm) => ({
     title: perm.rolename,
@@ -117,6 +121,7 @@ const PermissionsTable = ({ tableData, permissionData, id, fetchRows }) => {
     id: perm.id,
     roleid: perm.roleid,
     isChecked: selectedIds.includes(perm.roleid),
+    section: perm.targetmodule,
   }));
 
   const handleUpdatePermissions = async () => {
@@ -281,9 +286,19 @@ const PermissionsTable = ({ tableData, permissionData, id, fetchRows }) => {
                           <CustomSwitch isChecked={showSelectedOnly} onToggle={setShowSelectedOnly} />
                         </Flex>
                       </Stack>
-                      <Accordion allowToggle mt={6}>
-                        <CustomAccordionItem sectionTitle="Access Management" subtitles={subtitles} onCheckboxChange={handleCheckboxChange} />
-                      </Accordion>
+                      <Box mt={4} maxHeight="600px" overflowY="auto">
+
+                        {["Access Management", "Anypoint Code Builder", "Anypoint Monitoring", "API Catalog", "API Governance", "API Manager", "Design Center", "Exchange", "Runtime Manager", "Usage", "Visualizer"].map((sectionTitle) => (
+                          <CustomAccordionItem
+                            key={sectionTitle}
+                            sectionTitle={sectionTitle}
+                            subtitles={subtitles.filter((s) => s.section === sectionTitle)}
+                            onCheckboxChange={handleCheckboxChange}
+                          />
+                        ))}
+
+                      </Box>
+
                     </ModalBody>
                     <Divider />
                     <ModalFooter justifyContent="space-between">
@@ -306,3 +321,4 @@ const PermissionsTable = ({ tableData, permissionData, id, fetchRows }) => {
 };
 
 export default PermissionsTable;
+
