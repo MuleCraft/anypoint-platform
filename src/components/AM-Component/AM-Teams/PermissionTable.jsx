@@ -10,62 +10,30 @@ import {
   Link,
   Menu,
   MenuButton,
-  MenuList,
-  MenuItem,
   IconButton,
-  Modal,
-  ModalOverlay,
-  ModalHeader,
-  ModalBody,
-  VStack,
-  FormLabel,
-  Input,
-  ModalFooter,
-  Button,
-  ModalContent,
   useToast,
-  Tooltip,
   Box,
 } from "@chakra-ui/react";
-import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
-import supabase from "../../../Utils/supabase";
+import { HiChevronRight, HiChevronDown } from "react-icons/hi2";
+// import supabase from "../../../Utils/supabase";
 // import deleteBusinessGroup from "../../Utils/BusinessGroupDelete";
+// import fetchPermissionsTableRows from "../../../Utils/PermissionsData";
 
-const PermissionsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
-  const [ownerData, setOwnerData] = useState([]);
-  const toast = useToast();
+const PermissionsTable = ({ tableData, permissionData, bgNames, userData, teamId }) => {
+  // const [ownerData, setOwnerData] = useState([]);
+  // const toast = useToast();
 
-//   console.log('passed teams data:',tableData);
-
-//   useEffect(() => {
-//     const fetchBusinessGroups = async () => {
-//       const { data, error } = await supabase
-//         .schema("mc_cap_develop")
-//         .from("businessgroup")
-//         .select("*")
-//         .eq("businessGroupName", userData.company);
-
-//       if (error) {
-//         console.error("Error fetching business groups:", error);
-//       } else {
-//         setOwnerData(data[0]);
-//       }
-//     };
-
-//     if (userData) {
-//       fetchBusinessGroups();
-//     }
-//   }, [userData.company]);
-
-  const [isDeleteOpen, setDeleteOpen] = useState(false);
-  const [deleteInputValue, setDeleteInputValue] = useState("");
-  const [isDeleteButtonDisabled, setDeleteButtonDisabled] = useState(true);
+  // const [isDeleteOpen, setDeleteOpen] = useState(false);
+  // const [deleteInputValue, setDeleteInputValue] = useState("");
+  // const [isDeleteButtonDisabled, setDeleteButtonDisabled] = useState(true);
 
   const [selectedBusinessGroupId, setSelectedBusinessGroupId] = useState(null);
   const [targetGroupName, setTargetGroupName] = useState("");
   const [openRow, setOpenRow] = useState(null); // State to track the open row
   const [applyCondition, setApplyCondition] = useState(false); // State to apply condition
   const [clickedRowId, setClickedRowId] = useState(null); // State to store clicked row ID
+
+  console.log("permissionData for table:",permissionData);
 
   useEffect(() => {
     if (selectedBusinessGroupId) {
@@ -87,46 +55,34 @@ const PermissionsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
     // console.log('filtered teams rows:',filteredData);
   }, [tableData, applyCondition, clickedRowId]);
 
-  const handleDeleteOpen = () => {
-    setDeleteOpen(true);
-    setTargetGroupName(selectedBusinessGroupId.businessGroupName);
-  };
+    if (!tableData || tableData.length === 0) return null;
+  
+    const groupedPermissions = tableData.reduce((acc, permission) => {
+      const { groupname, rolename } = permission;
+      if (!acc[groupname]) {
+        acc[groupname] = [];
+      }
+      acc[groupname].push(rolename);
+      return acc;
+    }, {});
 
-  const handleDeleteClose = () => {
-    setDeleteOpen(false);
-    setDeleteInputValue("");
-    setDeleteButtonDisabled(true);
-    setTargetGroupName(selectedBusinessGroupId.businessGroupName);
-  };
+  // const [hoveredRows, setHoveredRows] = useState([]);
 
-  const handleDeleteInputChange = (e) => {
-    const value = e.target.value;
-    setDeleteInputValue(value);
-    const matchingGroup = tableData.find(
-      (group) =>
-        group.businessGroupName.toLowerCase() === value.toLowerCase() &&
-        group.organizationName.toLowerCase() === ownerData.organizationName.toLowerCase()
-    );
-    setDeleteButtonDisabled(!matchingGroup);
-  };
+  // const handleRowHover = (index) => {
+  //   setHoveredRows((prevHoveredRows) => {
+  //     const newHoveredRows = [...prevHoveredRows];
+  //     newHoveredRows[index] = true;
+  //     return newHoveredRows;
+  //   });
+  // };
 
-  const [hoveredRows, setHoveredRows] = useState([]);
-
-  const handleRowHover = (index) => {
-    setHoveredRows((prevHoveredRows) => {
-      const newHoveredRows = [...prevHoveredRows];
-      newHoveredRows[index] = true;
-      return newHoveredRows;
-    });
-  };
-
-  const handleRowNotHover = (index) => {
-    setHoveredRows((prevHoveredRows) => {
-      const newHoveredRows = [...prevHoveredRows];
-      newHoveredRows[index] = false;
-      return newHoveredRows;
-    });
-  };
+  // const handleRowNotHover = (index) => {
+  //   setHoveredRows((prevHoveredRows) => {
+  //     const newHoveredRows = [...prevHoveredRows];
+  //     newHoveredRows[index] = false;
+  //     return newHoveredRows;
+  //   });
+  // };
 
   const handleRowClick = (index, id) => {
     if (openRow === index) {
@@ -155,38 +111,6 @@ const PermissionsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
     setSelectedBusinessGroupId(businessGroupId);
   };
 
-  async function invokeGroupDeleteFunction(selectedBusinessGroupId) {
-    try {
-    //   const response = await deleteBusinessGroup(selectedBusinessGroupId);
-      handleDeleteClose();
-
-      if (response === "Error occurred!") {
-        toast({
-          title: "Error",
-          description: "Error occurred.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-      } else {
-        toast({
-          description: "Business group successfully deleted.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-      }
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 800);
-    } catch (error) {
-      console.error("Error occurred:", error);
-    }
-  }
-
   return (
     <TableContainer>
       <Table variant="simple" size="md">
@@ -198,13 +122,13 @@ const PermissionsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
           </Tr>
         </Thead>
         <Tbody>
-          {tableData.map((dataValue, index) => (
+          {permissionData.map((dataValue, index) => (
             <>
               <Tr
                 key={index}
                 fontWeight={500}
-                onMouseOver={() => handleRowHover(index)}
-                onMouseLeave={() => handleRowNotHover(index)}
+                // onMouseOver={() => handleRowHover(index)}
+                // onMouseLeave={() => handleRowNotHover(index)}
                 _hover={{ bgColor: "#ececec" }}
               >
                 <Td style={rowValueStyle}>
@@ -223,51 +147,34 @@ const PermissionsTable = ({ tableData, onOpenCreateChildGroup, userData }) => {
                     <Link 
                     href={`/accounts/teams/${dataValue.teamid}`}
                       _hover={{ textDecoration: "underline" }}
-                      color={hoveredRows[index] ? "#0176d3" : "#444444"}
+                      // color={hoveredRows[index] ? "#0176d3" : "#444444"}
                     >
                       {dataValue.childTeams === false ? (
                         <Box paddingLeft={55}>
-                          {dataValue.teamname}
+                          {dataValue.groupname}
                         </Box>
                       ) : (
-                        dataValue.teamname
+                        dataValue.groupname
                       )}
 
                     </Link>
                   </Box>
                 </Td>
                 <Td style={rowValueStyle}>
-                    {dataValue.teamname}
+                    {dataValue.rolename}
                 </Td>
                 <Td style={rowValueStyle}>
                   <Menu>
                     <MenuButton
                       as={IconButton}
                       aria-label="Options"
-                      icon={<HiEllipsisHorizontal />}
+                      // icon={<HiEllipsisHorizontal />}
                       variant="outline"
                       h={"28px"} color="gray.500"
                       border={"1px solid #5c5c5c"}
                       onClick={() => handleMenuOpen(dataValue)}
-                    />
-                    <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
-                      <Tooltip label="This business group is not entitled to create child groups" placement="auto" fontSize="4xl" isDisabled={selectedBusinessGroupId?.canCreateChildGroup !== false}>
-                        <MenuItem fontSize={14}
-                          onClick={() => onOpenCreateChildGroup(dataValue.teamid,dataValue.teamname)}
-                          isDisabled={selectedBusinessGroupId?.canCreateChildGroup === false}>
-                          Create child team
-                        </MenuItem>
-                      </Tooltip>
-                      {ownerData.id !== selectedBusinessGroupId?.id &&
-                        <Tooltip label="Cannot delete a Business Group with children" placement="auto" fontSize="4xl" isDisabled={selectedBusinessGroupId?.childGroups === false}>
-                          <MenuItem fontSize={14} onClick={handleDeleteOpen} color={"red.600"}
-                            isDisabled={selectedBusinessGroupId?.childGroups !== false}
-                            _hover={{ color: selectedBusinessGroupId?.childGroups !== false ? '#000' : "white", bgColor: selectedBusinessGroupId?.childGroups !== false ? '' : 'red.600' }}>
-                            Delete team...
-                          </MenuItem>
-                        </Tooltip>
-                      }
-                    </MenuList>
+                      fontSize={14}
+                    >Edit</MenuButton>
                   </Menu>
                 </Td>
               </Tr>

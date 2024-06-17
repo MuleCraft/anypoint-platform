@@ -57,6 +57,7 @@ export default async function createNewBusinessGroup(groupCreateParams) {
         canCreateChildGroup: groupCreateParams.isGroupCheckboxSelected,
         canCreateEnvironments: groupCreateParams.isEnvCheckboxSelected,
         organizationName: groupCreateParams.currentOrganization,
+        organizationId: groupCreateParams.organizationId
       },
     ])
     .select();

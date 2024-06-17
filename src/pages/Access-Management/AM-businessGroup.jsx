@@ -30,6 +30,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
   const [currentUserName, setCurrentUserName] = useState('');
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [currentOrganization, setCurrentOrganization] = useState('');
+  const [currentOrgId, setCurrentOrgId] = useState('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -40,6 +41,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
     setCurrentUserEmail(userData.email);
     setCurrentUserName(userData.display_name);
     setCurrentOrganization(userData.company);
+    setCurrentOrgId(userData.organizationId);
   }
 
   const fetchRows = async () => {
@@ -78,6 +80,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
                   currentUserEmail={currentUserEmail}
                   currentUserName={currentUserName}
                   currentOrganization={currentOrganization}
+                  currentOrgId={currentOrgId}
                   filteredTableData={filteredTableData}
                   isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
                 />
