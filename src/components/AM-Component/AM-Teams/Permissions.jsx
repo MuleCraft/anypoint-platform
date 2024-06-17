@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
     Box,
     Breadcrumb,
@@ -66,7 +66,7 @@ const Permissions = () => {
 
     const fetchRows = async () => {
         const tableRowData = await fetchPermissionsTableRows(id);
-        setPermissionsTableData(tableRowData);
+        setPermissionsTableData(tableRowData.permissions || []);
         console.log("permissions data:",tableRowData);
       
             // const roleIds = tableRowData.flatMap(group => group.permissionsData?.map(permission => permission.roleid) || []);
@@ -96,6 +96,7 @@ const Permissions = () => {
               return data;
     }
     const fetchBgNames = async () => {
+        console.log("org id:",userData.organizationId);
         const bgNames = await fetchBgData();
         setBusinessGroups(bgNames);
         console.log("bg names:",bgNames);
@@ -116,7 +117,7 @@ const Permissions = () => {
     const fetchPermissionNames = async () => {
         const permissionDetails = await fetchPermissionData(id);
         setPermissionData(permissionDetails);
-        console.log("permissions names:",permissionDetails);
+        // console.log("permissions names:",permissionDetails);
     }
 
     const fetchTeamDetails = async () => {
@@ -124,13 +125,19 @@ const Permissions = () => {
         setTeamsData(teamdetails);
         console.log("team details:",teamdetails);
     }
-
-    if (userData && (permissionsTableData.length === 0)) {
-        fetchRows();
-        fetchBgNames();
-        fetchPermissionNames();
-        fetchTeamDetails();
-    }
+    
+    useEffect(() => {
+        if (userData) {
+            const fetchData = async () => {
+                await fetchRows();
+                await fetchBgNames();
+                await fetchPermissionNames();
+                await fetchTeamDetails();
+            };
+            
+            fetchData();
+        }
+    }, [userData]);
 
     const [activeItem, setActiveItem] = useState("Permissions");
     const handleItemSelect = (itemName) => {
@@ -271,12 +278,12 @@ const Permissions = () => {
                                 />
                             </InputGroup>
                         </Stack>
-                        {permissionsTableData.length === 0 ? (
+                        {(permissionsTableData === null || permissionsTableData.length <1) ? (
                             <EmptyRows message={'No data to show'} />
                         ) : (
                             <PermissionsTable 
                                 tableData={teamsData}
-                                permissionData={permissionsTableData[0].permissions}
+                                permissionData={permissionsTableData}
                                 bgNames={businessGroups}
                                 teamId={id}
                                 userData={userData}

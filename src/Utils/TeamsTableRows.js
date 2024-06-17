@@ -1,7 +1,7 @@
 import supabase from "./supabase";
 
 export default async function fetchTeamsTableRows(currentOrganization) {
-  console.log('Fetch teams rows fn invoked!');
+  // console.log('Fetch teams rows fn invoked!');
   const { data, error } = await supabase
     .schema("mc_cap_develop")
     .from("teams")

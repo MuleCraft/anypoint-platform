@@ -10,7 +10,7 @@ export default async function fetchPermissionsTableRows(teamId) {
     .eq("teamid", teamId);
 
   if (data) {
-    return data;
+    return data[0];
   } else {
     console.log(error);
     return "Error occurred!";

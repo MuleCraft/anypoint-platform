@@ -2,12 +2,12 @@ import supabase from "./supabase";
 // import { v4 as uuidv4 } from "uuid";
 
 export default async function createNewTeams(teamsCreateParams, fetchTeamsCallback) {
-    console.log("Teams create fn invoked!");
+    // console.log("Teams create fn invoked!");
     let orgId = '';
     let parentTeamIdValue = '';
     let userdata = [];
     // const teamId = uuidv4();
-    console.log("team create params:", teamsCreateParams);
+    // console.log("team create params:", teamsCreateParams);
 
     if (teamsCreateParams.organizationId === '') {
         const { data: groupData, error: grouperror } = await supabase
