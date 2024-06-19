@@ -25,13 +25,21 @@ import {
   ModalContent,
   Box,
   useToast,
-  Text
+  Text,
 } from "@chakra-ui/react";
-import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
+import {
+  HiEllipsisHorizontal,
+  HiChevronRight,
+  HiChevronDown,
+} from "react-icons/hi2";
 import supabase from "../../../Utils/supabase";
 import { AuthContext } from "../../../Utils/AuthProvider";
 
-const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) => {
+const TeamTable = ({
+  tableData = [],
+  onOpenCreateChildteam,
+  refetchTableData,
+}) => {
   const [selectedTeamId, setSelectedTeamId] = useState(null);
   const [targetGroupName, setTargetGroupName] = useState("");
   const [expandedRows, setExpandedRows] = useState([]);
@@ -50,10 +58,12 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
   }, [selectedTeamId]);
 
   useEffect(() => {
-    const filteredData = tableData.filter(dataValue => {
-      return dataValue.parentteamId === null ||
+    const filteredData = tableData.filter((dataValue) => {
+      return (
+        dataValue.parentteamId === null ||
         expandedRows.includes(dataValue.teamId) ||
-        expandedRows.includes(dataValue.parentteamId);
+        expandedRows.includes(dataValue.parentteamId)
+      );
     });
 
     filteredData.sort((a, b) => {
@@ -83,7 +93,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
 
   const handleRowClick = (index, id) => {
     if (expandedRows.includes(id)) {
-      setExpandedRows(expandedRows.filter(rowId => rowId !== id));
+      setExpandedRows(expandedRows.filter((rowId) => rowId !== id));
     } else {
       setExpandedRows([...expandedRows, id]);
     }
@@ -103,7 +113,9 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
   const handleDeleteInputChange = (e) => {
     const value = e.target.value;
     setDeleteInputValue(value);
-    setDeleteButtonDisabled(value.toLowerCase() !== targetGroupName.toLowerCase());
+    setDeleteButtonDisabled(
+      value.toLowerCase() !== targetGroupName.toLowerCase()
+    );
   };
 
   const handleDeleteTeam = async () => {
@@ -124,7 +136,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
           status: "error",
           duration: 2000,
           isClosable: true,
-          position: "top-right"
+          position: "top-right",
         });
         return;
       }
@@ -136,7 +148,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
           status: "error",
           duration: 2000,
           isClosable: true,
-          position: "top-right"
+          position: "top-right",
         });
         return;
       }
@@ -155,7 +167,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
           status: "error",
           duration: 2000,
           isClosable: true,
-          position: "top-right"
+          position: "top-right",
         });
         return;
       }
@@ -168,7 +180,10 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
           .eq("teamid", childTeam.teamid);
 
         if (error) {
-          console.error(`Error deleting child team ${childTeam.teamid}:`, error.message);
+          console.error(
+            `Error deleting child team ${childTeam.teamid}:`,
+            error.message
+          );
           throw new Error(`Error deleting child team ${childTeam.teamid}`);
         }
       });
@@ -189,7 +204,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
           status: "error",
           duration: 2000,
           isClosable: true,
-          position: "top-right"
+          position: "top-right",
         });
       } else {
         toast({
@@ -198,7 +213,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
           status: "success",
           duration: 2000,
           isClosable: true,
-          position: "top-right"
+          position: "top-right",
         });
         handleDeleteClose();
         refetchTableData(); // Call the refetch function after successful deletion
@@ -211,7 +226,7 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
         status: "error",
         duration: 2000,
         isClosable: true,
-        position: "top-right"
+        position: "top-right",
       });
     }
   };
@@ -244,15 +259,31 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
               _hover={{ bgColor: "#ececec" }}
             >
               <Td style={rowValueStyle}>
-                <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`} display="flex">
+                <Box
+                  paddingLeft={
+                    dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`
+                  }
+                  display="flex"
+                >
                   <IconButton
                     aria-label="Toggle Details"
-                    icon={expandedRows.includes(dataValue.teamid) ? <HiChevronDown /> : <HiChevronRight />}
+                    icon={
+                      expandedRows.includes(dataValue.teamid) ? (
+                        <HiChevronDown />
+                      ) : (
+                        <HiChevronRight />
+                      )
+                    }
                     size=""
                     variant="ghost"
                     onClick={() => handleRowClick(index, dataValue.teamid)}
                     mr={2}
-                    display={(dataValue.ancestors.length === 0 || dataValue.childTeams === true) ? "inline-flex" : "none"}
+                    display={
+                      dataValue.ancestors.length === 0 ||
+                      dataValue.childTeams === true
+                        ? "inline-flex"
+                        : "none"
+                    }
                   />
                   <Link
                     href={`/accounts/teams/${dataValue.teamid}`}
@@ -260,21 +291,17 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
                     color={hoveredRows[index] ? "#0176d3" : "#444444"}
                   >
                     {dataValue.childGroups === false ? (
-                      <Box paddingLeft={25}>
-                        {dataValue.teamname}
-                      </Box>
+                      <Box paddingLeft={25}>{dataValue.teamname}</Box>
                     ) : (
                       <Box display="flex" gap={4}>
                         {dataValue.teamname}
-
-                        <Text key={index} fontSize="base" color="gray">You’re a {dataValue.members[index].membership_type}</Text>
-
-
-
-
+                        {dataValue.members?.[index]?.membership_type && (
+                          <Text key={index} fontSize="base" color="gray">
+                            You’re a {dataValue.members[index].membership_type}
+                          </Text>
+                        )}
                       </Box>
                     )}
-
                   </Link>
                 </Box>
               </Td>
@@ -293,11 +320,16 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
                   <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
                     <MenuItem
                       fontSize={14}
-                      onClick={() => onOpenCreateChildteam(dataValue.teamid, dataValue.teamname)}
+                      onClick={() =>
+                        onOpenCreateChildteam(
+                          dataValue.teamid,
+                          dataValue.teamname
+                        )
+                      }
                     >
                       Create child team
                     </MenuItem>
-                    {(dataValue.ancestors.length === 0) ? (
+                    {dataValue.ancestors.length === 0 ? (
                       ""
                     ) : (
                       <MenuItem
@@ -336,8 +368,9 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
             <VStack spacing={4}>
               <VStack spacing={0} fontSize={14} align={"flex-start"}>
                 <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
-                  <b>This action cannot be undone.</b> This will delete the <b>{targetGroupName}</b> team and all of its associated information.
-                  Please type the name of the team to confirm.
+                  <b>This action cannot be undone.</b> This will delete the{" "}
+                  <b>{targetGroupName}</b> team and all of its associated
+                  information. Please type the name of the team to confirm.
                 </FormLabel>
                 <Input
                   placeholder="team name"
@@ -350,16 +383,22 @@ const TeamTable = ({ tableData = [], onOpenCreateChildteam, refetchTableData }) 
               </VStack>
             </VStack>
           </ModalBody>
-          <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
-            <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>
+          <ModalFooter
+            borderBottomRadius={15}
+            justifyContent={"space-between"}
+            borderTop={"1px solid #e5e5e5"}
+          >
+            <Button
+              onClick={handleDeleteClose}
+              variant={"outline"}
+              fontSize={14}
+            >
               Cancel
             </Button>
             <Button
-
               onClick={handleDeleteTeam}
               variant={"DeleteButtonFilled"}
               isDisabled={isDeleteButtonDisabled}
-
             >
               Delete
             </Button>
