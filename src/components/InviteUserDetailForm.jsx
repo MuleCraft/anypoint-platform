@@ -19,6 +19,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
 import { NavLink, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 export default function InviteUserDetailForm() {
   const [isCheckedBox, setIsCheckedBox] = useState(false);
@@ -144,11 +145,14 @@ export default function InviteUserDetailForm() {
           return;
         }
 
+        const orgId = uuidv4();
+
         const { data: updateUser, error: updateUserError } =
           await supabase.auth.updateUser({
             data: {
               full_name: fullName,
               role: "User",
+              orgid: orgId
             },
           });
         if (updateUserError) {
@@ -156,6 +160,7 @@ export default function InviteUserDetailForm() {
         } else {
           console.log("Additional details inserted:", updateUser);
         }
+        
 
         const { data, error } = await supabase
           .schema("mc_cap_develop")
@@ -168,7 +173,8 @@ export default function InviteUserDetailForm() {
               display_name: username,
               recaptcha_verification: "true",
               acceptedterms_verification: "true",
-              role: "user",
+              role: "User",
+              organizationId: orgId
             },
           ]);
         if (error) {
