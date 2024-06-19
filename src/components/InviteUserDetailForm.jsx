@@ -19,11 +19,15 @@ import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
 import { NavLink, useParams } from "react-router-dom";
+import { AuthContext } from "../Utils/AuthProvider";
+import { useContext } from "react";
 
 export default function InviteUserDetailForm() {
   const [isCheckedBox, setIsCheckedBox] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+
+  const userData = useContext(AuthContext);
 
   const [username, setUserName] = useState("");
 
@@ -149,6 +153,7 @@ export default function InviteUserDetailForm() {
             data: {
               full_name: fullName,
               role: "User",
+              orgid: userData.organizationId
             },
           });
         if (updateUserError) {
@@ -156,7 +161,8 @@ export default function InviteUserDetailForm() {
         } else {
           console.log("Additional details inserted:", updateUser);
         }
-
+        
+        console.log('orgId',userData.organizationId);
         const { data, error } = await supabase
           .schema("mc_cap_develop")
           .from("users")
@@ -168,7 +174,8 @@ export default function InviteUserDetailForm() {
               display_name: username,
               recaptcha_verification: "true",
               acceptedterms_verification: "true",
-              role: "user",
+              role: "User",
+              organizationId: userData.organizationId
             },
           ]);
         if (error) {
