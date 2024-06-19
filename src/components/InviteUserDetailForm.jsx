@@ -19,12 +19,15 @@ import ReCAPTCHA from "react-google-recaptcha";
 import AnimateCompForms from "./AnimateCompForms";
 import supabase from "../Utils/supabase";
 import { NavLink, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import { AuthContext } from "../Utils/AuthProvider";
+import { useContext } from "react";
 
 export default function InviteUserDetailForm() {
   const [isCheckedBox, setIsCheckedBox] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+
+  const userData = useContext(AuthContext);
 
   const [username, setUserName] = useState("");
 
@@ -145,14 +148,12 @@ export default function InviteUserDetailForm() {
           return;
         }
 
-        const orgId = uuidv4();
-
         const { data: updateUser, error: updateUserError } =
           await supabase.auth.updateUser({
             data: {
               full_name: fullName,
               role: "User",
-              orgid: orgId
+              orgid: userData.organizationId
             },
           });
         if (updateUserError) {
@@ -161,7 +162,7 @@ export default function InviteUserDetailForm() {
           console.log("Additional details inserted:", updateUser);
         }
         
-
+        console.log('orgId',userData.organizationId);
         const { data, error } = await supabase
           .schema("mc_cap_develop")
           .from("users")
@@ -174,7 +175,7 @@ export default function InviteUserDetailForm() {
               recaptcha_verification: "true",
               acceptedterms_verification: "true",
               role: "User",
-              organizationId: orgId
+              organizationId: userData.organizationId
             },
           ]);
         if (error) {
