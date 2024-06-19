@@ -204,6 +204,8 @@ export default function SimpleCard() {
     }
     return isFormValid;
   };
+  const orgId = uuidv4();
+  
   const handleSubmit = async () => {
     if (validateForm()) {
       try {
@@ -229,6 +231,7 @@ export default function SimpleCard() {
           }
           return;
         }
+        
         const { data, error } = await supabase.auth.signUp({
           email: email,
           password: password,
@@ -238,6 +241,7 @@ export default function SimpleCard() {
               phone: phoneNumber,
               company: company,
               role: "admin",
+              orgid: orgId
             },
           },
         });
@@ -253,6 +257,7 @@ export default function SimpleCard() {
           currentUserName: username,
           currentUserEmail: email,
           currentOrganization: company,
+          organizationId: orgId,
           parentGroupId:''
         };
 
@@ -265,7 +270,7 @@ export default function SimpleCard() {
           parentTeam: '',
           ancestor_group_ids: [],
           ancestors: [],
-          organizationId: '',
+          organizationId: orgId,
           userName: username,
           membershiptype: 'maintainer'
         };
@@ -303,6 +308,7 @@ export default function SimpleCard() {
           acceptedterms_verification: "true",
           company: company,
           role: "Admin",
+          organizationId: orgId
         },
       ]);
     if (error) {
