@@ -281,6 +281,7 @@ const TeamTable = ({
                     display={
                       dataValue.ancestors.length === 0 ||
                         dataValue.childTeams === true
+
                         ? "inline-flex"
                         : "none"
                     }
@@ -320,7 +321,6 @@ const TeamTable = ({
                   <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
                     <MenuItem
                       fontSize={14}
-                      fontWeight={500}
                       onClick={() =>
                         onOpenCreateChildteam(
                           dataValue.teamid,
