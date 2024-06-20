@@ -72,6 +72,7 @@ const BGEnvironment = () => {
     const [tableData, setTableData] = useState([]);
 
     const [currentUserName, setCurrentUserName] = useState('');
+    const [currentOrgId, setCurrentOrgId] = useState('');
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,11 +83,12 @@ const BGEnvironment = () => {
     if (userData && (currentUserName === '')) {
 
         setCurrentUserName(userData.display_name);
+        setCurrentOrgId(userData.organizationId);
 
     }
 
     const fetchRows = async () => {
-        const tableRowData = await fetchBgTableRows(currentUserName);
+        const tableRowData = await fetchBgTableRows(currentOrgId);
         setTableData(tableRowData);
     }
 

@@ -82,6 +82,7 @@ const BGChildGroup = () => {
     const [currentUserEmail, setCurrentUserEmail] = useState('');
     const [currentOrganization, setCurrentOrganization] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentOrgId, setCurrentOrgId] = useState('');
 
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -90,10 +91,11 @@ const BGChildGroup = () => {
         setCurrentUserEmail(userData.email);
         setCurrentUserName(userData.display_name);
         setCurrentOrganization(userData.company);
+        setCurrentOrgId(userData.organizationId);
     }
 
     const fetchRows = async () => {
-        const tableRowData = await fetchBgTableRows(currentUserName);
+        const tableRowData = await fetchBgTableRows(currentOrgId);
         setTableData(tableRowData);
     }
 

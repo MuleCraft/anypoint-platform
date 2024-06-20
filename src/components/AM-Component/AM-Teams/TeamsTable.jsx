@@ -320,6 +320,7 @@ const TeamTable = ({
                   <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
                     <MenuItem
                       fontSize={14}
+                      fontWeight={500}
                       onClick={() =>
                         onOpenCreateChildteam(
                           dataValue.teamid,
@@ -334,10 +335,11 @@ const TeamTable = ({
                     ) : (
                       <MenuItem
                         fontSize={14}
+                        fontWeight={500}
                         onClick={() => setDeleteOpen(true)}
                         color={"red.600"}
                         _hover={{
-                          color: "#000",
+                          color: "white",
                           bgColor: "red.600",
                         }}
                       >

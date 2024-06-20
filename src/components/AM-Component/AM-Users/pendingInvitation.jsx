@@ -286,7 +286,7 @@ const UserTable = () => {
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between">
-        <Button colorScheme="blue" onClick={onOpen} zIndex={0}>
+        <Button variant="formButtons" onClick={onOpen} minW={'fit-content'} zIndex={0}>
           Invite Users
         </Button>
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
@@ -350,6 +350,7 @@ const UserTable = () => {
           />
           <Input
             placeholder="Filter users"
+            fontSize={14}
             value={filter}
             onChange={handleFilterChange}
             my={4}
@@ -407,13 +408,13 @@ const UserTable = () => {
                       />
                       <MenuList borderRadius={0}>
                         <MenuItem
-                          fontSize="sm"
+                          fontSize={14}
                           onClick={() => ResendInvitation(conversion.email)}
                         >
                           Resend Invitation...
                         </MenuItem>
                         <MenuItem
-                          fontSize="sm"
+                          fontSize={14}
                           color="red"
                           onClick={() => cancelInvitation(conversion.id)}
                         >

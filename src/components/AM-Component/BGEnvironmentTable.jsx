@@ -428,7 +428,7 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                                                 <MenuList p={'5px 0'} minW={'150px'} maxW={'240px'}>
                                                     <MenuItem fontSize={14} onClick={() => handleDeleteOpen(env)} color={'white'}
                                                         bgColor='red.600' >
-                                                        Delete business group...
+                                                        Delete environment...
                                                     </MenuItem>
                                                 </MenuList>
                                             </Menu>

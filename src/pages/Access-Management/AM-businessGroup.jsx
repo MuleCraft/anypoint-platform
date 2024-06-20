@@ -45,7 +45,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
   }
 
   const fetchRows = async () => {
-    const tableRowData = await fetchBgTableRows(currentUserName);
+    const tableRowData = await fetchBgTableRows(currentOrgId);
     setTableData(tableRowData);
   }
 
