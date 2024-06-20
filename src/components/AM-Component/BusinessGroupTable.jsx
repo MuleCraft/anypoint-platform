@@ -328,9 +328,11 @@ const BusinessGroupTable = ({ tableData, onOpenCreateChildGroup, userData }) => 
             </Button>
             <Button
               onClick={() => invokeGroupDeleteFunction(selectedBusinessGroupId)}
-              variant={"formButtons"}
+              fontSize={14}
+              color={'white'}
+              bg={'#ba0517'}
               isDisabled={isDeleteButtonDisabled}
-              _hover={{ bgColor: "navy" }}
+              _hover={{ bgColor: "#a20111" }}
             >
               Delete
             </Button>
