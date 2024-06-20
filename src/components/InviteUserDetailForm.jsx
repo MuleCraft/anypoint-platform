@@ -153,6 +153,7 @@ export default function InviteUserDetailForm() {
             data: {
               full_name: fullName,
               role: "User",
+              phone: phoneNumber,
               orgid: userData.organizationId
             },
           });
@@ -163,21 +164,24 @@ export default function InviteUserDetailForm() {
         }
         
         console.log('orgId',userData.organizationId);
+        console.log('fullname:',fullName);
+        console.log('phone number:',phoneNumber);
+        console.log('username:',username);
+
         const { data, error } = await supabase
           .schema("mc_cap_develop")
           .from("users")
-          .upsert([
+          .update([
             {
-              id: id,
               full_name: fullName,
               phone: phoneNumber,
               display_name: username,
               recaptcha_verification: "true",
               acceptedterms_verification: "true",
               role: "User",
-              organizationId: userData.organizationId
             },
-          ]);
+          ])
+          .eq("id", id)
         if (error) {
           console.error("Error inserting additional details:", error.message);
         } else {
