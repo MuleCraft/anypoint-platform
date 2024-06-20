@@ -32,7 +32,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import FlexableTabs from "../../FlexableTabs";
 import { HiEllipsisHorizontal } from "react-icons/hi2";
 import { FiSearch } from "react-icons/fi";
-import EmptyRows from "../../../components/AM-Component/EmptyRows";
 import fetchTeamsTableRows from "../../../Utils/TeamsTableRows";
 import { AuthContext } from "../../../Utils/AuthProvider";
 import CreateTeams from "./CreateTeams";
@@ -327,15 +326,11 @@ const ChildTeams = () => {
                     />
                 </InputGroup>
             </Stack>
-            {
-                filteredTableData.length === 0 ? (
-                    <EmptyRows message={'No data to show'} />
-                ) : (
-                    <Box p={5}>
-                        <ChildTeamsTable tableData={filteredTableData} onOpenCreateChildGroup={onOpen} userData={userData} id={id} fetchRows={fetchRows} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
-                    </Box>
-                )
-            }
+
+            <Box p={5}>
+                <ChildTeamsTable tableData={filteredTableData} onOpenCreateChildGroup={onOpen} userData={userData} id={id} fetchRows={fetchRows} isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
+            </Box>
+
             <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
                 <ModalOverlay />
                 <ModalContent minW={"600px"}>

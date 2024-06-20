@@ -555,7 +555,7 @@ const Members = () => {
                                         <Radio
                                             size='lg'
                                             name='role'
-                                            value='member'
+                                            value='Member'
                                             isChecked={role === 'Member'}
                                             onChange={(e) => setRole(e.target.value)}
                                             color='boxColor'
@@ -571,7 +571,7 @@ const Members = () => {
                                         <Radio
                                             size='lg'
                                             name='role'
-                                            value='maintainer'
+                                            value='Maintainer'
                                             isChecked={role === 'Maintainer'}
                                             onChange={(e) => setRole(e.target.value)}
                                             color='boxColor'

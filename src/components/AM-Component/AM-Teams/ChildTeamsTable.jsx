@@ -25,10 +25,11 @@ import {
     Input,
     VStack,
     FormLabel,
-    HStack,
+
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
 import supabase from "../../../Utils/supabase";
+import EmptyRows from "../../../components/AM-Component/EmptyRows";
 
 const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) => {
     const [selectedTeam, setSelectedTeam] = useState(null);
@@ -38,8 +39,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(true);
     const [filteredRows, setFilteredRows] = useState([]);
     const [hoveredRows, setHoveredRows] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10); // Number of items per page
+
     const toast = useToast();
 
     useEffect(() => {
@@ -73,11 +73,9 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     };
 
     const handleRowClick = (team) => {
-        if (selectedTeam === team) {
-            setSelectedTeam(null); // Toggle close if already selected
-        } else {
-            setSelectedTeam(team); // Open details for the selected team
-        }
+
+        setSelectedTeam(team);
+
     };
 
     const handleMenuOpen = (team) => {
@@ -160,7 +158,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                     position: "top-right"
                 });
                 handleDeleteClose();
-                fetchRows(); // Refetch the table data
+                fetchRows();
             }
         } catch (error) {
             console.error("Error deleting team:", error);
@@ -184,148 +182,154 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     };
     const rowValueStyle = { fontSize: 14, padding: "10px" };
 
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredRows.slice(indexOfFirstItem, indexOfLastItem);
+
+    console.log(selectedTeam?.teamid)
+
 
     return (
-        <TableContainer>
-            <Table variant="simple" size="md">
-                <Thead borderBottomWidth="3px">
-                    <Tr>
-                        <Th style={columnTitleStyle}>Name</Th>
-                        <Th style={columnTitleStyle} w={"80px"}></Th>
-                    </Tr>
-                </Thead>
-                <Tbody>
-                    {currentItems.map((dataValue, index) => (
-                        <Tr
-                            key={index}
-                            fontWeight={500}
-                            onMouseOver={() => handleRowHover(index)}
-                            onMouseLeave={() => handleRowNotHover(index)}
-                            _hover={{ bgColor: "#ececec" }}
-                            onClick={() => handleRowClick(dataValue)}
-                            cursor="pointer"
-                        >
-                            <Td style={rowValueStyle}>
-                                <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`}>
-                                    <IconButton
-                                        aria-label="Toggle Details"
-                                        icon={expandedRows.includes(dataValue.teamid) ? <HiChevronDown /> : <HiChevronRight />}
-                                        size=""
-                                        variant="ghost"
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Prevent row click event from triggering
-                                            handleRowClick(dataValue);
-                                        }}
-                                        mr={2}
-                                        display={(dataValue.ancestors.length === 0 || dataValue.childTeams === true) ? "inline-flex" : "none"}
-                                    />
-                                    <Link
-                                        href={`/accounts/teams/${dataValue.teamid}`}
-                                        _hover={{ textDecoration: "underline" }}
-                                        color={hoveredRows[index] ? "#0176d3" : "#444444"}
-                                    >
-                                        {dataValue.childGroups === false ? (
-                                            <Box paddingLeft={25}>
-                                                {dataValue.teamname}
-                                            </Box>
-                                        ) : (
-                                            dataValue.teamname
-                                        )}
-                                    </Link>
-                                </Box>
-                            </Td>
-                            <Td style={rowValueStyle}>
-                                <Menu>
-                                    <MenuButton
-                                        as={IconButton}
-                                        aria-label="Options"
-                                        icon={<HiEllipsisHorizontal />}
-                                        variant="outline"
-                                        h={"28px"}
-                                        color="gray.500"
-                                        border={"1px solid #5c5c5c"}
-                                    />
-                                    <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
-                                        <MenuItem
-                                            fontSize={14}
-                                            onClick={() => onOpenCreateChildGroup(dataValue.teamid, dataValue.teamname)}
-                                        >
-                                            Create child team
-                                        </MenuItem>
-                                        {(dataValue.ancestors.length === 0) ? (
-                                            ""
-                                        ) : (
-                                            <MenuItem
-                                                fontSize={14}
-                                                onClick={() => handleMenuOpen(dataValue)}
-                                                color={"red.600"}
-                                                _hover={{
-                                                    color: "#000",
-                                                    bgColor: "red.600",
-                                                }}
-                                            >
-                                                Delete team...
-                                            </MenuItem>
-                                        )}
-                                    </MenuList>
-                                </Menu>
-                            </Td>
-                        </Tr>
-                    ))}
-                </Tbody>
-            </Table>
-
-            <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
-                <ModalOverlay />
-                <ModalContent minW={"600px"}>
-                    <ModalHeader
-                        bg={"#f3f3f3"}
-                        fontSize={20}
-                        fontWeight={800}
-                        color={"#444444"}
-                        borderTopRadius={15}
-                        borderBottom={"1px solid #e5e5e5"}
-                    >
-                        Are you sure?
-                    </ModalHeader>
-                    <ModalBody p={"32px 32px"}>
-                        <VStack spacing={4}>
-                            <VStack spacing={0} fontSize={14} align={"flex-start"}>
-                                <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
-                                    <b>This action cannot be undone.</b> This will delete the <b>{selectedTeam?.teamname}</b> team and all of its associated information.
-                                    Please type the name of the team to confirm.
-                                </FormLabel>
-                                <Input
-                                    placeholder="Team name"
-                                    mt={1}
-                                    fontSize={14}
+        <>
+            {filteredRows.length === 0 ? (
+                <EmptyRows />
+            ) : (
+                <TableContainer>
+                    <Table variant="simple" size="md">
+                        <Thead borderBottomWidth="3px">
+                            <Tr>
+                                <Th style={columnTitleStyle}>Name</Th >
+                                <Th style={columnTitleStyle} w={"80px"}></Th>
+                            </Tr >
+                        </Thead >
+                        <Tbody>
+                            {filteredRows.map((dataValue, index) => (
+                                <Tr
+                                    key={index}
                                     fontWeight={500}
-                                    value={deleteInputValue}
-                                    onChange={handleDeleteInputChange}
-                                />
-                            </VStack>
-                        </VStack>
-                    </ModalBody>
-                    <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
-                        <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={handleDeleteTeam}
-                            variant={"DeleteButtonFilled"}
-                            isDisabled={isDeleteButtonDisabled}
-                            _hover={{ bgColor: "navy" }}
-                        >
-                            Delete
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-        </TableContainer>
+                                    onMouseOver={() => handleRowHover(index)}
+                                    onMouseLeave={() => handleRowNotHover(index)}
+                                    _hover={{ bgColor: "#ececec" }}
+                                    onClick={() => handleRowClick(dataValue)}
+                                    cursor="pointer"
+                                >
+                                    <Td style={rowValueStyle}>
+                                        <Box paddingLeft={dataValue.ancestors.length === 0 ? 0 : `${index * 55}px`}>
+                                            <IconButton
+                                                aria-label="Toggle Details"
+                                                icon={expandedRows.includes(dataValue.teamid) ? <HiChevronDown /> : <HiChevronRight />}
+                                                size=""
+                                                variant="ghost"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Prevent row click event from triggering
+                                                    handleRowClick(dataValue);
+                                                }}
+                                                mr={2}
+                                                display={(dataValue.ancestors.length === 0 || dataValue.childTeams === true) ? "inline-flex" : "none"}
+                                            />
+                                            <Link
+                                                href={`/accounts/teams/${dataValue.teamid}`}
+                                                _hover={{ textDecoration: "underline" }}
+                                                color={hoveredRows[index] ? "#0176d3" : "#444444"}
+                                            >
+                                                {dataValue.childGroups === false ? (
+                                                    <Box paddingLeft={25}>
+                                                        {dataValue.teamname}
+                                                    </Box>
+                                                ) : (
+                                                    dataValue.teamname
+                                                )}
+                                            </Link>
+                                        </Box>
+                                    </Td>
+                                    <Td style={rowValueStyle}>
+                                        <Menu>
+                                            <MenuButton
+                                                as={IconButton}
+                                                aria-label="Options"
+                                                icon={<HiEllipsisHorizontal />}
+                                                variant="outline"
+                                                h={"28px"}
+                                                color="gray.500"
+                                                border={"1px solid #5c5c5c"}
+                                            />
+                                            <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
+                                                <MenuItem
+                                                    fontSize={14}
+                                                    onClick={() => onOpenCreateChildGroup(dataValue.teamid, dataValue.teamname)}
+                                                >
+                                                    Create child team
+                                                </MenuItem>
+                                                {(dataValue.ancestors.length === 0) ? (
+                                                    ""
+                                                ) : (
+                                                    <MenuItem
+                                                        fontSize={14}
+                                                        onClick={() => handleMenuOpen(dataValue)}
+                                                        color={"red.600"}
+                                                        _hover={{
+                                                            color: "#000",
+                                                            bgColor: "red.600",
+                                                        }}
+                                                    >
+                                                        Delete team...
+                                                    </MenuItem>
+                                                )}
+                                            </MenuList>
+                                        </Menu>
+                                    </Td>
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table >
+
+                    <Modal onClose={handleDeleteClose} isOpen={isDeleteOpen} isCentered>
+                        <ModalOverlay />
+                        <ModalContent minW={"600px"}>
+                            <ModalHeader
+                                bg={"#f3f3f3"}
+                                fontSize={20}
+                                fontWeight={800}
+                                color={"#444444"}
+                                borderTopRadius={15}
+                                borderBottom={"1px solid #e5e5e5"}
+                            >
+                                Are you sure?
+                            </ModalHeader>
+                            <ModalBody p={"32px 32px"}>
+                                <VStack spacing={4}>
+                                    <VStack spacing={0} fontSize={14} align={"flex-start"}>
+                                        <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
+                                            <b>This action cannot be undone.</b> This will delete the <b>{selectedTeam?.teamname}</b> team and all of its associated information.
+                                            Please type the name of the team to confirm.
+                                        </FormLabel>
+                                        <Input
+                                            placeholder="Team name"
+                                            mt={1}
+                                            fontSize={14}
+                                            fontWeight={500}
+                                            value={deleteInputValue}
+                                            onChange={handleDeleteInputChange}
+                                        />
+                                    </VStack>
+                                </VStack>
+                            </ModalBody>
+                            <ModalFooter borderBottomRadius={15} justifyContent={"space-between"} borderTop={"1px solid #e5e5e5"}>
+                                <Button onClick={handleDeleteClose} variant={"outline"} fontSize={14}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={handleDeleteTeam}
+                                    variant={"DeleteButtonFilled"}
+                                    isDisabled={isDeleteButtonDisabled}
+                                    _hover={{ bgColor: "navy" }}
+                                >
+                                    Delete
+                                </Button>
+                            </ModalFooter>
+                        </ModalContent>
+                    </Modal>
+                </TableContainer >
+            )}
+
+        </>
     );
 };
 

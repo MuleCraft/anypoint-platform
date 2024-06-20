@@ -365,21 +365,21 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                     </Text>
                 </HStack>
                 {/* <Flex gap={10} alignItems="center"> */}
-                    <InputGroup maxW="-webkit-fit-content">
-                        <InputLeftElement
-                            pointerEvents="none"
-                            top={4}
-                            left={4}
-                            children={<FiSearch color="gray" />} />
-                        <Input
-                            placeholder="Filter environments"
-                            value={filterText}
-                            onChange={handleFilterChange}
-                            my={4}
-                            ml={4}
-                            fontSize="14px"
-                            fontWeight={500} />
-                    </InputGroup>
+                <InputGroup maxW="-webkit-fit-content">
+                    <InputLeftElement
+                        pointerEvents="none"
+                        top={4}
+                        left={4}
+                        children={<FiSearch color="gray" />} />
+                    <Input
+                        placeholder="Filter environments"
+                        value={filterText}
+                        onChange={handleFilterChange}
+                        my={4}
+                        ml={4}
+                        fontSize="14px"
+                        fontWeight={500} />
+                </InputGroup>
                 {/* </Flex> */}
             </Stack>
             {filteredTableData.length === 0 ? (
@@ -450,7 +450,7 @@ const BGEnvironmentTable = ({ tableData, userData, id }) => {
                                 <ModalBody p={'32px 32px'}>
                                     <VStack spacing={4}>
                                         <VStack spacing={0} fontSize={14} align={'flex-start'}>
-                                            <FormLabel color={'#747474'} fontWeight={500} fontSize={14}><b>This action cannot be undone.</b> This will delete the <b>{selectedEnvironment.envName}</b> business group and all of its associated information. Please type the name of the business group to confirm.</FormLabel>
+                                            <FormLabel color={'#747474'} fontWeight={500} fontSize={14}><b>This action cannot be undone.</b> This will delete the <b>{selectedEnvironment.envName}</b> environment and all of its associated information. Please type the name of the environment to confirm.</FormLabel>
                                             <Input
                                                 type="text"
                                                 placeholder="Type the environment name"

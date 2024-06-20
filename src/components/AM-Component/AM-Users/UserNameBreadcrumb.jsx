@@ -300,7 +300,8 @@ const UserNameBreadcrumb = () => {
       const { data: supabaseData, error: supabaseError } = await supabase
         .schema("mc_cap_develop")
         .from("users")
-        .upsert({ id: id, email: editableEmail.trim() });
+        .update({ id: id, email: editableEmail.trim() })
+        .eq("id", id);
 
       if (supabaseError) {
         console.error(

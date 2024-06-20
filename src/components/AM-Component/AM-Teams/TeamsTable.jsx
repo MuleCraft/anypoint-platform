@@ -295,8 +295,11 @@ const TeamTable = ({
                     ) : (
                       <Box display="flex" gap={4}>
                         {dataValue.teamname}
-
-                        <Text key={index} fontSize="base" color="gray">You’re a {dataValue.members[index].membership_type}</Text>
+                        {dataValue.members?.[index]?.membership_type && (
+                          <Text key={index} fontSize="base" color="gray">
+                            You’re a {dataValue.members[index].membership_type}
+                          </Text>
+                        )}
                       </Box>
                     )}
                   </Link>
@@ -317,6 +320,7 @@ const TeamTable = ({
                   <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
                     <MenuItem
                       fontSize={14}
+                      fontWeight={500}
                       onClick={() =>
                         onOpenCreateChildteam(
                           dataValue.teamid,
@@ -331,10 +335,11 @@ const TeamTable = ({
                     ) : (
                       <MenuItem
                         fontSize={14}
+                        fontWeight={500}
                         onClick={() => setDeleteOpen(true)}
                         color={"red.600"}
                         _hover={{
-                          color: "#000",
+                          color: "white",
                           bgColor: "red.600",
                         }}
                       >

@@ -45,7 +45,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
   }
 
   const fetchRows = async () => {
-    const tableRowData = await fetchBgTableRows(currentUserName);
+    const tableRowData = await fetchBgTableRows(currentOrgId);
     setTableData(tableRowData);
   }
 
@@ -68,7 +68,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
         <div className="Wrapper">
           <Flex>
             <Box>
-              <Sidebar 
+              <Sidebar
                 sections={sections}
                 activeItem={activeItem}
                 onItemSelect={handleItemSelect}
