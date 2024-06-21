@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   Stack,
   Flex,
@@ -20,38 +20,43 @@ import { AuthContext } from "../../Utils/AuthProvider";
 import EmptyRows from "../../components/AM-Component/EmptyRows";
 
 export default function AMBusinessGroup({ name, pathValue }) {
-
   const { userData } = useContext(AuthContext);
 
   const [activeItem, setActiveItem] = useState("BusinessGroups");
   const [tableData, setTableData] = useState([]);
   const [filterValue, setFilterValue] = useState("");
-
-  const [currentUserName, setCurrentUserName] = useState('');
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
-  const [currentOrganization, setCurrentOrganization] = useState('');
-  const [currentOrgId, setCurrentOrgId] = useState('');
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [currentUser, setCurrentUser] = useState({
+    userName: '',
+    userEmail: '',
+    organization: '',
+    orgId: '',
+  });
+
+  useEffect(() => {
+    if (userData) {
+      setCurrentUser({
+        userName: userData.display_name,
+        userEmail: userData.email,
+        organization: userData.company,
+        orgId: userData.organizationId,
+      });
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (currentUser.orgId && tableData.length === 0) {
+        const tableRowData = await fetchBgTableRows(currentUser.orgId);
+        setTableData(tableRowData);
+      }
+    };
+    fetchData();
+  }, [currentUser.orgId, tableData.length]);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-
-  if (userData && (currentUserName === '')) {
-    setCurrentUserEmail(userData.email);
-    setCurrentUserName(userData.display_name);
-    setCurrentOrganization(userData.company);
-    setCurrentOrgId(userData.organizationId);
-  }
-
-  const fetchRows = async () => {
-    const tableRowData = await fetchBgTableRows(currentUserName);
-    setTableData(tableRowData);
-  }
-
-  if (userData && (tableData.length === 0)) {
-    fetchRows();
-  }
 
   const handleItemSelect = (itemName) => {
     setActiveItem(itemName);
@@ -68,7 +73,7 @@ export default function AMBusinessGroup({ name, pathValue }) {
         <div className="Wrapper">
           <Flex>
             <Box>
-              <Sidebar 
+              <Sidebar
                 sections={sections}
                 activeItem={activeItem}
                 onItemSelect={handleItemSelect}
@@ -77,10 +82,10 @@ export default function AMBusinessGroup({ name, pathValue }) {
             <Flex direction="column" ml="200" mt="150" p={"20px 25px"} gap={8}>
               <Stack mt={"-60px"} direction={"row"} spacing={6} align={'center'}>
                 <CreateBusinessGroup
-                  currentUserEmail={currentUserEmail}
-                  currentUserName={currentUserName}
-                  currentOrganization={currentOrganization}
-                  currentOrgId={currentOrgId}
+                  currentUserEmail={currentUser.userEmail}
+                  currentUserName={currentUser.userName}
+                  currentOrganization={currentUser.organization}
+                  currentOrgId={currentUser.orgId}
                   filteredTableData={filteredTableData}
                   isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
                 />

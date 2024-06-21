@@ -25,22 +25,29 @@ import {
     Input,
     VStack,
     FormLabel,
-    HStack,
 } from "@chakra-ui/react";
 import { HiEllipsisHorizontal, HiChevronRight, HiChevronDown } from "react-icons/hi2";
 import supabase from "../../../Utils/supabase";
+import EmptyRows from "../EmptyRows";
 
 const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) => {
     const [selectedTeam, setSelectedTeam] = useState(null);
+    const [targetTeam, setTargetTeamName] = useState(null);
+    const [targetTeamId, setTargetTeamId] = useState(null);
     const [expandedRows, setExpandedRows] = useState([]);
     const [isDeleteOpen, setDeleteOpen] = useState(false);
     const [deleteInputValue, setDeleteInputValue] = useState("");
     const [isDeleteButtonDisabled, setIsDeleteButtonDisabled] = useState(true);
     const [filteredRows, setFilteredRows] = useState([]);
     const [hoveredRows, setHoveredRows] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10); // Number of items per page
     const toast = useToast();
+
+    useEffect(() => {
+        if (selectedTeam) {
+            setTargetTeamName(selectedTeam.teamname);
+            setTargetTeamId(selectedTeam.teamid);
+        }
+      }, [selectedTeam]);
 
     useEffect(() => {
         const filteredData = tableData.filter(dataValue => {
@@ -81,6 +88,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     };
 
     const handleMenuOpen = (team) => {
+        // console.log("team to be deleted:",team);
         setSelectedTeam(team);
         setDeleteOpen(true);
     };
@@ -94,11 +102,12 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     const handleDeleteInputChange = (e) => {
         const value = e.target.value;
         setDeleteInputValue(value);
-        setIsDeleteButtonDisabled(value.toLowerCase() !== selectedTeam?.teamname?.toLowerCase());
+        setIsDeleteButtonDisabled(value !== targetTeam);
     };
 
     const handleDeleteTeam = async () => {
-        const teamId = selectedTeam.teamid;
+        // console.log("team to be deleted on click:",targetTeamId);
+        const teamId = targetTeamId;
         try {
             const { data: childTeams, error: childTeamsError } = await supabase
                 .schema("mc_cap_develop")
@@ -184,12 +193,11 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     };
     const rowValueStyle = { fontSize: 14, padding: "10px" };
 
-    // Pagination logic
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredRows.slice(indexOfFirstItem, indexOfLastItem);
-
     return (
+        <>
+        {(filteredRows === null ||filteredRows.length === 0) ? (
+            <EmptyRows message={'No data to show'} />
+                ) : (
         <TableContainer>
             <Table variant="simple" size="md">
                 <Thead borderBottomWidth="3px">
@@ -199,7 +207,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {currentItems.map((dataValue, index) => (
+                    {filteredRows.map((dataValue, index) => (
                         <Tr
                             key={index}
                             fontWeight={500}
@@ -252,6 +260,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                                     <MenuList p={"5px 0"} minW={"150px"} maxW={"240px"}>
                                         <MenuItem
                                             fontSize={14}
+                                            fontWeight={500}
                                             onClick={() => onOpenCreateChildGroup(dataValue.teamid, dataValue.teamname)}
                                         >
                                             Create child team
@@ -261,10 +270,11 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                                         ) : (
                                             <MenuItem
                                                 fontSize={14}
+                                                fontWeight={500}
                                                 onClick={() => handleMenuOpen(dataValue)}
                                                 color={"red.600"}
                                                 _hover={{
-                                                    color: "#000",
+                                                    color: "white",
                                                     bgColor: "red.600",
                                                 }}
                                             >
@@ -296,7 +306,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                         <VStack spacing={4}>
                             <VStack spacing={0} fontSize={14} align={"flex-start"}>
                                 <FormLabel color={"#747474"} fontWeight={500} fontSize={14}>
-                                    <b>This action cannot be undone.</b> This will delete the <b>{selectedTeam?.teamname}</b> team and all of its associated information.
+                                    <b>This action cannot be undone.</b> This will delete the <b>{targetTeam}</b> team and all of its associated information.
                                     Please type the name of the team to confirm.
                                 </FormLabel>
                                 <Input
@@ -318,7 +328,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                             onClick={handleDeleteTeam}
                             variant={"DeleteButtonFilled"}
                             isDisabled={isDeleteButtonDisabled}
-                            _hover={{ bgColor: "navy" }}
+                            _hover={{ bgColor: "red.800" }}
                         >
                             Delete
                         </Button>
@@ -326,6 +336,9 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                 </ModalContent>
             </Modal>
         </TableContainer>
+        )
+    }
+        </>
     );
 };
 

@@ -198,12 +198,12 @@ const UserNameBreadcrumb = () => {
         console.error("Error updating name via axios:", error.message);
         throw new Error("Failed to update name via external service.");
       }
-
+      
       const { data: supabaseData, error: supabaseError } = await supabase
         .schema("mc_cap_develop")
         .from("users")
-        .upsert({ id: id, full_name: editableName.trim() });
-
+        .update({ id: id, full_name: editableName.trim() })
+        .eq("id", id);
       if (supabaseError) {
         console.error(
           "Error updating name in Supabase:",
@@ -211,7 +211,7 @@ const UserNameBreadcrumb = () => {
         );
         throw new Error("Failed to update name in Supabase.");
       }
-
+ 
       console.log("Name updated successfully in Supabase:", supabaseData);
 
       setUser((prevUser) => ({

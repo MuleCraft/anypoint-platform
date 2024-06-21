@@ -123,7 +123,7 @@ const CreateTeams = ({ filteredTeamsTableData, orgId, isOpen, onOpen, onClose, f
 
     return (
         <>
-            <Button variant="formButtons" onClick={onOpen}>
+            <Button variant="formButtons" onClick={onOpen} minW={'fit-content'}>
                 Create Team
             </Button>
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">

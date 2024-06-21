@@ -104,6 +104,8 @@ const ChildTeams = () => {
         data.teamname.toLowerCase().includes(filterValue.toLowerCase())
     );
 
+    console.log("filtered:",filteredTableData);
+
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };

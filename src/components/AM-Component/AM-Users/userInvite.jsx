@@ -258,7 +258,7 @@ const UserInvite = () => {
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between" zIndex={0}>
-        <Button colorScheme="blue" onClick={onOpen}>
+        <Button variant="formButtons" onClick={onOpen} minW={'fit-content'}>
           Invite Users
         </Button>
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
@@ -323,6 +323,7 @@ const UserInvite = () => {
             />
             <Input
               placeholder="Filter users"
+              fontSize={14}
               value={filter}
               onChange={handleFilterChange}
               my={4}
