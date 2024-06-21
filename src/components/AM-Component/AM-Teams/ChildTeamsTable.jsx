@@ -33,6 +33,7 @@ import EmptyRows from "../EmptyRows";
 const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) => {
     const [selectedTeam, setSelectedTeam] = useState(null);
     const [targetTeam, setTargetTeamName] = useState(null);
+    const [targetTeamId, setTargetTeamId] = useState(null);
     const [expandedRows, setExpandedRows] = useState([]);
     const [isDeleteOpen, setDeleteOpen] = useState(false);
     const [deleteInputValue, setDeleteInputValue] = useState("");
@@ -44,6 +45,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     useEffect(() => {
         if (selectedTeam) {
             setTargetTeamName(selectedTeam.teamname);
+            setTargetTeamId(selectedTeam.teamid);
         }
       }, [selectedTeam]);
 
@@ -86,7 +88,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     };
 
     const handleMenuOpen = (team) => {
-        console.log("team to be deleted:",team);
+        // console.log("team to be deleted:",team);
         setSelectedTeam(team);
         setDeleteOpen(true);
     };
@@ -104,7 +106,8 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
     };
 
     const handleDeleteTeam = async () => {
-        const teamId = selectedTeam.teamid;
+        // console.log("team to be deleted on click:",targetTeamId);
+        const teamId = targetTeamId;
         try {
             const { data: childTeams, error: childTeamsError } = await supabase
                 .schema("mc_cap_develop")
@@ -325,7 +328,7 @@ const ChildTeamsTable = ({ tableData, onOpenCreateChildGroup, id, fetchRows }) =
                             onClick={handleDeleteTeam}
                             variant={"DeleteButtonFilled"}
                             isDisabled={isDeleteButtonDisabled}
-                            _hover={{ bgColor: "navy" }}
+                            _hover={{ bgColor: "red.800" }}
                         >
                             Delete
                         </Button>
