@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import {
     Box,
     Breadcrumb,
@@ -30,7 +30,14 @@ import ChildGroupTable from "./AM-BusinessGroup/ChildGroupTable";
 
 const BGChildGroup = () => {
     const { id } = useParams();
+    const { userData } = useContext(AuthContext);
+
     const [group, setGroup] = useState(null);
+    const [activeItem, setActiveItem] = useState("Child Groups");
+    const [tableData, setTableData] = useState([]);
+    const [filterValue, setFilterValue] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -51,14 +58,33 @@ const BGChildGroup = () => {
         };
 
         fetchUserData();
-    }, []);
+    }, [id]);
 
-    const [activeItem, setActiveItem] = useState("Child Groups");
+    useEffect(() => {
+        const fetchRows = async () => {
+            if (userData?.organizationId) {
+                const tableRowData = await fetchBgTableRows(userData.organizationId);
+                setTableData(tableRowData);
+            }
+        };
+
+        if (userData) {
+            fetchRows();
+        }
+    }, [userData]);
+
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
 
-    const userId = [
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    const filtered = useMemo(() => {
+        return tableData.filter((data) => data.businessGroupId === id);
+    }, [tableData, id]);
+
+    const userId = useMemo(() => [
         {
             heading: 'Access Management',
             items: [
@@ -66,55 +92,11 @@ const BGChildGroup = () => {
                 { name: 'AccessOverview', label: 'Access Overview', path: `/accounts/businessGroups/${id}/access` },
                 { name: 'Child Groups', label: 'Child Groups', path: `/accounts/businessGroups/${id}/children` },
                 { name: 'Environments', label: 'Environments', path: `/accounts/businessGroups/${id}/environments` },
-
-
             ],
         },
-
-    ];
-
-
-    const { userData } = useContext(AuthContext);
-    const [tableData, setTableData] = useState([]);
-    const [filterValue, setFilterValue] = useState("");
-
-    const [currentUserName, setCurrentUserName] = useState('');
-    const [currentUserEmail, setCurrentUserEmail] = useState('');
-    const [currentOrganization, setCurrentOrganization] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentOrgId, setCurrentOrgId] = useState('');
-
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
-
-    if (userData && (currentUserName === '')) {
-        setCurrentUserEmail(userData.email);
-        setCurrentUserName(userData.display_name);
-        setCurrentOrganization(userData.company);
-        setCurrentOrgId(userData.organizationId);
-    }
-
-    const fetchRows = async () => {
-        const tableRowData = await fetchBgTableRows(currentOrgId);
-        setTableData(tableRowData);
-    }
-
-    if (userData && (tableData.length === 0)) {
-        fetchRows();
-    }
-
-
-
-    const filtered = tableData.filter((data) =>
-
-        (data.businessGroupId === id)
-
-
-    );
-
+    ], [id]);
 
     return (
-
         <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
             <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
@@ -123,9 +105,7 @@ const BGChildGroup = () => {
                             Business Groups
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentGroupID === "" ? (
-                        ""
-                    ) : (
+                    {group?.parentGroupID !== "" && (
                         <BreadcrumbItem>
                             <BreadcrumbLink
                                 fontSize="lg"
@@ -135,9 +115,7 @@ const BGChildGroup = () => {
                                 {group?.organizationName}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )
-
-                    }
+                    )}
                     <BreadcrumbItem>
                         <BreadcrumbLink
                             fontSize="lg"
@@ -148,9 +126,7 @@ const BGChildGroup = () => {
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-                {group?.childGroups !== false ? (
-                    ""
-                ) : (
+                {group?.childGroups === false && (
                     <Menu>
                         <MenuButton
                             as={IconButton}
@@ -180,11 +156,14 @@ const BGChildGroup = () => {
             <Stack mt={"25px"} direction={"row"} spacing={6} align={'center'} justify={'space-between'} px={5}>
                 <HStack spacing={6}>
                     <CreateBusinessGroup
-                        currentUserEmail={currentUserEmail}
-                        currentUserName={currentUserName}
-                        currentOrganization={currentOrganization}
+                        currentUserEmail={userData?.email}
+                        currentUserName={userData?.display_name}
+                        currentOrganization={userData?.company}
+                        currentOrgId={userData?.organizationId}
                         filteredTableData={filtered}
-                        isOpen={isModalOpen} onClose={closeModal} onOpen={openModal}
+                        isOpen={isModalOpen}
+                        onClose={closeModal}
+                        onOpen={openModal}
                     />
                     <Text fontSize={14} color={"#747474"} fontWeight={500} right={300}>
                         Permissions for a business group do not apply to its child business groups.
@@ -197,18 +176,14 @@ const BGChildGroup = () => {
                         color="gray.500"
                     />
                     <Input placeholder="Filter business group" fontSize={14} fontWeight={500}
-                        onChange={(e) => { setFilterValue(e.target.value) }}
+                        onChange={(e) => setFilterValue(e.target.value)}
                     />
                 </InputGroup>
             </Stack>
-            {tableData.length === 0 ? (
-                <EmptyRows message={'No data to show'} />
-            ) : (
-                <Box m={7}>
-                    <ChildGroupTable tableData={tableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
-                </Box>
-            )}
-        </Box >
+            <Box m={7}>
+                <ChildGroupTable tableData={tableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
+            </Box>
+        </Box>
     );
 };
 

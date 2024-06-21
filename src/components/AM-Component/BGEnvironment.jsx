@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import {
     Box,
     Breadcrumb,
@@ -10,12 +10,10 @@ import {
     MenuButton,
     MenuItem,
     MenuList,
-
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 import supabase from "../../Utils/supabase";
 import FlexableTabs from "../FlexableTabs";
-
 import fetchBgTableRows from "../../Utils/BgTableRows";
 import { AuthContext } from "../../Utils/AuthProvider";
 import EmptyRows from "./EmptyRows";
@@ -24,7 +22,13 @@ import { HiEllipsisHorizontal } from "react-icons/hi2";
 
 const BGEnvironment = () => {
     const { id } = useParams();
+    const { userData } = useContext(AuthContext);
+
     const [group, setGroup] = useState(null);
+    const [tableData, setTableData] = useState([]);
+    const [activeItem, setActiveItem] = useState("Environments");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -45,65 +49,52 @@ const BGEnvironment = () => {
         };
 
         fetchUserData();
-    }, []);
+    }, [id]);
 
-    const [activeItem, setActiveItem] = useState("Environments");
+    useEffect(() => {
+        const fetchRows = async () => {
+            if (userData?.organizationId) {
+                const tableRowData = await fetchBgTableRows(userData.organizationId);
+                setTableData(tableRowData);
+            }
+        };
+
+        if (userData && tableData.length === 0) {
+            fetchRows();
+        }
+    }, [userData, tableData.length]);
+
     const handleItemSelect = (itemName) => {
         setActiveItem(itemName);
     };
 
-    const userId = [
-        {
-            heading: 'Access Management',
-            items: [
-
-                { name: 'Settings', label: 'Settings', path: `/accounts/businessGroups/${id}` },
-                { name: 'AccessOverview', label: 'Access Overview', path: `/accounts/businessGroups/${id}/access` },
-                { name: 'Child Groups', label: 'Child Groups', path: `/accounts/businessGroups/${id}/children` },
-                { name: 'Environments', label: 'Environments', path: `/accounts/businessGroups/${id}/environments` },
-
-            ],
-        },
-
-    ];
-
-
-    const { userData } = useContext(AuthContext);
-    const [tableData, setTableData] = useState([]);
-
-    const [currentUserName, setCurrentUserName] = useState('');
-    const [currentOrgId, setCurrentOrgId] = useState('');
-
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
     const openModal = () => setIsModalOpen(true);
 
+    const filteredTableData = useMemo(() => {
+        return tableData.filter(
+            (data) =>
+                (data?.businessGroupId === id || data?.parentGroupID === id) &&
+                (data?.organizationName === group?.organizationName || group?.parentGroupID === "")
+        );
+    }, [tableData, id, group?.organizationName, group?.parentGroupID]);
 
-    if (userData && (currentUserName === '')) {
-
-        setCurrentUserName(userData.display_name);
-        setCurrentOrgId(userData.organizationId);
-
-    }
-
-    const fetchRows = async () => {
-        const tableRowData = await fetchBgTableRows(currentOrgId);
-        setTableData(tableRowData);
-    }
-
-    if (userData && (tableData.length === 0)) {
-        fetchRows();
-    }
-
-    const filteredTableData = tableData.filter((data) =>
-        (data?.businessGroupId === id || data?.parentGroupID === id) &&
-        data?.organizationName === group?.organizationName || group?.parentGroupID === ""
+    const userId = useMemo(
+        () => [
+            {
+                heading: "Access Management",
+                items: [
+                    { name: "Settings", label: "Settings", path: `/accounts/businessGroups/${id}` },
+                    { name: "AccessOverview", label: "Access Overview", path: `/accounts/businessGroups/${id}/access` },
+                    { name: "Child Groups", label: "Child Groups", path: `/accounts/businessGroups/${id}/children` },
+                    { name: "Environments", label: "Environments", path: `/accounts/businessGroups/${id}/environments` },
+                ],
+            },
+        ],
+        [id]
     );
 
     return (
-
-        <Box w={'100%'} h={'100%'} minW={0} flex={1} display={'flex'} flexDirection={'column'} ml={205} mt={'90px'}>
+        <Box w={"100%"} h={"100%"} minW={0} flex={1} display={"flex"} flexDirection={"column"} ml={205} mt={"90px"}>
             <Flex alignItems="center" justify="space-between">
                 <Breadcrumb>
                     <BreadcrumbItem>
@@ -111,34 +102,20 @@ const BGEnvironment = () => {
                             Business Groups
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {group?.parentGroupID === "" ? (
-                        ""
-                    ) : (
+                    {group?.parentGroupID && (
                         <BreadcrumbItem>
-                            <BreadcrumbLink
-                                fontSize="lg"
-                                fontWeight="400"
-                                href={`/accounts/businessGroups/${id}`}
-                            >
+                            <BreadcrumbLink fontSize="lg" fontWeight="400" href={`/accounts/businessGroups/${id}`}>
                                 {group?.organizationName}
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    )
-
-                    }
+                    )}
                     <BreadcrumbItem>
-                        <BreadcrumbLink
-                            fontSize="lg"
-                            fontWeight="600"
-                            href={`/accounts/businessGroups/${id}`}
-                        >
+                        <BreadcrumbLink fontSize="lg" fontWeight="600" href={`/accounts/businessGroups/${id}`}>
                             {group?.businessGroupName}
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                 </Breadcrumb>
-                {group?.childGroups !== false ? (
-                    ""
-                ) : (
+                {!group?.childGroups && (
                     <Menu>
                         <MenuButton
                             as={IconButton}
@@ -159,19 +136,19 @@ const BGEnvironment = () => {
                 )}
             </Flex>
             <Box pt={7}>
-                <FlexableTabs
-                    sections={userId}
-                    activeItem={activeItem}
-                    onItemSelect={handleItemSelect}
-                />
+                <FlexableTabs sections={userId} activeItem={activeItem} onItemSelect={handleItemSelect} />
             </Box>
-
             {filteredTableData.length === 0 ? (
-                <EmptyRows message={'No data to show'} />
+                <EmptyRows message={"No data to show"} />
             ) : (
-                <BGEnvironmentTable tableData={filteredTableData} onOpenCreateChildGroup={openModal} userData={userData} id={id} />
+                <BGEnvironmentTable
+                    tableData={filteredTableData}
+                    onOpenCreateChildGroup={openModal}
+                    userData={userData}
+                    id={id}
+                />
             )}
-        </Box >
+        </Box>
     );
 };
 
