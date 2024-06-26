@@ -421,26 +421,10 @@ const UserNameBreadcrumb = () => {
     {
       heading: "Access Management",
       items: [
-        {
-          name: "Permissions",
-          label: "Permissions",
-          path: `/accounts/users/${id}/permissions`,
-        },
-        {
-          name: "Memberships",
-          label: "Memberships",
-          path: `/accounts/users/${id}/teams`,
-        },
-        {
-          name: "Settings",
-          label: "Settings",
-          path: `/accounts/users/${id}/settings`,
-        },
-        {
-          name: "Limits",
-          label: "Limits",
-          path: `/accounts/users/${id}/limits`,
-        },
+        { name: 'Permissions', label: 'Permissions', path: `/accounts/users/${id}/permissions` },
+        { name: 'Memberships', label: 'Memberships', path: `/accounts/users/${id}/teams` },
+        { name: 'Settings', label: 'Settings', path: `/accounts/users/${id}/settings` },
+        { name: 'Limits', label: 'Limits', path: `/accounts/users/${id}/limits` },
       ],
     },
   ];
