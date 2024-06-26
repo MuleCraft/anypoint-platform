@@ -30,7 +30,7 @@ import {
 } from "@chakra-ui/react";
 import { AuthContext } from "../../../Utils/AuthProvider";
 import { FiSearch } from "react-icons/fi";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { CheckIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import moment from "moment";
 import { Link as RouterLink } from "react-router-dom";
 import axios from "axios";
@@ -47,13 +47,13 @@ const UserInvite = () => {
   const toast = useToast();
   const [showNameColumn, setShowNameColumn] = useState(true);
   const [showEmailColumn, setShowEmailColumn] = useState(true);
-  const [showVerifiedDateColumn, setShowVerifiedDateColumn] = useState(true);
+  const [showVerifiedDateColumn, setShowVerifiedDateColumn] = useState(false);
   const [showIdentityProviderColumn, setShowIdentityProviderColumn] =
     useState(true);
-  const [showCreatedDateColumn, setShowCreatedDateColumn] = useState(true);
+  const [showCreatedDateColumn, setShowCreatedDateColumn] = useState(false);
   const [showLastModifiedDateColumn, setShowLastModifiedDateColumn] =
-    useState(true);
-  const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(true);
+    useState(false);
+  const [showLastLoginDateColumn, setShowLastLoginDateColumn] = useState(false);
   const [showStatusColumn, setShowStatusColumn] = useState(true);
   const [orgId, setOrgId] = useState("");
   const handleReload = (event, path) => {
@@ -255,6 +255,8 @@ const UserInvite = () => {
         );
       })
     : [];
+
+  console.log(userData?.id)
   return (
     <div>
       <Flex alignItems="center" justifyContent="space-between" zIndex={0}>
@@ -466,11 +468,17 @@ const UserInvite = () => {
                       handleReload(event, `/accounts/users/${user.id}`)
                     }
                   >
-                    {user.full_name}
+                    <Flex alignItems="center" gap={4}>
+                      {user.full_name}
+                      {user.id === userData?.id ? (<Text fontSize="xs" color="gray">This is you</Text>) : (
+                        ""
+                      )}
+                    </Flex>
                   </RouterLink>
                 </Td>
                 <Td style={rowValueStyle} hidden={!showEmailColumn}>
-                  {user.email}
+                  <Flex alignItems="center" gap={2}><CheckIcon /> {user.email}</Flex>
+
                 </Td>
                 <Td style={rowValueStyle} hidden={!showVerifiedDateColumn}>
                   {moment(user.confirmation_sent_at).format(
