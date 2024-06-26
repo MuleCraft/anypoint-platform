@@ -188,8 +188,9 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-              }`,
+            Authorization: `Bearer ${
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+            }`,
           },
         }
       );
@@ -198,7 +199,7 @@ const UserNameBreadcrumb = () => {
         console.error("Error updating name via axios:", error.message);
         throw new Error("Failed to update name via external service.");
       }
-      
+
       const { data: supabaseData, error: supabaseError } = await supabase
         .schema("mc_cap_develop")
         .from("users")
@@ -211,7 +212,7 @@ const UserNameBreadcrumb = () => {
         );
         throw new Error("Failed to update name in Supabase.");
       }
- 
+
       console.log("Name updated successfully in Supabase:", supabaseData);
 
       setUser((prevUser) => ({
@@ -284,8 +285,9 @@ const UserNameBreadcrumb = () => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
-              }`,
+            Authorization: `Bearer ${
+              import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+            }`,
           },
         }
       );
@@ -340,13 +342,14 @@ const UserNameBreadcrumb = () => {
 
   const cancelInvitation = async () => {
     const role = userData?.role;
+    const sessionUser = userData?.id;
     const token = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
     try {
       if (role === "Admin" || userData?.id === id) {
         const { response } = await axios.post(
-          import.meta.env.VITE_CANCEL_INVITE,
-          { userId: id, role },
+          import.meta.env.VITE_DELETE_USERS,
+          { userId: id, role, sessionUser },
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -354,7 +357,6 @@ const UserNameBreadcrumb = () => {
             },
           }
         );
-
         if (userData?.id === id) {
           await supabase.auth.signOut();
           window.location.href = "/login";
@@ -415,18 +417,32 @@ const UserNameBreadcrumb = () => {
   };
   const rowValueStyle = { fontSize: 14 };
 
-
   const userId = [
     {
-      heading: 'Access Management',
+      heading: "Access Management",
       items: [
-        { name: 'Permissions', label: 'Permissions', path: `/accounts/users/${id}/permissions` },
-        { name: 'Memberships', label: 'Memberships', path: `/accounts/users/${id}/teams` },
-        { name: 'Settings', label: 'Settings', path: `/accounts/users/${id}/settings` },
-        { name: 'Limits', label: 'Limits', path: `/accounts/users/${id}/limits` },
+        {
+          name: "Permissions",
+          label: "Permissions",
+          path: `/accounts/users/${id}/permissions`,
+        },
+        {
+          name: "Memberships",
+          label: "Memberships",
+          path: `/accounts/users/${id}/teams`,
+        },
+        {
+          name: "Settings",
+          label: "Settings",
+          path: `/accounts/users/${id}/settings`,
+        },
+        {
+          name: "Limits",
+          label: "Limits",
+          path: `/accounts/users/${id}/limits`,
+        },
       ],
     },
-
   ];
 
   return (
@@ -634,7 +650,6 @@ const UserNameBreadcrumb = () => {
           mt={20}
           px={4}
           justifyContent="space-between"
-
         >
           <Button
             size="md"
