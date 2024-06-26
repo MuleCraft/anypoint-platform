@@ -27,6 +27,9 @@ import AMMenbers from "./pages/Access-Management/Teams/AM-members";
 import AMPermissions from "./pages/Access-Management/Teams/AM-permissions";
 import AMAccessOverview from "./pages/Access-Management/Business-Group/AM-accessOverview";
 import EditPremissions from "./components/AM-Component/AM-Teams/EditPermissions";
+import AMUsersPermissions from "./pages/Access-Management/Users/AM-permissions";
+import AMUsersMembership from "./pages/Access-Management/Users/AM-membership";
+import AMUsersLimits from "./pages/Access-Management/Users/AM-Limits";
 
 export default function App() {
   const AccessManagement = "Access Management";
@@ -68,9 +71,45 @@ export default function App() {
               }
             />
             <Route
-              path="accounts/users/:id"
+              path="accounts/users/:id/settings"
               element={
                 <AMUserBreadcrumb
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="accounts/users/:id"
+              element={
+                <AMUsersPermissions
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="accounts/users/:id/permissions"
+              element={
+                <AMUsersPermissions
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="accounts/users/:id/teams"
+              element={
+                <AMUsersMembership
+                  name={AccessManagement}
+                  pathValue={AccessManagentPath}
+                />
+              }
+            />
+            <Route
+              path="accounts/users/:id/limits"
+              element={
+                <AMUsersLimits
                   name={AccessManagement}
                   pathValue={AccessManagentPath}
                 />
